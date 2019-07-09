@@ -1,9 +1,8 @@
 [package]
 name = "rust_game"
 version = "0.1.0"
-authors = ["Ted <Dukekamono@hotmail.com>"]
+authors = ["Ted <Dukekamono@hotmail.com>", "William Olsen <wolsen@pdx.edu>"]
 edition = "2018"
 
-[dependencies.amethyst]
-version = "0.11"
-features = ["vulkan"]
+[dependencies]
+ggez = "0.5.0-rc.0"
