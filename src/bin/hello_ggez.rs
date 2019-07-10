@@ -1,3 +1,6 @@
+// based on guide found at
+// https://github.com/ggez/ggez/blob/master/docs/guides/HelloGgez.md
+
 use ggez::*;
 
 struct State {
