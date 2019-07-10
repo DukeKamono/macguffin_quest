@@ -1,7 +1,7 @@
 [package]
 name = "rust_game"
 version = "0.1.0"
-authors = ["Ted <Dukekamono@hotmail.com>", "William Olsen <wolsen@pdx.edu>"]
+authors = ["James T. Moore <jtm4@pdx.edu>", "William Olsen <wolsen@pdx.edu>"]
 edition = "2018"
 
 [dependencies]
