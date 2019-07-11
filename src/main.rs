@@ -4,46 +4,57 @@
 
 
 use ggez::event::{EventHandler, KeyCode, KeyMods};
-use ggez::{graphics, nalgebra as na, timer};
+//use ggez::{nalgebra as na};
 use ggez::input::keyboard;
 use ggez::*;
 
 mod player;
 use crate::player::Player;
 
+mod blob;
+use crate::blob::Blob;
+
 struct MainState {
-	player: Player
+	player: Player,
+	blob: Blob,
 }
 
 impl EventHandler for MainState {
 	fn update(&mut self, ctx: &mut Context) -> GameResult {
 		// Increase or decrease `position_x` by 0.5, or by 5.0 if Shift is held.
-		if keyboard::is_key_pressed(ctx, KeyCode::Right) {
+		if keyboard::is_key_pressed(ctx, KeyCode::D) {
 			if keyboard::is_mod_active(ctx, KeyMods::SHIFT) {
 				self.player.x += 4.5;
 			}
 			self.player.x += 0.5;
-		} else if keyboard::is_key_pressed(ctx, KeyCode::Left) {
+		} else if keyboard::is_key_pressed(ctx, KeyCode::A) {
 			if keyboard::is_mod_active(ctx, KeyMods::SHIFT) {
 				self.player.x -= 4.5;
 			}
 			self.player.x -= 0.5;
 		}
+		if keyboard::is_key_pressed(ctx, KeyCode::W) {
+			if keyboard::is_mod_active(ctx, KeyMods::SHIFT) {
+				self.player.y -= 4.5;
+			}
+			self.player.y -= 0.5;
+		} else if keyboard::is_key_pressed(ctx, KeyCode::S) {
+			if keyboard::is_mod_active(ctx, KeyMods::SHIFT) {
+				self.player.y += 4.5;
+			}
+			self.player.y += 0.5;
+		}
 		Ok(())
 	}
 
 	fn draw(&mut self, ctx: &mut Context) -> GameResult {
-		graphics::clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
-		// Create a circle at `position_x` and draw
-		let circle = graphics::Mesh::new_circle(
-			ctx,
-			graphics::DrawMode::fill(),
-			na::Point2::new(self.player.x, 380.0),
-			100.0,
-			2.0,
-			graphics::WHITE,
-		)?;
-		graphics::draw(ctx, &circle, graphics::DrawParam::default())?;
+		// This sets the background to BLACK.
+		graphics::clear(ctx, graphics::BLACK);
+
+		self.player.draw(ctx);
+		self.blob.draw(ctx);
+
+		// This presents the contents of ctx to the game.
 		graphics::present(ctx)?;
 		timer::yield_now();
 		Ok(())
@@ -71,12 +82,18 @@ fn main() {
 	// create a context to access hardware (also creates event loop)
 	let c = ggez::conf::Conf::new();
 	let (ref mut ctx, ref mut event_loop) = ggez::ContextBuilder::new("rust_game", "James M. & William O.")
+		.add_resource_path(
+			std::path::PathBuf::from("./src/resources/texture")
+		)
 		.conf(c)
 		.build()
 		.unwrap();
 	
 	// create an instance of game state
-	let state = &mut MainState { player: Player::new(ctx) };
+	let state = &mut MainState {
+		player: Player::new(ctx),
+		blob: Blob::new(ctx)
+	};
 
 	// start game loop
 	match ggez::event::run(ctx, event_loop, state) {
