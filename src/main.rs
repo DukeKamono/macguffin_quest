@@ -7,6 +7,7 @@ use ggez::event::{EventHandler, KeyCode, KeyMods};
 //use ggez::{nalgebra as na};
 use ggez::input::keyboard;
 use ggez::*;
+use rand::prelude::*;
 
 mod player;
 use crate::player::Player;
@@ -44,6 +45,13 @@ impl EventHandler for MainState {
 			}
 			self.player.y += 0.5;
 		}
+
+		if (self.player.x >= self.blob.x && self.player.x <= self.blob.x + 32.0) && (self.player.y >= self.blob.y && self.player.y <= self.blob.y + 32.0) {
+			let mut rng = thread_rng();
+			self.blob.x = rng.gen_range(0, 800) as f32;
+			self.blob.y = rng.gen_range(0, 600) as f32;
+		}
+
 		Ok(())
 	}
 
