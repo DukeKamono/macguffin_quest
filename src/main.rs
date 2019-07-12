@@ -70,19 +70,16 @@ impl EventHandler for MainState {
     }
 
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, mods: KeyMods, _: bool) {
-        match key {
-            // Quit if Shift+Ctrl+Q is pressed.
-            KeyCode::Q => {
-                if mods.contains(KeyMods::SHIFT & KeyMods::CTRL) {
-                    println!("Terminating!");
-                    ggez::quit(ctx);
-                } else if mods.contains(KeyMods::SHIFT) || mods.contains(KeyMods::CTRL) {
-                    println!("You need to hold both Shift and Control to quit.");
-                } else {
-                    println!("Now you're not even trying!");
-                }
+        // Quit if Shift+Ctrl+Q is pressed.
+        if let KeyCode::Q = key {
+            if mods.contains(KeyMods::SHIFT & KeyMods::CTRL) {
+                println!("Terminating!");
+                ggez::quit(ctx);
+            } else if mods.contains(KeyMods::SHIFT) || mods.contains(KeyMods::CTRL) {
+                println!("You need to hold both Shift and Control to quit.");
+            } else {
+                println!("Now you're not even trying!");
             }
-            _ => (),
         }
     }
 }
