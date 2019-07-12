@@ -4,7 +4,6 @@ Copyright (c) 2019 James T Moore and William Olsen
 Search lands far and wide, dungeons dark and deep, ruins desolate and decrepit for the most scared of grails… the MacGuffin!
 
 ## Description
-
 The Ruler of the lands has issued a proclamation of new quest to all interested adventures. The proclamation reads:
 
 > To all of the brave of heart, stout of character, or keen of mind adventurers in the land. I Ruler WhatsTheirName is in need of a most sacred relic; the MacGuffin. I know not where the MacGuffin rests; which is where you come in. To the adventurer that brings me the MacGuffin I promise everlasting fame and a wondrous reward. Go forth and bring to me the MacGuffin.
@@ -16,13 +15,11 @@ Upon hearing this proclamation many adventures set out in search of the MacGuffi
 MacGuffin Quest is an adventure game where you are tasked with finding the famed MacGuffin. To do this you will need to explore dangerous dungeons filled with monsters, traps, and puzzles. If you survive the MacGuffin may be yours for the taking.
 
 ## Operation
-
 The game is not near a completed state so all the controls/operations/features are not finished/listed.
 
 (ie this will be updated... eventually)
 
 ### Setup
-
 1. Install [Rust](https://www.rust-lang.org/)  
 2. Run `git clone https://github.com/DukeKamono/macguffin_quest.git`
 3. Run `cd macguffin_quest`
@@ -39,6 +36,13 @@ Use WASD keys to move character sprite around the screen.
 Collide with enemy sprite to cause it move to a new location.
 
 Hit the q-key to quit.
+
+### Running examples
+Probably not of great interest due to fact that the examples are primarily demo programs to learn features of ggez.
+
+Run with command `cargo run --example [example_name]`
+
+See [example readme](https://github.com/DukeKamono/macguffin_quest/blob/master/examples/README.md) for more information.
 
 ## License 
 This program is licensed under the MIT License located in the [LICENSE](https://github.com/DukeKamono/macguffin_quest/blob/master/LICENSE) file.
