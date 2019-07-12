@@ -13,7 +13,7 @@ Upon hearing this proclamation many adventures set out in search of the MacGuffi
 
 ---
 
-MacGuffin Quest is an adventure game where you are tasked with finding the famed MacGuffin. To do this you will need to explore dangerous dungeons filled with monsters, traps, and puzzles. 
+MacGuffin Quest is an adventure game where you are tasked with finding the famed MacGuffin. To do this you will need to explore dangerous dungeons filled with monsters, traps, and puzzles. If you survive the MacGuffin may be yours for the taking.
 
 ## Operation
 
@@ -53,6 +53,10 @@ Using version 1.36.0
 * [ggez - Good Games Easily](https://github.com/ggez/ggez)  
 The Rust game api being used.  
 Using version 0.5.0-rc.0
+
+* [rand](https://github.com/rust-random/rand)  
+Used to generate random numbers.  
+Using version 0.7
 
 * [ggez - goodies](https://github.com/ggez/ggez-goodies)  
 Debating using this for the state system.
