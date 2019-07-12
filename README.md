@@ -11,3 +11,6 @@ Thinking about using ggez goodies for state machine.
 Website for ggez-goodies
 
 https://docs.rs/crate/ggez-goodies/0.1.0
+
+Location of LICENSE file
+https://github.com/DukeKamono/macguffin_quest/blob/master/LICENSE
