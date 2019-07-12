@@ -12,7 +12,7 @@ impl ggez::event::EventHandler for State {
         self.dt = timer::delta(ctx);
         Ok(())
     }
-    fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, _ctx: &mut Context) -> GameResult<()> {
         println!("Hello ggex! dt = {}nx", self.dt.subsec_nanos());
         Ok(())
     }
@@ -20,7 +20,9 @@ impl ggez::event::EventHandler for State {
 
 fn main() {
     // create an instance of game state
-    let state = &mut State { dt: std::time::Duration::new(0, 0) };
+    let state = &mut State {
+        dt: std::time::Duration::new(0, 0),
+    };
 
     // create a context to access hardware (also creates event loop)
     let c = conf::Conf::new();
@@ -28,7 +30,7 @@ fn main() {
         .conf(c)
         .build()
         .unwrap();
-    
+
     // start game loop
     event::run(ctx, event_loop, state).unwrap();
 
