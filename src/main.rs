@@ -89,7 +89,7 @@ impl EventHandler for MainState {
 fn main() {
 	// create a context to access hardware (also creates event loop)
 	let c = ggez::conf::Conf::new();
-	let (ref mut ctx, ref mut event_loop) = ggez::ContextBuilder::new("rust_game", "James M. & William O.")
+	let (ref mut ctx, ref mut event_loop) = ggez::ContextBuilder::new("macguffin_quest", "James M. & William O.")
 		.add_resource_path(
 			std::path::PathBuf::from("./src/resources/texture")
 		)

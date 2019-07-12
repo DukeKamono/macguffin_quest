@@ -1,5 +1,5 @@
 [package]
-name = "rust_game"
+name = "macguffin_quest"
 version = "0.1.0"
 authors = ["James T. Moore <jtm4@pdx.edu>", "William Olsen <wolsen@pdx.edu>"]
 edition = "2018"

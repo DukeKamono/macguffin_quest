@@ -1,4 +1,4 @@
-rust_game
+macguffin_quest
 
 Website info for ggez library.
 
