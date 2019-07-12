@@ -93,6 +93,9 @@ fn main() {
 		.add_resource_path(
 			std::path::PathBuf::from("./src/resources/texture")
 		)
+		.add_resource_path(
+            std::path::PathBuf::from("./src/resources/font")
+        )
 		.conf(c)
 		.build()
 		.unwrap();
