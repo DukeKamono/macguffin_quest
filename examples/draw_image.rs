@@ -31,7 +31,7 @@ impl event::EventHandler for State {
 fn main() {
     // create context
     let (ctx, event_loop) = &mut ContextBuilder::new("display image", "people")
-        .add_resource_path(std::path::PathBuf::from("./src/resources/texture"))
+        .add_resource_path(std::path::PathBuf::from("./resources/texture"))
         .build()
         .unwrap();
     // create game state

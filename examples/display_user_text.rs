@@ -80,8 +80,8 @@ fn main() {
                 .dimensions(800.0, 600.0)
                 .resizable(false),
         )
-        .add_resource_path(std::path::PathBuf::from("./src/resources/font"))
-        .add_resource_path(std::path::PathBuf::from("./src/resources/texture"))
+        .add_resource_path(std::path::PathBuf::from("./resources/font"))
+        .add_resource_path(std::path::PathBuf::from("./resources/texture"))
         .build()
         .unwrap();
     // create state and game loop

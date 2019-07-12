@@ -92,8 +92,8 @@ fn main() {
     let c = ggez::conf::Conf::new();
     let (ref mut ctx, ref mut event_loop) =
         ggez::ContextBuilder::new("macguffin_quest", "James M. & William O.")
-            .add_resource_path(std::path::PathBuf::from("./src/resources/texture"))
-            .add_resource_path(std::path::PathBuf::from("./src/resources/font"))
+            .add_resource_path(std::path::PathBuf::from("./resources/texture"))
+            .add_resource_path(std::path::PathBuf::from("./resources/font"))
             .conf(c)
             .build()
             .unwrap();
