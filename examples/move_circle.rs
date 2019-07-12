@@ -3,8 +3,8 @@
 // https://docs.rs/ggez/0.5.0-rc.2/ggez/input/keyboard/index.html
 
 use ggez::event::{EventHandler, KeyCode, KeyMods};
-use ggez::{graphics, nalgebra as na, timer};
 use ggez::input::keyboard;
+use ggez::{graphics, nalgebra as na, timer};
 use ggez::{Context, GameResult};
 
 struct MainState {
@@ -46,19 +46,16 @@ impl EventHandler for MainState {
     }
 
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, mods: KeyMods, _: bool) {
-        match key {
-            // Quit if Shift+Ctrl+Q is pressed.
-            KeyCode::Q => {
-                if mods.contains(KeyMods::SHIFT & KeyMods::CTRL) {
-                    println!("Terminating!");
-                    ggez::quit(ctx);
-                } else if mods.contains(KeyMods::SHIFT) || mods.contains(KeyMods::CTRL) {
-                    println!("You need to hold both Shift and Control to quit.");
-                } else {
-                    println!("Now you're not even trying!");
-                }
+        // Quit if Shift+Ctrl+Q is pressed.
+        if let KeyCode::Q = key {
+            if mods.contains(KeyMods::SHIFT & KeyMods::CTRL) {
+                println!("Terminating!");
+                ggez::quit(ctx);
+            } else if mods.contains(KeyMods::SHIFT) || mods.contains(KeyMods::CTRL) {
+                println!("You need to hold both Shift and Control to quit.");
+            } else {
+                println!("Now you're not even trying!");
             }
-            _ => (),
         }
     }
 }
@@ -69,11 +66,12 @@ fn main() {
 
     // create a context to access hardware (also creates event loop)
     let c = ggez::conf::Conf::new();
-    let (ref mut ctx, ref mut event_loop) = ggez::ContextBuilder::new("hello_ggez", "awesome_person")
-        .conf(c)
-        .build()
-        .unwrap();
-    
+    let (ref mut ctx, ref mut event_loop) =
+        ggez::ContextBuilder::new("hello_ggez", "awesome_person")
+            .conf(c)
+            .build()
+            .unwrap();
+
     // start game loop
     match ggez::event::run(ctx, event_loop, state) {
         Ok(_) => println!("Goodbye"),
