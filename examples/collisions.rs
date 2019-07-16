@@ -26,20 +26,20 @@ struct Circle {
     radius: f32,
 }
 impl Circle {
-    fn new(x: f32, y:f32, r:f32) -> Circle {
-        Circle{
+    fn new(x: f32, y: f32, r: f32) -> Circle {
+        Circle {
             location: nalgebra::Point2::<f32>::new(x, y),
             radius: r,
         }
     }
 }
-impl Entity for Circle {    
+impl Entity for Circle {
     fn bounding_box(&self) -> graphics::Rect {
         graphics::Rect::new(
             self.location[0] - self.radius,
             self.location[1] - self.radius,
             self.radius * 2.0,
-            self.radius * 2.0
+            self.radius * 2.0,
         )
     }
 
@@ -60,15 +60,15 @@ impl event::EventHandler for Circle {
             self.location,
             self.radius,
             5.0,
-            graphics::WHITE
+            graphics::WHITE,
         )?;
         graphics::draw(ctx, &circle, graphics::DrawParam::default())?;
 
         let rectangle = graphics::Mesh::new_rectangle(
-            ctx, 
+            ctx,
             graphics::DrawMode::stroke(1.0),
             self.bounding_box(),
-            graphics::WHITE
+            graphics::WHITE,
         )?;
         graphics::draw(ctx, &rectangle, graphics::DrawParam::default())?;
 
@@ -76,21 +76,19 @@ impl event::EventHandler for Circle {
     }
 }
 
-
-
 struct Square {
     location: nalgebra::Point2<f32>,
     size: f32,
 }
 impl Square {
-    fn new(x: f32, y:f32, s:f32) -> Square {
-        Square{
+    fn new(x: f32, y: f32, s: f32) -> Square {
+        Square {
             location: nalgebra::Point2::<f32>::new(x, y),
             size: s,
         }
     }
 }
-impl Entity for Square {    
+impl Entity for Square {
     fn bounding_box(&self) -> graphics::Rect {
         graphics::Rect::new(
             self.location[0] - self.size,
@@ -112,10 +110,10 @@ impl event::EventHandler for Square {
     }
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         let rectangle = graphics::Mesh::new_rectangle(
-            ctx, 
+            ctx,
             graphics::DrawMode::fill(),
             self.bounding_box(),
-            graphics::WHITE
+            graphics::WHITE,
         )?;
         graphics::draw(ctx, &rectangle, graphics::DrawParam::default())?;
 
@@ -138,7 +136,10 @@ impl State {
 
         let p = Box::new(Square::new(400.0, 60.0, 50.0));
 
-        State{ player: p, entities: v }
+        State {
+            player: p,
+            entities: v,
+        }
     }
 }
 impl event::EventHandler for State {
