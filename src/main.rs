@@ -70,17 +70,25 @@ impl EventHandler for MainState {
     }
 
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, mods: KeyMods, _: bool) {
+		if key == KeyCode::P {
+			println!("Pause?");
+		}
+	
+		// mods.contains i think is broke? It says it's empty (mods.is_empty()),
+		// but that it also contains shift and ctrl?
+		// We don't need this as we will prob make a pause menu to quit.
+		//
         // Quit if Shift+Ctrl+Q is pressed.
-        if let KeyCode::Q = key {
-            if mods.contains(KeyMods::SHIFT & KeyMods::CTRL) {
-                println!("Terminating!");
-                ggez::quit(ctx);
-            } else if mods.contains(KeyMods::SHIFT) || mods.contains(KeyMods::CTRL) {
-                println!("You need to hold both Shift and Control to quit.");
-            } else {
-                println!("Now you're not even trying!");
-            }
-        }
+        //if let KeyCode::Q = key {
+        //    if mods.contains(KeyMods::SHIFT & KeyMods::CTRL) {
+        //        println!("Terminating!");
+        //        ggez::quit(ctx);
+        //    } else if mods.contains(KeyMods::SHIFT) || mods.contains(KeyMods::CTRL) {
+        //        println!("You need to hold both Shift and Control to quit.");
+        //    } else {
+        //        println!("Now you're not even trying!");
+        //    }
+        //}
     }
 }
 
