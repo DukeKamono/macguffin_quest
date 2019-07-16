@@ -17,6 +17,8 @@ trait Entity: event::EventHandler {
         let them = &e.bounding_box();
         us.overlaps(them)
     }
+
+    fn move_location(&mut self, x: f32, y: f32) -> nalgebra::Point2<f32>;
 }
 
 struct Circle {
@@ -39,6 +41,12 @@ impl Entity for Circle {
             self.radius * 2.0,
             self.radius * 2.0
         )
+    }
+
+    fn move_location(&mut self, x: f32, y: f32) -> nalgebra::Point2<f32> {
+        self.location[0] += x;
+        self.location[1] += y;
+        self.location
     }
 }
 impl event::EventHandler for Circle {
@@ -91,6 +99,12 @@ impl Entity for Square {
             self.size,
         )
     }
+
+    fn move_location(&mut self, x: f32, y: f32) -> nalgebra::Point2<f32> {
+        self.location[0] += x;
+        self.location[1] += y;
+        self.location
+    }
 }
 impl event::EventHandler for Square {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
@@ -129,7 +143,30 @@ impl State {
 }
 impl event::EventHandler for State {
     // game loop to update logic... should do something...
-    fn update(&mut self, _ctx: &mut Context) -> GameResult {
+    fn update(&mut self, ctx: &mut Context) -> GameResult {
+        // move player square
+        if input::keyboard::is_key_pressed(ctx, event::KeyCode::Right) {
+            if input::keyboard::is_mod_active(ctx, event::KeyMods::SHIFT) {
+                self.player.move_location(4.5, 0.0);
+            }
+            self.player.move_location(0.5, 0.0);
+        } else if input::keyboard::is_key_pressed(ctx, event::KeyCode::Left) {
+            if input::keyboard::is_mod_active(ctx, event::KeyMods::SHIFT) {
+                self.player.move_location(-4.5, 0.0);
+            }
+            self.player.move_location(-0.5, 0.0);
+        } else if input::keyboard::is_key_pressed(ctx, event::KeyCode::Up) {
+            if input::keyboard::is_mod_active(ctx, event::KeyMods::SHIFT) {
+                self.player.move_location(0.0, -4.5);
+            }
+            self.player.move_location(0.0, -0.5);
+        } else if input::keyboard::is_key_pressed(ctx, event::KeyCode::Down) {
+            if input::keyboard::is_mod_active(ctx, event::KeyMods::SHIFT) {
+                self.player.move_location(0.0, 4.5);
+            }
+            self.player.move_location(0.0, 0.5);
+        }
+
         for i in &mut self.entities {
             // get a reference to contents of box<Entity>
             if i.collision(&*self.player) {
@@ -144,11 +181,11 @@ impl event::EventHandler for State {
         // clear screen
         graphics::clear(ctx, graphics::BLACK);
 
-        self.player.draw(ctx)?;
-
         for i in &mut self.entities {
             i.draw(ctx)?;
         }
+
+        self.player.draw(ctx)?;
 
         // display to screen
         graphics::present(ctx)?;
