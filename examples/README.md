@@ -7,6 +7,9 @@ These are a bunch of demo programs created to learn features of ggez or test con
 Use command `cargo run --example [example_name]` where `[example_name]` is one of the examples.
 
 ## List of Examples
+* `collisions`
+Example based on collision detection.
+Work in progress to develop the idea.
 * `display_user_text`  
 Loads a font type file to display text in custom font.  
 Accepts user text input, displaying to the screen.  
