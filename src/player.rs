@@ -5,6 +5,7 @@ use ggez::*;
 pub struct Player {
     pub x: f32,
     pub y: f32,
+	pub hp: f32,
     pub sprite: graphics::Image,
     //hitbox: graphics::Image,
 }
@@ -14,6 +15,7 @@ impl Player {
         Player {
             x: 10.0,
             y: 10.0,
+			hp: 30.0,
             sprite: graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap(),
             //hitbox: graphics::Image::new(ctx, "/assets/pong_spritesheet.png").unwrap(),
         }
