@@ -1,194 +1,137 @@
 use ggez::*;
 
-trait Entity: event::EventHandler {
-    // note: where self: Sized is needed for compiler to be able to make trait
-    // object when trait function does not have a self parameter
+trait MyDrawTrait {
     // https://doc.rust-lang.org/error-index.html#method-has-no-receiver
-    //fn new() -> Self where Self: Sized;
-
-    fn bounding_box(&self) -> graphics::Rect;
-
-    fn display_bounding_box(&self) -> bool {
-        false
-    }
-
-    fn collision(&self, e: &Entity) -> bool {
-        let us = &self.bounding_box();
-        let them = &e.bounding_box();
-        us.overlaps(them)
-    }
-
-    fn move_location(&mut self, x: f32, y: f32) -> nalgebra::Point2<f32>;
+    fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> Self
+        where Self: Sized;
+    fn draw(&self, ctx: &mut Context) -> GameResult;
+    fn move_location(&mut self, xinc: f32, yinc: f32);
+}
+trait MyCollideTrait: MyDrawTrait {
+    fn hit_box(&self) -> graphics::Rect;
+    // not sure if this is right
+    fn collision<T>(&self, other: &T) -> bool
+        where T: MyCollideTrait;
 }
 
-struct Circle {
-    location: nalgebra::Point2<f32>,
-    radius: f32,
+struct Object {
+    shape: graphics::Mesh,
+    hit_box: graphics::Rect,
+    x: f32,
+    y: f32,
 }
-impl Circle {
-    fn new(x: f32, y: f32, r: f32) -> Circle {
-        Circle {
-            location: nalgebra::Point2::<f32>::new(x, y),
-            radius: r,
+impl MyDrawTrait for Object {
+    fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> Object {
+        // radius of circle
+        let r = 50f32;
+        // create hit box
+        let hb = graphics::Rect::new(0.0, 0.0, r*2.0, r*2.0);
+        // create mesh
+        let circle = graphics::MeshBuilder::new()
+            .circle(
+                graphics::DrawMode::fill(),
+                nalgebra::Point2::new(r,r),
+                r,
+                1.0,
+                graphics::WHITE
+            )
+            .rectangle(
+                graphics::DrawMode::stroke(1.0),
+                hb.clone(),
+                graphics::WHITE
+            )
+            .build(ctx).unwrap();
+        // return new object
+        Object {
+            shape: circle,
+            hit_box: hb,
+            x: xpos,
+            y: ypos,
         }
     }
-}
-impl Entity for Circle {
-    fn bounding_box(&self) -> graphics::Rect {
-        graphics::Rect::new(
-            self.location[0] - self.radius,
-            self.location[1] - self.radius,
-            self.radius * 2.0,
-            self.radius * 2.0,
-        )
+    fn draw(&self, ctx: &mut Context) -> GameResult {
+        let dp = graphics::DrawParam::default()
+            .dest(
+                nalgebra::Point2::new(self.x, self.y)
+            );
+        graphics::draw(ctx, &self.shape, dp)
     }
-
-    fn move_location(&mut self, x: f32, y: f32) -> nalgebra::Point2<f32> {
-        self.location[0] += x;
-        self.location[1] += y;
-        self.location
+    fn move_location(&mut self, xinc: f32, yinc: f32) {
+        self.x += xinc;
+        self.y += yinc;
     }
 }
-impl event::EventHandler for Circle {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult {
-        Ok(())
+impl MyCollideTrait for Object {
+    fn hit_box(&self) -> graphics::Rect {
+        let mut r = self.hit_box.clone();
+        r.x = self.x;
+        r.y = self.y;
+        r
     }
-    fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        let circle = graphics::Mesh::new_circle(
-            ctx,
-            graphics::DrawMode::fill(),
-            self.location,
-            self.radius,
-            5.0,
-            graphics::WHITE,
-        )?;
-        graphics::draw(ctx, &circle, graphics::DrawParam::default())?;
-
-        let rectangle = graphics::Mesh::new_rectangle(
-            ctx,
-            graphics::DrawMode::stroke(1.0),
-            self.bounding_box(),
-            graphics::WHITE,
-        )?;
-        graphics::draw(ctx, &rectangle, graphics::DrawParam::default())?;
-
-        Ok(())
-    }
-}
-
-struct Square {
-    location: nalgebra::Point2<f32>,
-    size: f32,
-}
-impl Square {
-    fn new(x: f32, y: f32, s: f32) -> Square {
-        Square {
-            location: nalgebra::Point2::<f32>::new(x, y),
-            size: s,
-        }
-    }
-}
-impl Entity for Square {
-    fn bounding_box(&self) -> graphics::Rect {
-        graphics::Rect::new(
-            self.location[0] - self.size,
-            self.location[1] - self.size,
-            self.size,
-            self.size,
-        )
-    }
-
-    fn move_location(&mut self, x: f32, y: f32) -> nalgebra::Point2<f32> {
-        self.location[0] += x;
-        self.location[1] += y;
-        self.location
-    }
-}
-impl event::EventHandler for Square {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult {
-        Ok(())
-    }
-    fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        let rectangle = graphics::Mesh::new_rectangle(
-            ctx,
-            graphics::DrawMode::fill(),
-            self.bounding_box(),
-            graphics::WHITE,
-        )?;
-        graphics::draw(ctx, &rectangle, graphics::DrawParam::default())?;
-
-        Ok(())
+    fn collision<T>(&self, other: &T) -> bool
+        where T: MyCollideTrait {
+        self.hit_box().overlaps(&other.hit_box())
     }
 }
 
 struct State {
-    player: Box<Entity>,
-    entities: Vec<Box<Entity>>,
+    player: Object,
+    // should really be Vec<Box<MyCollideTrait>>
+    // but that makes this example harder
+    walls: Vec<Object>,
 }
 impl State {
-    fn new() -> State {
-        let mut v = Vec::<Box<Entity>>::new();
-        v.push(Box::new(Circle::new(20.0, 20.0, 20.0)));
-        v.push(Box::new(Circle::new(400.0, 300.0, 50.0)));
-        v.push(Box::new(Circle::new(100.0, 500.0, 100.0)));
-        v.push(Box::new(Square::new(500.0, 50.0, 20.0)));
-        v.push(Box::new(Square::new(700.0, 500.0, 100.0)));
-
-        let p = Box::new(Square::new(400.0, 60.0, 50.0));
+    fn new(ctx: &mut Context) -> State {
+        let p = Object::new(ctx, 0.0, 0.0);
+        
+        let mut v = Vec::new();
+        v.push(Object::new(ctx, 350.0, 150.0));
+        v.push(Object::new(ctx, 350.0, 250.0));
+        v.push(Object::new(ctx, 350.0, 350.0));
 
         State {
             player: p,
-            entities: v,
+            walls: v,
         }
     }
 }
 impl event::EventHandler for State {
-    // game loop to update logic... should do something...
     fn update(&mut self, ctx: &mut Context) -> GameResult {
-        // move player square
+        let mut xmov = 0f32;
+        let mut ymov = 0f32;
+
         if input::keyboard::is_key_pressed(ctx, event::KeyCode::Right) {
-            if input::keyboard::is_mod_active(ctx, event::KeyMods::SHIFT) {
-                self.player.move_location(4.5, 0.0);
-            }
-            self.player.move_location(0.5, 0.0);
-        } else if input::keyboard::is_key_pressed(ctx, event::KeyCode::Left) {
-            if input::keyboard::is_mod_active(ctx, event::KeyMods::SHIFT) {
-                self.player.move_location(-4.5, 0.0);
-            }
-            self.player.move_location(-0.5, 0.0);
-        } else if input::keyboard::is_key_pressed(ctx, event::KeyCode::Up) {
-            if input::keyboard::is_mod_active(ctx, event::KeyMods::SHIFT) {
-                self.player.move_location(0.0, -4.5);
-            }
-            self.player.move_location(0.0, -0.5);
-        } else if input::keyboard::is_key_pressed(ctx, event::KeyCode::Down) {
-            if input::keyboard::is_mod_active(ctx, event::KeyMods::SHIFT) {
-                self.player.move_location(0.0, 4.5);
-            }
-            self.player.move_location(0.0, 0.5);
+            xmov += 5.0;
+        }
+        if input::keyboard::is_key_pressed(ctx, event::KeyCode::Left) {
+            xmov += -5.0;
+        }
+        if input::keyboard::is_key_pressed(ctx, event::KeyCode::Up) {
+            ymov += -5.0;
+        }
+        if input::keyboard::is_key_pressed(ctx, event::KeyCode::Down) {
+            ymov += 5.0;
         }
 
-        for i in &mut self.entities {
-            // get a reference to contents of box<Entity>
-            if i.collision(&*self.player) {
-                println!("Collision detected");
+        self.player.move_location(xmov, ymov);
+        for wall in &self.walls {
+            if self.player.collision(wall) {
+                self.player.move_location(-xmov, -ymov);
             }
         }
+
+        //println!("{:?}", self.player.hit_box());
+
         Ok(())
     }
-
-    // draw things to screen
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        // clear screen
         graphics::clear(ctx, graphics::BLACK);
 
-        for i in &mut self.entities {
-            i.draw(ctx)?;
+        for wall in &self.walls {
+            wall.draw(ctx)?;
         }
-
         self.player.draw(ctx)?;
-
-        // display to screen
+        
         graphics::present(ctx)?;
         timer::yield_now();
         Ok(())
@@ -202,7 +145,7 @@ fn main() {
         .build()
         .unwrap();
     // create state and game loop
-    let state = &mut State::new();
+    let state = &mut State::new(ctx);
     // run loop
     match event::run(ctx, event_loop, state) {
         Ok(_) => println!("Clean loop exit"),

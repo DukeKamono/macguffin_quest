@@ -9,8 +9,7 @@ Use command `cargo run --example [example_name]` where `[example_name]` is one o
 ## List of Examples
 * `collisions`  
 Example of collision detection using trait.  
-Move square with arrow keys.  
-On collision a message will be printed to console.
+Move square with arrow keys.
 * `display_user_text`  
 Loads a font type file to display text in custom font.  
 Accepts user text input, displaying to the screen.  
