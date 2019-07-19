@@ -2,13 +2,12 @@ use ggez::*;
 use graphics::*;
 use std::time::Duration;
 
-
 // helper function to test if smaller rectangle is inside a bigger rectangle
 fn contains(bigger: &Rect, smaller: &Rect) -> bool {
-    bigger.x <= smaller.x 
-    && bigger.y <= smaller.y
-    && bigger.w >= smaller.x + smaller.w
-    && bigger.h >= smaller.y + smaller.h
+    bigger.x <= smaller.x
+        && bigger.y <= smaller.y
+        && bigger.w >= smaller.x + smaller.w
+        && bigger.h >= smaller.y + smaller.h
 }
 
 struct Sprite {
@@ -23,11 +22,18 @@ impl Sprite {
         let sheet = source.clone();
 
         if !contains(&sheet.dimensions(), &clip) {
-            return Err(error::GameError::ResourceLoadError(format!("Clip {:?} not contained in source", clip)));
+            return Err(error::GameError::ResourceLoadError(format!(
+                "Clip {:?} not contained in source",
+                clip
+            )));
         }
-        let dp = DrawParam::default().src(
-            Rect::fraction(clip.x, clip.y, clip.w, clip.h, &sheet.dimensions())
-        );
+        let dp = DrawParam::default().src(Rect::fraction(
+            clip.x,
+            clip.y,
+            clip.w,
+            clip.h,
+            &sheet.dimensions(),
+        ));
 
         Ok(Sprite {
             source_sheet: sheet,
@@ -35,10 +41,8 @@ impl Sprite {
         })
     }
     fn draw(&self, ctx: &mut Context, xpos: f32, ypos: f32) -> GameResult {
-        self.source_sheet.draw(
-            ctx,
-            self.draw_param.dest([xpos, ypos]),
-        )?;
+        self.source_sheet
+            .draw(ctx, self.draw_param.dest([xpos, ypos]))?;
         Ok(())
     }
 }
@@ -47,7 +51,7 @@ struct AnimateSprite {
     source_sheet: Image,
     draw_param: Vec<DrawParam>,
     current_frame: usize,
-    frame_duration: Duration, // duration of a single frame
+    frame_duration: Duration,       // duration of a single frame
     accumulated_duration: Duration, // how long current frame has been displayed
 }
 impl AnimateSprite {
@@ -60,12 +64,17 @@ impl AnimateSprite {
         let mut params = Vec::new();
         for c in clip {
             if !contains(&sheet.dimensions(), &c) {
-                return Err(error::GameError::ResourceLoadError(format!("Clip {:?} not contained in source", c)));
+                return Err(error::GameError::ResourceLoadError(format!(
+                    "Clip {:?} not contained in source",
+                    c
+                )));
             }
-            params.push(DrawParam::default().src(
-                Rect::fraction(c.x, c.y, c.w, c.h, &sheet.dimensions())
-            ).scale([4.0, 4.0]));
-        } 
+            params.push(
+                DrawParam::default()
+                    .src(Rect::fraction(c.x, c.y, c.w, c.h, &sheet.dimensions()))
+                    .scale([4.0, 4.0]),
+            );
+        }
 
         Ok(AnimateSprite {
             source_sheet: sheet,
@@ -87,10 +96,8 @@ impl AnimateSprite {
         Ok(())
     }
     fn draw(&self, ctx: &mut Context, xpos: f32, ypos: f32) -> GameResult {
-        self.source_sheet.draw(
-            ctx,
-            self.draw_param[self.current_frame].dest([xpos, ypos]),
-        )?;
+        self.source_sheet
+            .draw(ctx, self.draw_param[self.current_frame].dest([xpos, ypos]))?;
         Ok(())
     }
 }
