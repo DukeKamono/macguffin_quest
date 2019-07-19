@@ -23,3 +23,5 @@ Based on [ggez guide Hello ggez](https://github.com/ggez/ggez/blob/master/docs/g
 * `move_circle`  
 Based on ggez [keyboard input documentation](https://docs.rs/ggez/0.5.0-rc.2/ggez/input/keyboard/index.html) example.  
 Takes in arrow key input from keyboard.
+* `sprite_sheet`  
+Simple example to load a sprite sheet as Image and make use of it.
