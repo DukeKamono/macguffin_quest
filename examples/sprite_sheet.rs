@@ -1,16 +1,9 @@
 use ggez::*;
 use graphics::*;
 
-// trait that is a wrapper for ggez::graphics::Drawable trait
-// see Drawable documentation for trait's required methods
-// https://docs.rs/ggez/0.5.0-rc.2/ggez/graphics/trait.Drawable.html
-trait MyDrawable: Drawable {
-    // do I need any other methods?
-}
-
 struct Sprite {
     source_sheet: Image,
-    clip_rect: Rect,
+    draw_param: DrawParam,
 }
 impl Sprite {
     // provide reference to sprite sheet as source
@@ -28,43 +21,26 @@ impl Sprite {
         if !contains(&sheet.dimensions(), &clip) {
             return Err(error::GameError::ResourceLoadError(format!("Clip {:?} not contained in source", clip)));
         }
-        let rectangle = Rect::new(
-            clip.x / sheet.width() as f32,
-            clip.y / sheet.height() as f32,
-            clip.w / sheet.width() as f32,
-            clip.h / sheet.height() as f32,
+        let dp = DrawParam::default().src(
+            Rect::new(
+                clip.x / sheet.width() as f32,
+                clip.y / sheet.height() as f32,
+                clip.w / sheet.width() as f32,
+                clip.h / sheet.height() as f32,
+            )
         );
 
         Ok(Sprite {
             source_sheet: sheet,
-            clip_rect: rectangle,
+            draw_param: dp,
         })
     }
-}
-impl MyDrawable for Sprite {
-    //none
-}
-impl Drawable for Sprite {
-    fn draw(&self, ctx: &mut Context, param: DrawParam) -> GameResult {
-        let dp = param.src(self.clip_rect);
-        self.source_sheet.draw(ctx, dp)?;
+    fn draw(&self, ctx: &mut Context, xpos: f32, ypos: f32) -> GameResult {
+        self.source_sheet.draw(
+            ctx,
+            self.draw_param.dest([xpos, ypos]),
+        )?;
         Ok(())
-    }
-    fn dimensions(&self, _ctx: &mut Context) -> Option<Rect> {
-        let clip = &self.clip_rect;
-        let sheet = &self.source_sheet;
-        Some(Rect::new(
-            clip.x * sheet.width() as f32,
-            clip.y * sheet.height() as f32,
-            clip.w * sheet.width() as f32,
-            clip.h * sheet.height() as f32,
-        ))
-    }
-    fn set_blend_mode(&mut self, mode: Option<BlendMode>) {
-        self.source_sheet.set_blend_mode(mode);
-    }
-    fn blend_mode(&self) -> Option<BlendMode> {
-        self.source_sheet.blend_mode()
     }
 }
 
@@ -74,16 +50,14 @@ struct State {
 }
 impl State {
     fn new(ctx: &mut Context) -> GameResult<State> {
-        println!("Create State");
-
         let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png")?;
+        //let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet-guides.png")?;
+
         let mut sprite = Vec::new();
         sprite.push(Sprite::new(&img, Rect::new(0f32, 128f32, 64f32, 64f32))?);
         sprite.push(Sprite::new(&img, Rect::new(128f32, 768f32, 64f32, 64f32))?);
         sprite.push(Sprite::new(&img, Rect::new(320f32, 256f32, 64f32, 64f32))?);
 
-        
-        println!("Create State - finished");
         Ok(State {
             //img,
             sprite,
@@ -100,8 +74,8 @@ impl event::EventHandler for State {
 
         let mut dest = 0f32;
         for s in &self.sprite {
-            draw(ctx, s, DrawParam::default().dest([dest, dest]))?;
-            dest += 100f32;
+            s.draw(ctx, dest, dest)?;
+            dest += 64f32;
         }
 
         present(ctx)?;
