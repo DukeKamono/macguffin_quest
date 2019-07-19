@@ -64,8 +64,8 @@ impl AnimateSprite {
             }
             params.push(DrawParam::default().src(
                 Rect::fraction(c.x, c.y, c.w, c.h, &sheet.dimensions())
-            ));
-        }
+            ).scale([4.0, 4.0]));
+        } 
 
         Ok(AnimateSprite {
             source_sheet: sheet,
