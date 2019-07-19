@@ -3,7 +3,8 @@ use ggez::*;
 trait MyDrawTrait {
     // https://doc.rust-lang.org/error-index.html#method-has-no-receiver
     fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> Self
-        where Self: Sized;
+    where
+        Self: Sized;
     fn draw(&self, ctx: &mut Context) -> GameResult;
     fn move_location(&mut self, xinc: f32, yinc: f32);
 }
@@ -11,7 +12,8 @@ trait MyCollideTrait: MyDrawTrait {
     fn hit_box(&self) -> graphics::Rect;
     // not sure if this is right
     fn collision<T>(&self, other: &T) -> bool
-        where T: MyCollideTrait;
+    where
+        T: MyCollideTrait;
 }
 
 struct Object {
@@ -25,22 +27,19 @@ impl MyDrawTrait for Object {
         // radius of circle
         let r = 50f32;
         // create hit box
-        let hb = graphics::Rect::new(0.0, 0.0, r*2.0, r*2.0);
+        let hb = graphics::Rect::new(0.0, 0.0, r * 2.0, r * 2.0);
         // create mesh
         let circle = graphics::MeshBuilder::new()
             .circle(
                 graphics::DrawMode::fill(),
-                nalgebra::Point2::new(r,r),
+                nalgebra::Point2::new(r, r),
                 r,
                 1.0,
-                graphics::WHITE
+                graphics::WHITE,
             )
-            .rectangle(
-                graphics::DrawMode::stroke(1.0),
-                hb.clone(),
-                graphics::WHITE
-            )
-            .build(ctx).unwrap();
+            .rectangle(graphics::DrawMode::stroke(1.0), hb.clone(), graphics::WHITE)
+            .build(ctx)
+            .unwrap();
         // return new object
         Object {
             shape: circle,
@@ -50,10 +49,7 @@ impl MyDrawTrait for Object {
         }
     }
     fn draw(&self, ctx: &mut Context) -> GameResult {
-        let dp = graphics::DrawParam::default()
-            .dest(
-                nalgebra::Point2::new(self.x, self.y)
-            );
+        let dp = graphics::DrawParam::default().dest(nalgebra::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.shape, dp)
     }
     fn move_location(&mut self, xinc: f32, yinc: f32) {
@@ -69,7 +65,9 @@ impl MyCollideTrait for Object {
         r
     }
     fn collision<T>(&self, other: &T) -> bool
-        where T: MyCollideTrait {
+    where
+        T: MyCollideTrait,
+    {
         self.hit_box().overlaps(&other.hit_box())
     }
 }
@@ -83,7 +81,7 @@ struct State {
 impl State {
     fn new(ctx: &mut Context) -> State {
         let p = Object::new(ctx, 0.0, 0.0);
-        
+
         let mut v = Vec::new();
         v.push(Object::new(ctx, 350.0, 150.0));
         v.push(Object::new(ctx, 350.0, 250.0));
@@ -131,7 +129,7 @@ impl event::EventHandler for State {
             wall.draw(ctx)?;
         }
         self.player.draw(ctx)?;
-        
+
         graphics::present(ctx)?;
         timer::yield_now();
         Ok(())
