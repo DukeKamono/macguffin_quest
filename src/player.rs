@@ -1,6 +1,14 @@
 use ggez::nalgebra as na;
-//use ggez::input::keyboard;
+use ggez::event::{KeyCode, KeyMods};
+use ggez::input::keyboard;
 use ggez::*;
+
+
+// constant values for keys used to determine movement
+const KEY_UP: KeyCode = KeyCode::W;
+const KEY_DOWN: KeyCode = KeyCode::S;
+const KEY_RIGHT: KeyCode = KeyCode::D;
+const KEY_LEFT: KeyCode = KeyCode::A;
 
 pub struct Player {
     pub x: f32,
@@ -18,6 +26,28 @@ impl Player {
 			hp: 30.0,
             sprite: graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap(),
             //hitbox: graphics::Image::new(ctx, "/assets/pong_spritesheet.png").unwrap(),
+        }
+    }
+
+    // Increase or decrease `position_x` by 0.5, or by 5.0 if Shift is held.
+    pub fn update(&mut self, ctx: &mut Context) {
+        // private function to return correct speed
+        fn move_increment(ctx: &mut Context) -> f32 {
+            if keyboard::is_mod_active(ctx, KeyMods::SHIFT) {
+                return 5.0;
+            }
+            0.5
+        }
+
+        if keyboard::is_key_pressed(ctx, KEY_RIGHT) {
+            self.x += move_increment(ctx);
+        } else if keyboard::is_key_pressed(ctx, KEY_LEFT) {
+            self.x -= move_increment(ctx);
+        }
+        if keyboard::is_key_pressed(ctx, KEY_UP) {
+            self.y -= move_increment(ctx);
+        } else if keyboard::is_key_pressed(ctx, KEY_DOWN) {
+            self.y += move_increment(ctx);
         }
     }
 
