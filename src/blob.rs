@@ -5,10 +5,10 @@ use rand::prelude::*;
 pub struct Blob {
     pub x: f32,
     pub y: f32,
-	pub hp: f32,
+    pub hp: f32,
     spawn_range: graphics::Rect,
     pub sprite: graphics::Image,
-    //hitbox: graphics::Image,
+    pub hitbox: graphics::Rect,
 }
 
 impl Blob {
@@ -16,10 +16,10 @@ impl Blob {
         Blob {
             x: 250.0,
             y: 250.0,
-			hp: 10.0,
+            hp: 10.0,
             spawn_range: spawn,
             sprite: graphics::Image::new(ctx, "/blob.png").unwrap(),
-            //hitbox: graphics::Image::new(ctx, "/assets/pong_spritesheet.png").unwrap(),
+            hitbox: graphics::Rect::new(0.0, 0.0, 50.0 * 2.0, 50.0 * 2.0),//graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap(),
         }
     }
 
@@ -45,3 +45,26 @@ impl Blob {
         graphics::draw(ctx, &self.sprite, draw_param).expect("Can't display blob!");
     }
 }
+
+//trait MyCollideTrait {
+//    fn hit_box(&self) -> graphics::Rect;
+//    // not sure if this is right
+//    fn collision<T>(&self, other: &T) -> bool
+//    where
+//        T: MyCollideTrait;
+//}
+//
+//impl MyCollideTrait for Blob {
+//    fn hit_box(&self) -> graphics::Rect {
+//        let mut r = self.hit_box().clone();
+//        r.x = self.x;
+//        r.y = self.y;
+//        r
+//    }
+//    fn collision<T>(&self, other: &T) -> bool
+//    where
+//        T: MyCollideTrait,
+//    {
+//        self.hit_box().overlaps(&other.hit_box())
+//    }
+//}

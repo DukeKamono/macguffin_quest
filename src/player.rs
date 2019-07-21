@@ -13,19 +13,23 @@ const KEY_LEFT: KeyCode = KeyCode::A;
 pub struct Player {
     pub x: f32,
     pub y: f32,
-	pub hp: f32,
+    pub hp: f32,
     pub sprite: graphics::Image,
-    //hitbox: graphics::Image,
+    pub hitbox: graphics::Rect,
 }
 
 impl Player {
     pub fn new(ctx: &mut Context) -> Player {
+        let sprt = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
+
+        let hp = sprt.dimensions();
+
         Player {
             x: 10.0,
             y: 10.0,
-			hp: 30.0,
-            sprite: graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap(),
-            //hitbox: graphics::Image::new(ctx, "/assets/pong_spritesheet.png").unwrap(),
+            hp: 30.0,
+            sprite: sprt,
+            hitbox: hp,
         }
     }
 
@@ -57,4 +61,43 @@ impl Player {
         // This draws the player.
         graphics::draw(ctx, &self.sprite, draw_param).expect("Can't display Player!");
     }
+
+    pub fn hit_box(&self) -> graphics::Rect {
+       let mut r = self.hitbox.clone();
+       r.x = self.x;
+       r.y = self.y;
+       r
+    }
+
+    pub fn collide(&self, other: &super::Wall) -> bool {
+        self.hit_box().overlaps(&other.hit_box())
+    }
+
+    pub fn move_location(&mut self, xinc: f32, yinc: f32) {
+        self.x += xinc;
+        self.y += yinc;
+    }
 }
+
+//trait MyCollideTrait {
+//    fn hit_box(&self) -> graphics::Rect;
+//    // not sure if this is right
+//    fn collision<T>(&self, other: &T) -> bool
+//    where
+//        T: MyCollideTrait;
+//}
+//
+//impl MyCollideTrait for Player {
+//    fn hit_box(&self) -> graphics::Rect {
+//        let mut r = self.hitbox.clone();
+//        r.x = self.x;
+//        r.y = self.y;
+//        r
+//    }
+//    fn collision<T>(&self, other: &T) -> bool
+//    where
+//        T: MyCollideTrait,
+//    {
+//        self.hitbox.overlaps(&other.hit_box())
+//    }
+//}

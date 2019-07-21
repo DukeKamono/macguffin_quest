@@ -1,7 +1,3 @@
-// from examples on
-// https://docs.rs/ggez/0.5.0-rc.2/ggez/
-// https://docs.rs/ggez/0.5.0-rc.2/ggez/input/keyboard/index.html
-
 use ggez::event::{EventHandler, KeyCode, KeyMods};
 use ggez::*;
 
@@ -11,9 +7,13 @@ use player::Player;
 mod blob;
 use blob::Blob;
 
+mod wall;
+use wall::Wall;
+
 struct MainState {
     player: Player,
     blob: Blob,
+    walls: Vec<Wall>,
 }
 
 impl EventHandler for MainState {
@@ -24,11 +24,21 @@ impl EventHandler for MainState {
             self.blob.relocate();
         }
 
+        for wall in &self.walls {
+            if self.player.collide(wall) {
+                self.player.move_location(-0.5, -0.5);
+            }
+        }
+
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
+
+        for wall in &self.walls {
+            wall.draw(ctx);
+        }
 
         self.player.draw(ctx);
         self.blob.draw(ctx);
@@ -40,7 +50,7 @@ impl EventHandler for MainState {
     }
 
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) {
-		match key {
+        match key {
             KeyCode::P => println!("Pause? Maybe latter."),
             KeyCode::Escape => quit(ctx),
             // other keys to detect
@@ -63,9 +73,16 @@ fn main() {
     // create an instance of game state
     let win_width = ctx.conf.window_mode.width;
     let win_height = ctx.conf.window_mode.height;
+
+    let mut v = Vec::new();
+    v.push(Wall::new(ctx, 350.0, 150.0));
+    v.push(Wall::new(ctx, 350.0, 250.0));
+    v.push(Wall::new(ctx, 350.0, 350.0));
+
     let state = &mut MainState {
         player: Player::new(ctx),
         blob: Blob::new(ctx, graphics::Rect::new(0f32, 0f32, win_width, win_height)),
+        walls: v,
     };
 
     // start game loop
