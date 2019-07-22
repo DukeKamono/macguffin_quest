@@ -3,6 +3,7 @@ use ggez::event::{KeyCode, KeyMods};
 use ggez::input::keyboard;
 use ggez::*;
 
+use crate::entities::environment::wall::Wall;
 
 // constant values for keys used to determine movement
 const KEY_UP: KeyCode = KeyCode::W;
@@ -77,7 +78,7 @@ impl Player {
        r
     }
 
-    pub fn collide(&self, other: &super::Wall) -> bool {
+    pub fn collide(&self, other: &Wall) -> bool {
         self.hit_box().overlaps(&other.hit_box())
     }
 

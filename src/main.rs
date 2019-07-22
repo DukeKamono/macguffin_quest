@@ -1,14 +1,15 @@
 use ggez::event::{EventHandler, KeyCode, KeyMods};
 use ggez::*;
 
-mod player;
-use player::Player;
+// contains all the information on entities
+mod entities;
 
-mod blob;
-use blob::Blob;
-
-mod wall;
-use wall::Wall;
+// get player struct to use
+use entities::player::player::Player;
+// get blob struct to use
+use entities::enemies::blob::Blob;
+// get wall struct to use
+use entities::environment::wall::Wall;
 
 struct MainState {
     player: Player,

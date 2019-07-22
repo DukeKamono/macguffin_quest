@@ -2,6 +2,8 @@ use ggez::nalgebra as na;
 use ggez::*;
 //use rand::prelude::*;
 
+use crate::entities::player::player::Player;
+
 pub struct Blob {
     pub x: f32,
     pub y: f32,
@@ -28,7 +30,7 @@ impl Blob {
     }
 
     // really should make use of Player.rect() method... but that does not exist
-    pub fn collide(&self, other: &super::Player) -> bool {
+    pub fn collide(&self, other: &Player) -> bool {
         let mut self_rectangle = self.sprite.dimensions();
         let mut other_rectangle = other.sprite.dimensions();
         self_rectangle.move_to([self.x, self.y]);
