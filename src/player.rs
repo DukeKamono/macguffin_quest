@@ -14,6 +14,8 @@ pub struct Player {
     pub x: f32,
     pub y: f32,
     pub hp: f32,
+    pub atk: f32,
+    pub def: f32,
     pub sprite: graphics::Image,
     pub hitbox: graphics::Rect,
 }
@@ -28,6 +30,8 @@ impl Player {
             x: 10.0,
             y: 10.0,
             hp: 30.0,
+            atk: 3.0,
+            def: 2.0,
             sprite: sprt,
             hitbox: hp,
         }
@@ -53,6 +57,10 @@ impl Player {
         } else if keyboard::is_key_pressed(ctx, KEY_DOWN) {
             self.y += move_increment(ctx);
         }
+
+        if keyboard::is_key_pressed(ctx, KeyCode::Space) {
+            println!("Attempting to attack. Atk: {}", self.atk);
+        }
     }
 
     pub fn draw(&self, ctx: &mut Context) {
@@ -74,30 +82,13 @@ impl Player {
     }
 
     pub fn move_location(&mut self, xinc: f32, yinc: f32) {
-        self.x += xinc;
-        self.y += yinc;
+        self.x = xinc;
+        self.y = yinc;
+    }
+
+    pub fn take_dmg(&mut self, dmg_to_take: f32) {
+        self.hp -= dmg_to_take;
+        // Check for death and maybe call a death function.
+        println!("hp is: {}", self.hp);
     }
 }
-
-//trait MyCollideTrait {
-//    fn hit_box(&self) -> graphics::Rect;
-//    // not sure if this is right
-//    fn collision<T>(&self, other: &T) -> bool
-//    where
-//        T: MyCollideTrait;
-//}
-//
-//impl MyCollideTrait for Player {
-//    fn hit_box(&self) -> graphics::Rect {
-//        let mut r = self.hitbox.clone();
-//        r.x = self.x;
-//        r.y = self.y;
-//        r
-//    }
-//    fn collision<T>(&self, other: &T) -> bool
-//    where
-//        T: MyCollideTrait,
-//    {
-//        self.hitbox.overlaps(&other.hit_box())
-//    }
-//}

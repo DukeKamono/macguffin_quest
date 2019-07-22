@@ -40,7 +40,8 @@ impl Wall {
        r.y = self.y;
        r
     }
-
+    
+    // MAYBE if it was a moving wall?
     //pub fn collide(&self, other: &super::Player) -> bool {
     //    self.hit_box().overlaps(&other.hit_box())
     //}
@@ -50,26 +51,3 @@ impl Wall {
         graphics::draw(ctx, &self.shape, dp).expect("Error drawing Wall");
     }
 }
-
-//pub trait MyCollideTrait {
-//    fn hit_box(&self) -> graphics::Rect;
-//    // not sure if this is right
-//    fn collision<T>(&self, other: &T) -> bool
-//    where
-//        T: MyCollideTrait;
-//}
-//
-//impl MyCollideTrait for Wall {
-//    fn hit_box(&self) -> graphics::Rect {
-//        let mut r = self.hitbox.clone();
-//        r.x = self.x;
-//        r.y = self.y;
-//        r
-//    }
-//    fn collision<T>(&self, other: &T) -> bool
-//    where
-//        T: MyCollideTrait,
-//    {
-//        self.hitbox.overlaps(&other.hit_box())
-//    }
-//}
