@@ -1,7 +1,3 @@
-// from examples on
-// https://docs.rs/ggez/0.5.0-rc.2/ggez/
-// https://docs.rs/ggez/0.5.0-rc.2/ggez/input/keyboard/index.html
-
 use ggez::event::{EventHandler, KeyCode, KeyMods};
 use ggez::*;
 
@@ -11,17 +7,30 @@ use player::Player;
 mod blob;
 use blob::Blob;
 
+mod wall;
+use wall::Wall;
+
 struct MainState {
     player: Player,
     blob: Blob,
+    walls: Vec<Wall>,
 }
 
 impl EventHandler for MainState {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
+        let playerx = self.player.x;
+        let playery = self.player.y;
+
         self.player.update(ctx);
 
         if self.blob.collide(&self.player) {
-            self.blob.relocate();
+            self.player.take_dmg(self.blob.atk);
+        }
+
+        for wall in &self.walls {
+            if self.player.collide(wall) {
+                self.player.move_location(playerx, playery);
+            }
         }
 
         Ok(())
@@ -29,6 +38,10 @@ impl EventHandler for MainState {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
+
+        for wall in &self.walls {
+            wall.draw(ctx);
+        }
 
         self.player.draw(ctx);
         self.blob.draw(ctx);
@@ -40,7 +53,7 @@ impl EventHandler for MainState {
     }
 
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) {
-		match key {
+        match key {
             KeyCode::P => println!("Pause? Maybe latter."),
             KeyCode::Escape => quit(ctx),
             // other keys to detect
@@ -63,9 +76,16 @@ fn main() {
     // create an instance of game state
     let win_width = ctx.conf.window_mode.width;
     let win_height = ctx.conf.window_mode.height;
+
+    let mut wall_vec = Vec::new();
+    wall_vec.push(Wall::new(ctx, 350.0, 150.0));
+    wall_vec.push(Wall::new(ctx, 350.0, 250.0));
+    wall_vec.push(Wall::new(ctx, 350.0, 350.0));
+
     let state = &mut MainState {
         player: Player::new(ctx),
         blob: Blob::new(ctx, graphics::Rect::new(0f32, 0f32, win_width, win_height)),
+        walls: wall_vec,
     };
 
     // start game loop
