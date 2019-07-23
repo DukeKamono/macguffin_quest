@@ -3,7 +3,7 @@ use ggez::event::{KeyCode, KeyMods};
 use ggez::input::keyboard;
 use ggez::*;
 
-use super::super::CollideEntity;
+use super::super::{DrawableEntity, CollideEntity};
 
 // constant values for keys used to determine movement
 const KEY_UP: KeyCode = KeyCode::W;
@@ -60,13 +60,6 @@ impl Player {
         }
     }
 
-    pub fn draw(&self, ctx: &mut Context) {
-        // This sets the location of the thing going to be drawn. (player)
-        let draw_param = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
-        // This draws the player.
-        graphics::draw(ctx, &self.sprite, draw_param).expect("Can't display Player!");
-    }
-
     pub fn move_location(&mut self, xinc: f32, yinc: f32) {
         self.x = xinc;
         self.y = yinc;
@@ -76,6 +69,14 @@ impl Player {
         self.hp -= dmg_to_take;
         // Check for death and maybe call a death function.
         println!("hp is: {}", self.hp);
+    }
+}
+
+impl DrawableEntity for Player {
+    fn draw(&self, ctx: &mut Context) -> GameResult {
+        let dp = graphics::DrawParam::default()
+            .dest(na::Point2::new(self.x, self.y));
+        graphics::draw(ctx, &self.sprite, dp)
     }
 }
 

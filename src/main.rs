@@ -4,13 +4,13 @@ use ggez::*;
 // contains all the information on entities
 mod entities;
 // get collison trait from entities
-use entities::CollideEntity;
+use entities::{DrawableEntity, CollideEntity};
 // get player struct to use
-use entities::player::player::Player;
+use entities::player::{player::Player};
 // get blob struct to use
-use entities::enemies::blob::Blob;
+use entities::enemies::{blob::Blob};
 // get wall struct to use
-use entities::environment::wall::Wall;
+use entities::environment::{wall::Wall};
 
 struct MainState {
     player: Player,
@@ -42,11 +42,11 @@ impl EventHandler for MainState {
         graphics::clear(ctx, graphics::BLACK);
 
         for wall in &self.walls {
-            wall.draw(ctx);
+            wall.draw(ctx)?;
         }
 
-        self.player.draw(ctx);
-        self.blob.draw(ctx);
+        self.player.draw(ctx)?;
+        self.blob.draw(ctx)?;
 
         // This presents the contents of ctx to the game.
         graphics::present(ctx)?;
@@ -75,10 +75,6 @@ fn main() {
             .build()
             .unwrap();
 
-    // create an instance of game state
-    let win_width = ctx.conf.window_mode.width;
-    let win_height = ctx.conf.window_mode.height;
-
     let mut wall_vec = Vec::new();
     wall_vec.push(Wall::new(ctx, 350.0, 150.0));
     wall_vec.push(Wall::new(ctx, 350.0, 250.0));
@@ -86,7 +82,7 @@ fn main() {
 
     let state = &mut MainState {
         player: Player::new(ctx),
-        blob: Blob::new(ctx, graphics::Rect::new(0f32, 0f32, win_width, win_height)),
+        blob: Blob::new(ctx),
         walls: wall_vec,
     };
 

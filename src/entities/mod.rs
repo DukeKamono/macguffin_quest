@@ -18,11 +18,14 @@ pub mod environment;
 
 
 // required by traits
-use ggez::graphics::{Drawable, Rect};
+use ggez::{Context, GameResult};
+use ggez::graphics::{Rect};
 
 // trait used to mark drawable entities
-// must implement ggez::graphics::Drawable
-pub trait DrawableEntity: Drawable {}
+// must implement ggez::graphics::Drawable (but not right now)
+pub trait DrawableEntity/*: Drawable */{
+    fn draw(&self, ctx: &mut Context) -> GameResult;
+}
 
 // trait used to mark entities that may collide with each other
 pub trait CollideEntity {

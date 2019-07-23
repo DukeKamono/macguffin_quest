@@ -2,7 +2,7 @@ use ggez::nalgebra as na;
 use ggez::*;
 //use rand::prelude::*;
 
-use super::super::CollideEntity;
+use super::super::{DrawableEntity, CollideEntity};
 
 pub struct Blob {
     pub x: f32,
@@ -15,7 +15,7 @@ pub struct Blob {
 }
 
 impl Blob {
-    pub fn new(ctx: &mut Context, _spawn: graphics::Rect) -> Blob {
+    pub fn new(ctx: &mut Context) -> Blob {
         let img = graphics::Image::new(ctx, "/blob.png").unwrap();
         let hb = img.dimensions();
 
@@ -29,13 +29,6 @@ impl Blob {
             hitbox: hb,
         }
     }
-
-    pub fn draw(&self, ctx: &mut Context) {
-        // This sets the location of the thing going to be drawn. (blob)
-        let draw_param = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
-        // This draws the blob.
-        graphics::draw(ctx, &self.sprite, draw_param).expect("Can't display blob!");
-    }
     
     // Need to figure out how to do player attacks to hit monsters.
     //pub fn take_dmg(&mut self, dmg_to_take: f32) {
@@ -43,6 +36,14 @@ impl Blob {
     //    // Check for death and maybe call a death function.
     //    println!("hp is: {}", self.hp);
     //}
+}
+
+impl DrawableEntity for Blob {
+    fn draw(&self, ctx: &mut Context) -> GameResult {
+        let dp = graphics::DrawParam::default()
+            .dest(na::Point2::new(self.x, self.y));
+        graphics::draw(ctx, &self.sprite, dp)
+    }
 }
 
 impl CollideEntity for Blob {
