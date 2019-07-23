@@ -22,11 +22,14 @@ use ggez::graphics::{Drawable, Rect};
 
 // trait used to mark drawable entities
 // must implement ggez::graphics::Drawable
-trait DrawableEntity: Drawable {}
+pub trait DrawableEntity: Drawable {}
 
 // trait used to mark entities that may collide with each other
-trait CollideEntity {
+pub trait CollideEntity {
+    // get hitbox of CollideEntity
     fn get_hitbox(&self) -> Rect;
+
+    // true / false if two CollideEntity's overlap (ie collide)
     fn collision(&self, other: &CollideEntity) -> bool {
         self.get_hitbox().overlaps(&other.get_hitbox())
     }

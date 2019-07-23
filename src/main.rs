@@ -3,7 +3,8 @@ use ggez::*;
 
 // contains all the information on entities
 mod entities;
-
+// get collison trait from entities
+use entities::CollideEntity;
 // get player struct to use
 use entities::player::player::Player;
 // get blob struct to use
@@ -24,12 +25,12 @@ impl EventHandler for MainState {
 
         self.player.update(ctx);
 
-        if self.blob.collide(&self.player) {
+        if self.blob.collision(&self.player) {
             self.player.take_dmg(self.blob.atk);
         }
 
         for wall in &self.walls {
-            if self.player.collide(wall) {
+            if self.player.collision(wall) {
                 self.player.move_location(playerx, playery);
             }
         }

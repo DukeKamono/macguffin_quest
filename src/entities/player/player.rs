@@ -3,7 +3,7 @@ use ggez::event::{KeyCode, KeyMods};
 use ggez::input::keyboard;
 use ggez::*;
 
-use crate::entities::environment::wall::Wall;
+use super::super::CollideEntity;
 
 // constant values for keys used to determine movement
 const KEY_UP: KeyCode = KeyCode::W;
@@ -18,14 +18,11 @@ pub struct Player {
     pub atk: f32,
     pub def: f32,
     pub sprite: graphics::Image,
-    pub hitbox: graphics::Rect,
 }
 
 impl Player {
     pub fn new(ctx: &mut Context) -> Player {
         let sprt = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
-
-        let hp = sprt.dimensions();
 
         Player {
             x: 10.0,
@@ -34,7 +31,6 @@ impl Player {
             atk: 3.0,
             def: 2.0,
             sprite: sprt,
-            hitbox: hp,
         }
     }
 
@@ -71,17 +67,6 @@ impl Player {
         graphics::draw(ctx, &self.sprite, draw_param).expect("Can't display Player!");
     }
 
-    pub fn hit_box(&self) -> graphics::Rect {
-       let mut r = self.hitbox.clone();
-       r.x = self.x;
-       r.y = self.y;
-       r
-    }
-
-    pub fn collide(&self, other: &Wall) -> bool {
-        self.hit_box().overlaps(&other.hit_box())
-    }
-
     pub fn move_location(&mut self, xinc: f32, yinc: f32) {
         self.x = xinc;
         self.y = yinc;
@@ -91,5 +76,14 @@ impl Player {
         self.hp -= dmg_to_take;
         // Check for death and maybe call a death function.
         println!("hp is: {}", self.hp);
+    }
+}
+
+impl CollideEntity for Player {
+    fn get_hitbox(&self) -> graphics::Rect {
+        let mut r = self.sprite.dimensions();
+        r.x = self.x;
+        r.y = self.y;
+        r
     }
 }

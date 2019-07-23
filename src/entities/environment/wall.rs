@@ -1,5 +1,7 @@
 use ggez::*;
 
+use super::super::CollideEntity;
+
 pub struct Wall {
     pub x: f32,
     pub y: f32,
@@ -34,20 +36,17 @@ impl Wall {
         }
     }
 
-    pub fn hit_box(&self) -> graphics::Rect {
-       let mut r = self.hitbox.clone();
-       r.x = self.x;
-       r.y = self.y;
-       r
-    }
-    
-    // MAYBE if it was a moving wall?
-    //pub fn collide(&self, other: &super::Player) -> bool {
-    //    self.hit_box().overlaps(&other.hit_box())
-    //}
-
     pub fn draw(&self, ctx: &mut Context) {
         let dp = graphics::DrawParam::default().dest(nalgebra::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.shape, dp).expect("Error drawing Wall");
+    }
+}
+
+impl CollideEntity for Wall {
+    fn get_hitbox(&self) -> graphics::Rect {
+        let mut r = self.hitbox;
+        r.x = self.x;
+        r.y = self.y;
+        r
     }
 }
