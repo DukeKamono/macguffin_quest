@@ -1,6 +1,6 @@
 use ggez::*;
 
-use super::super::{DrawableEntity, CollideEntity};
+use super::super::{CollideEntity, DrawableEntity};
 
 pub struct Wall {
     pub x: f32,
@@ -24,7 +24,7 @@ impl Wall {
                 1.0,
                 graphics::WHITE,
             )
-            .rectangle(graphics::DrawMode::stroke(1.0), hb.clone(), graphics::WHITE)
+            .rectangle(graphics::DrawMode::stroke(1.0), hb, graphics::WHITE)
             .build(ctx)
             .unwrap();
 
@@ -39,8 +39,7 @@ impl Wall {
 
 impl DrawableEntity for Wall {
     fn draw(&self, ctx: &mut Context) -> GameResult {
-        let dp = graphics::DrawParam::default()
-            .dest(nalgebra::Point2::new(self.x, self.y));
+        let dp = graphics::DrawParam::default().dest(nalgebra::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.shape, dp)
     }
 }

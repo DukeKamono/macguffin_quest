@@ -2,7 +2,7 @@ use ggez::nalgebra as na;
 use ggez::*;
 //use rand::prelude::*;
 
-use super::super::{DrawableEntity, CollideEntity};
+use super::super::{CollideEntity, DrawableEntity};
 
 pub struct Blob {
     pub x: f32,
@@ -29,7 +29,7 @@ impl Blob {
             hitbox: hb,
         }
     }
-    
+
     // Need to figure out how to do player attacks to hit monsters.
     //pub fn take_dmg(&mut self, dmg_to_take: f32) {
     //    self.hp -= dmg_to_take;
@@ -40,8 +40,7 @@ impl Blob {
 
 impl DrawableEntity for Blob {
     fn draw(&self, ctx: &mut Context) -> GameResult {
-        let dp = graphics::DrawParam::default()
-            .dest(na::Point2::new(self.x, self.y));
+        let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.sprite, dp)
     }
 }

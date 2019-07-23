@@ -1,9 +1,9 @@
-use ggez::nalgebra as na;
 use ggez::event::{KeyCode, KeyMods};
 use ggez::input::keyboard;
+use ggez::nalgebra as na;
 use ggez::*;
 
-use super::super::{DrawableEntity, CollideEntity};
+use super::super::{CollideEntity, DrawableEntity};
 
 // constant values for keys used to determine movement
 const KEY_UP: KeyCode = KeyCode::W;
@@ -74,8 +74,7 @@ impl Player {
 
 impl DrawableEntity for Player {
     fn draw(&self, ctx: &mut Context) -> GameResult {
-        let dp = graphics::DrawParam::default()
-            .dest(na::Point2::new(self.x, self.y));
+        let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.sprite, dp)
     }
 }

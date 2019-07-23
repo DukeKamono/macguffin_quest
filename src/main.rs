@@ -4,13 +4,13 @@ use ggez::*;
 // contains all the information on entities
 mod entities;
 // get collison trait from entities
-use entities::{DrawableEntity, CollideEntity};
+use entities::{CollideEntity, DrawableEntity};
 // get player struct to use
-use entities::player::{player::Player};
+use entities::player::player::Player;
 // get blob struct to use
-use entities::enemies::{blob::Blob};
+use entities::enemies::blob::Blob;
 // get wall struct to use
-use entities::environment::{wall::Wall};
+use entities::environment::wall::Wall;
 
 struct MainState {
     player: Player,
@@ -59,7 +59,7 @@ impl EventHandler for MainState {
             KeyCode::P => println!("Pause? Maybe latter."),
             KeyCode::Escape => quit(ctx),
             // other keys to detect
-            _ => { /* Do Nothing */ },
+            _ => { /* Do Nothing */ }
         }
     }
 }
