@@ -14,12 +14,14 @@ use entities::environment::wall::Wall;
 
 mod sprites;
 use sprites::sprite::Sprite;
+use sprites::animated_sprite::*;
 
 struct MainState {
     player: Player,
     blob: Blob,
     walls: Vec<Wall>,
     sprite: Sprite,
+    animated: AnimatedSprite,
     rotation: f32,
 }
 
@@ -39,6 +41,8 @@ impl EventHandler for MainState {
                 self.player.move_location(playerx, playery);
             }
         }
+
+        self.animated.animate(timer::delta(ctx));
 
         self.rotation += timer::duration_to_f64(timer::delta(ctx)) as f32;
         self.rotation = self.rotation % (2.0 * std::f32::consts::PI);
@@ -69,7 +73,16 @@ impl EventHandler for MainState {
                 1.0,
             ))
             ;
-        graphics::draw(ctx, &self.sprite, dp.clone())?;
+        graphics::draw(ctx, &self.sprite, dp)?;
+
+        let dp = graphics::DrawParam::default()
+            .dest([736f32, 64f32])
+            .offset([0.5,0.5])
+            .scale([2.0, 2.0])
+            .rotation(self.rotation)
+            ;
+        graphics::draw(ctx, &self.animated, dp)?;
+
 
         // This presents the contents of ctx to the game.
         graphics::present(ctx)?;
@@ -109,6 +122,17 @@ fn main() {
         blob: Blob::new(ctx),
         walls: wall_vec,
         sprite: Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap(),
+        animated: AnimatedSprite::new(
+            &img,
+            vec![
+                graphics::Rect::new(0f32, 320f32, 64f32, 64f32),
+                graphics::Rect::new(64f32, 320f32, 64f32, 64f32),
+                graphics::Rect::new(128f32, 320f32, 64f32, 64f32),
+                graphics::Rect::new(192f32, 320f32, 64f32, 64f32),
+                graphics::Rect::new(256f32, 320f32, 64f32, 64f32),
+                graphics::Rect::new(320f32, 320f32, 64f32, 64f32),
+            ],
+        ).unwrap(),
         rotation: 0f32,
     };
 
