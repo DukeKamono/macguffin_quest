@@ -12,10 +12,15 @@ use entities::enemies::blob::Blob;
 // get wall struct to use
 use entities::environment::wall::Wall;
 
+mod sprites;
+use sprites::sprite::Sprite;
+
 struct MainState {
     player: Player,
     blob: Blob,
     walls: Vec<Wall>,
+    sprite: Sprite,
+    rotation: f32,
 }
 
 impl EventHandler for MainState {
@@ -35,6 +40,9 @@ impl EventHandler for MainState {
             }
         }
 
+        self.rotation += timer::duration_to_f64(timer::delta(ctx)) as f32;
+        self.rotation = self.rotation % (2.0 * std::f32::consts::PI);
+
         Ok(())
     }
 
@@ -47,6 +55,21 @@ impl EventHandler for MainState {
 
         self.player.draw(ctx)?;
         self.blob.draw(ctx)?;
+
+        let dp = graphics::DrawParam::default()
+            .src(graphics::Rect::new(0.0, 0.0, 1.0, 1.0))
+            .dest([736f32, 536f32])
+            .offset([0.5,0.5])
+            .scale([2.0,2.0])
+            .rotation(self.rotation)
+            .color(graphics::Color::new(
+                1.0 - self.rotation / (2.0 * std::f32::consts::PI),
+                self.rotation / (2.0 * std::f32::consts::PI),
+                self.rotation / (2.0 * std::f32::consts::PI),
+                1.0,
+            ))
+            ;
+        graphics::draw(ctx, &self.sprite, dp.clone())?;
 
         // This presents the contents of ctx to the game.
         graphics::present(ctx)?;
@@ -80,10 +103,13 @@ fn main() {
     wall_vec.push(Wall::new(ctx, 350.0, 250.0));
     wall_vec.push(Wall::new(ctx, 350.0, 350.0));
 
+    let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
     let state = &mut MainState {
         player: Player::new(ctx),
         blob: Blob::new(ctx),
         walls: wall_vec,
+        sprite: Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap(),
+        rotation: 0f32,
     };
 
     // start game loop
