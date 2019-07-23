@@ -13,8 +13,9 @@ use entities::enemies::blob::Blob;
 use entities::environment::wall::Wall;
 
 mod sprites;
-use sprites::sprite::Sprite;
-use sprites::animated_sprite::*;
+//use sprites::sprite::Sprite;
+//use sprites::animated_sprite::*;
+use sprites::*;
 
 struct MainState {
     player: Player,

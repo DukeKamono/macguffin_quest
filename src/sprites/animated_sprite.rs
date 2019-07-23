@@ -22,7 +22,8 @@ impl AnimatedSprite {
         
         let mut rect = Vec::new();
         for c in clips {
-            if super::contains(&sheet.dimensions(), &c) {
+            //if super::contains(&sheet.dimensions(), &c) {
+            if contains(&sheet.dimensions(), &c) {
                 rect.push(Rect::fraction(c.x, c.y, c.w, c.h, &sheet.dimensions()));
             } else {
                 return Err(error::GameError::ResourceLoadError(

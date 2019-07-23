@@ -2,10 +2,12 @@
 // Contains modules related to drawable sprites
 
 // sprite based on subsection of larger image
-pub mod sprite;
+//pub mod sprite;
+include!("./sprite.rs");
 
 // animated sprite based on subsections of larger image
-pub mod animated_sprite;
+//pub mod animated_sprite;
+include!("./animated_sprite.rs");
 
 // for helper function
 use ggez::graphics::Rect;

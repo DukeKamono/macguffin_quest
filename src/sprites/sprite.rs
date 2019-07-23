@@ -10,7 +10,8 @@ impl Sprite {
     pub fn new(sheet: &Image, clip: Rect) -> GameResult<Sprite> {
         let sheet = sheet.clone();
 
-        if !super::contains(&sheet.dimensions(), &clip) {
+        //if !super::contains(&sheet.dimensions(), &clip) {
+        if !contains(&sheet.dimensions(), &clip) {
             return Err(error::GameError::ResourceLoadError(
                 format!(
                     "Clip {:?} not contained in sheet",
