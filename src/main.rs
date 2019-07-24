@@ -59,6 +59,9 @@ impl EventHandler for MainState {
         }
 
         self.player.draw(ctx)?;
+        if self.player.attacking {
+            self.player.draw_weapon(ctx);
+        }
         self.blob.draw(ctx)?;
 
         let dp = graphics::DrawParam::default()

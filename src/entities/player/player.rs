@@ -18,11 +18,14 @@ pub struct Player {
     pub atk: f32,
     pub def: f32,
     pub sprite: graphics::Image,
+    pub atk_image: graphics::Image,
+    pub attacking: bool,
 }
 
 impl Player {
     pub fn new(ctx: &mut Context) -> Player {
         let sprt = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
+        let sprt2 = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
 
         Player {
             x: 10.0,
@@ -31,6 +34,8 @@ impl Player {
             atk: 3.0,
             def: 2.0,
             sprite: sprt,
+            atk_image: sprt2,
+            attacking: false,
         }
     }
 
@@ -57,6 +62,7 @@ impl Player {
 
         if keyboard::is_key_pressed(ctx, KeyCode::Space) {
             println!("Attempting to attack. Atk: {}", self.atk);
+            self.attacking = true;
         }
     }
 
@@ -69,6 +75,12 @@ impl Player {
         self.hp -= dmg_to_take;
         // Check for death and maybe call a death function.
         println!("hp is: {}", self.hp);
+    }
+
+    // With multiple weapons, we should make a new struct for each type and attach them to the player.
+    pub fn draw_weapon(&self, ctx: &mut Context) {
+        let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x + 2.0, self.y + 2.0));
+        graphics::draw(ctx, &self.atk_image, dp)
     }
 }
 
