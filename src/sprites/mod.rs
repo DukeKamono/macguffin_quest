@@ -9,6 +9,10 @@ include!("./sprite.rs");
 //pub mod animated_sprite;
 include!("./animated_sprite.rs");
 
+// animated sprite builder for creating animated sprites from an image
+// kind of dumb... could be more sophisticated
+include!("./animated_builder.rs");
+
 // for helper function
 use ggez::graphics::Rect;
 

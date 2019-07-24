@@ -118,22 +118,17 @@ fn main() {
     wall_vec.push(Wall::new(ctx, 350.0, 350.0));
 
     let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
+    let sprite = Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap();
+    let animated = AnimatedBuilder::new(&img)
+        .create_animated(graphics::Rect::new(0f32, 320f32, 64f32, 64f32), 6usize)
+        .unwrap();
+
     let state = &mut MainState {
         player: Player::new(ctx),
         blob: Blob::new(ctx),
         walls: wall_vec,
-        sprite: Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap(),
-        animated: AnimatedSprite::new(
-            &img,
-            vec![
-                graphics::Rect::new(0f32, 320f32, 64f32, 64f32),
-                graphics::Rect::new(64f32, 320f32, 64f32, 64f32),
-                graphics::Rect::new(128f32, 320f32, 64f32, 64f32),
-                graphics::Rect::new(192f32, 320f32, 64f32, 64f32),
-                graphics::Rect::new(256f32, 320f32, 64f32, 64f32),
-                graphics::Rect::new(320f32, 320f32, 64f32, 64f32),
-            ],
-        ).unwrap(),
+        sprite,
+        animated,
         rotation: 0f32,
     };
 
