@@ -30,7 +30,7 @@ pub trait CollideEntity {
     fn get_hitbox(&self) -> Rect;
 
     // true / false if two CollideEntity's overlap (ie collide)
-    fn collision(&self, other: &CollideEntity) -> bool {
+    fn collision(&self, other: &dyn CollideEntity) -> bool {
         self.get_hitbox().overlaps(&other.get_hitbox())
     }
 }

@@ -5,3 +5,4 @@
 
 // Namespace of current player code
 pub mod player;
+pub mod atk_box;

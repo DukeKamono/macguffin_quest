@@ -15,13 +15,13 @@ pub struct Blob {
 }
 
 impl Blob {
-    pub fn new(ctx: &mut Context) -> Blob {
+    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> Blob {
         let img = graphics::Image::new(ctx, "/blob.png").unwrap();
         let hb = img.dimensions();
 
         Blob {
-            x: 250.0,
-            y: 250.0,
+            x: xpos,
+            y: ypos,
             hp: 10.0,
             atk: 3.0,
             def: 1.0,
@@ -30,12 +30,11 @@ impl Blob {
         }
     }
 
-    // Need to figure out how to do player attacks to hit monsters.
-    //pub fn take_dmg(&mut self, dmg_to_take: f32) {
-    //    self.hp -= dmg_to_take;
-    //    // Check for death and maybe call a death function.
-    //    println!("hp is: {}", self.hp);
-    //}
+    pub fn take_dmg(&mut self, dmg_to_take: f32) {
+        self.hp -= dmg_to_take;
+        // Check for death and maybe call a death function.
+        println!("hp is: {}", self.hp);
+    }
 }
 
 impl DrawableEntity for Blob {
