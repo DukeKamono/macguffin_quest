@@ -30,13 +30,15 @@ pub trait CollideEntity {
     fn get_hitbox(&self) -> Rect;
 
     // gets iterator over all hitboxes of CollideEntity
-    fn get_sub_hitboxs(&self) -> Box<Iterator<Item = Rect>> {
-        Box::new(std::iter::once(self.get_hitbox()))
+    // ok it really returns a vec cause I cant figure out iterators
+    fn get_sub_hitboxs(&self) -> Vec<Rect> {
+        //Box::new(std::iter::once(self.get_hitbox()))
+        vec![self.get_hitbox()]
     }
 
     // true / false if two CollideEntity's overlap (ie collide)
     fn collision(&self, other: &CollideEntity) -> bool {
-        //self.get_hitbox().overlaps(&other.get_hitbox())
+        // could improve this using iterator chains... maybe
         for myhb in self.get_sub_hitboxs() {
             for ohb in other.get_sub_hitboxs() {
                 if myhb.overlaps(&ohb) {
