@@ -5,6 +5,8 @@ use ggez::*;
 
 use super::super::{CollideEntity, DrawableEntity};
 
+use super::atk_box::AtkBox;
+
 // constant values for keys used to determine movement
 const KEY_UP: KeyCode = KeyCode::W;
 const KEY_DOWN: KeyCode = KeyCode::S;
@@ -18,23 +20,24 @@ pub struct Player {
     pub atk: f32,
     pub def: f32,
     pub sprite: graphics::Image,
-    pub atk_image: graphics::Image,
+    pub atk_box: Option<AtkBox>,
     pub attacking: bool,
 }
 
 impl Player {
     pub fn new(ctx: &mut Context) -> Player {
         let sprt = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
-        let sprt2 = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
-
+		let xpos = 10.0;
+		let ypos = 10.0;
+		
         Player {
-            x: 10.0,
-            y: 10.0,
+            x: xpos,
+            y: ypos,
             hp: 30.0,
             atk: 3.0,
             def: 2.0,
             sprite: sprt,
-            atk_image: sprt2,
+            atk_box: None,
             attacking: false,
         }
     }
@@ -62,8 +65,11 @@ impl Player {
 
         if keyboard::is_key_pressed(ctx, KeyCode::Space) {
             println!("Attempting to attack. Atk: {}", self.atk);
-            self.attacking = true;
+			self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y));
         }
+		else {
+			self.atk_box = None;
+		}
     }
 
     pub fn move_location(&mut self, xinc: f32, yinc: f32) {
@@ -79,13 +85,16 @@ impl Player {
 
     // With multiple weapons, we should make a new struct for each type and attach them to the player.
     pub fn draw_weapon(&self, ctx: &mut Context) {
-        let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x + 2.0, self.y + 2.0));
-        graphics::draw(ctx, &self.atk_image, dp)
+		if let Some(atk) = &self.atk_box {
+			atk.draw(ctx).expect("Failed to draw attack.");
+			println!("drawing?");
+		}
     }
 }
 
 impl DrawableEntity for Player {
     fn draw(&self, ctx: &mut Context) -> GameResult {
+		self.draw_weapon(ctx);
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.sprite, dp)
     }

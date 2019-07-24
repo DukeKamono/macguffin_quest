@@ -19,7 +19,7 @@ use sprites::*;
 
 struct MainState {
     player: Player,
-    blob: Blob,
+    blobs: Vec<Blob>,
     walls: Vec<Wall>,
     sprite: Sprite,
     animated: AnimatedSprite,
@@ -33,10 +33,19 @@ impl EventHandler for MainState {
 
         self.player.update(ctx);
 
-        if self.blob.collision(&self.player) {
-            self.player.take_dmg(self.blob.atk);
-        }
-
+		for blob in &mut self.blobs {
+			if blob.collision(&self.player) {
+				self.player.take_dmg(blob.atk);
+			}
+			
+			if let Some(atk) = &self.player.atk_box {
+				if blob.collision(atk) {
+					println!("blob took dmg");
+					blob.take_dmg(self.player.atk);
+				}
+			}
+		}
+		
         for wall in &self.walls {
             if self.player.collision(wall) {
                 self.player.move_location(playerx, playery);
@@ -59,11 +68,11 @@ impl EventHandler for MainState {
         }
 
         self.player.draw(ctx)?;
-        if self.player.attacking {
-            self.player.draw_weapon(ctx);
-        }
-        self.blob.draw(ctx)?;
-
+		
+		for blob in &self.blobs {
+			blob.draw(ctx)?;
+		}
+		
         let dp = graphics::DrawParam::default()
             .src(graphics::Rect::new(0.0, 0.0, 1.0, 1.0))
             .dest([736f32, 536f32])
@@ -120,6 +129,11 @@ fn main() {
     wall_vec.push(Wall::new(ctx, 350.0, 250.0));
     wall_vec.push(Wall::new(ctx, 350.0, 350.0));
 
+	let mut blob_vec = Vec::new();
+	blob_vec.push(Blob::new(ctx, 250.0, 250.0));
+	blob_vec.push(Blob::new(ctx, 250.0, 350.0));
+	blob_vec.push(Blob::new(ctx, 250.0, 150.0));
+	
     let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
     let sprite = Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap();
     let animated = AnimatedBuilder::new(&img)
@@ -128,7 +142,7 @@ fn main() {
 
     let state = &mut MainState {
         player: Player::new(ctx),
-        blob: Blob::new(ctx),
+        blobs: blob_vec,
         walls: wall_vec,
         sprite,
         animated,
