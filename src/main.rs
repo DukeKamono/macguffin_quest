@@ -10,7 +10,7 @@ use entities::player::player::Player;
 // get blob struct to use
 use entities::enemies::blob::Blob;
 // get wall struct to use
-use entities::environment::wall::Wall;
+use entities::environment::{level::Level, level_builder::LevelBuilder, wall::Wall};
 
 mod sprites;
 //use sprites::sprite::Sprite;
@@ -20,7 +20,7 @@ use sprites::*;
 struct MainState {
     player: Player,
     blob: Blob,
-    walls: Vec<Wall>,
+    level: Level,
     sprite: Sprite,
     animated: AnimatedSprite,
     rotation: f32,
@@ -37,10 +37,8 @@ impl EventHandler for MainState {
             self.player.take_dmg(self.blob.atk);
         }
 
-        for wall in &self.walls {
-            if self.player.collision(wall) {
-                self.player.move_location(playerx, playery);
-            }
+        if self.player.collision(&self.level) {
+            self.player.move_location(playerx, playery);
         }
 
         self.animated.animate(timer::delta(ctx));
@@ -54,9 +52,7 @@ impl EventHandler for MainState {
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
 
-        for wall in &self.walls {
-            wall.draw(ctx)?;
-        }
+        self.level.draw(ctx)?;
 
         self.player.draw(ctx)?;
         self.blob.draw(ctx)?;
@@ -112,10 +108,11 @@ fn main() {
             .build()
             .unwrap();
 
-    let mut wall_vec = Vec::new();
-    wall_vec.push(Wall::new(ctx, 350.0, 150.0));
-    wall_vec.push(Wall::new(ctx, 350.0, 250.0));
-    wall_vec.push(Wall::new(ctx, 350.0, 350.0));
+    let mut player = Player::new(ctx);
+    player.move_location(150f32, 150f32);
+
+    //let level = LevelBuilder::sample1(ctx);
+    let level = LevelBuilder::sample2(ctx);
 
     let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
     let sprite = Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap();
@@ -124,9 +121,9 @@ fn main() {
         .unwrap();
 
     let state = &mut MainState {
-        player: Player::new(ctx),
+        player,
         blob: Blob::new(ctx),
-        walls: wall_vec,
+        level,
         sprite,
         animated,
         rotation: 0f32,
