@@ -56,7 +56,7 @@ impl LevelBuilder {
 
     //pub from_level_file() -> ???;
 
-    pub fn sample1(&self) -> Level {
+    pub fn _sample1(&self) -> Level {
         let w = vec![
             (350.0, 150.0, 1usize),
             (414.0, 150.0, 0usize),
@@ -84,6 +84,33 @@ impl LevelBuilder {
                 w.push((*x as f32, y as f32, 1usize));
                 //println!("{},{}", x, y);
             }
+        }
+        self.generate_level(w)
+    }
+
+    pub fn sample3(&self) -> Level {
+        let mut w = Vec::new();
+        let tr = self.tile_width * 11usize;
+        let br = self.tile_height * 8usize;
+        let m = self.tile_width * 6usize;
+        // corners
+        w.push((0f32, 0f32, 5usize));
+        w.push((tr as f32, 0f32, 5usize));
+        w.push((0f32, br as f32, 5usize));
+        w.push((tr as f32, br as f32, 5usize));
+        // top and bottom
+        for x in (self.tile_width..tr).step_by(self.tile_width) {
+            w.push((x as f32, 0f32, 0usize));
+            w.push((x as f32, br as f32, 1usize));
+        }
+        // left right
+        for y in (self.tile_height..br).step_by(self.tile_height) {
+            w.push((0f32, y as f32, 2usize));
+            w.push((tr as f32, y as f32, 3usize));
+        }
+        // middle
+        for y in (self.tile_height * 3usize..m).step_by(self.tile_height) {
+            w.push((m as f32, y as f32, 4usize));
         }
         self.generate_level(w)
     }

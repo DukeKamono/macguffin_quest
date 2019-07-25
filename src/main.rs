@@ -108,22 +108,39 @@ fn main() {
     let mut player = Player::new(ctx);
     player.move_location(150f32, 150f32);
 
-    let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
-
+    // build level
+    let img = graphics::Image::new(ctx, "/testwalls.png").unwrap();
     let mut lb = LevelBuilder::new(ctx, None);
-    //lb.set_tile_image(0usize, &Sprite::new(&img, graphics::Rect::new(256f32, 640f32, 64f32, 64f32)).unwrap()).unwrap();
     lb.set_tile_image(
-        1usize,
-        &Sprite::new(&img, graphics::Rect::new(192f32, 768f32, 64f32, 64f32)).unwrap(),
+        0usize,
+        &Sprite::new(&img, graphics::Rect::new(0f32, 0f32, 64f32, 64f32)).unwrap(),
     )
     .unwrap();
-    let level = lb.sample1();
+    lb.set_tile_image(
+        1usize,
+        &Sprite::new(&img, graphics::Rect::new(64f32, 0f32, 64f32, 64f32)).unwrap(),
+    )
+    .unwrap();
+    lb.set_tile_image(
+        2usize,
+        &Sprite::new(&img, graphics::Rect::new(128f32, 0f32, 64f32, 64f32)).unwrap(),
+    )
+    .unwrap();
+    lb.set_tile_image(
+        3usize,
+        &Sprite::new(&img, graphics::Rect::new(192f32, 0f32, 64f32, 64f32)).unwrap(),
+    )
+    .unwrap();
+    let level = lb.sample3();
 
+    // demo sprites
+    let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
     let sprite = Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap();
     let animated = AnimatedBuilder::new(&img)
         .create_animated(graphics::Rect::new(0f32, 320f32, 64f32, 64f32), 6usize)
         .unwrap();
 
+    // create state
     let state = &mut MainState {
         player,
         blob: Blob::new(ctx),
