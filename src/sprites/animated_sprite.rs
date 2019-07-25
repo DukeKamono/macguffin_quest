@@ -69,11 +69,11 @@ impl AnimatedSprite {
     }
 
     pub fn width(&self) -> f32 {
-        self.clips[self.current_frame].w
+        self.clips[self.current_frame].w * self.sheet.width() as f32
     }
 
     pub fn height(&self) -> f32 {
-        self.clips[self.current_frame].h
+        self.clips[self.current_frame].h * self.sheet.height() as f32
     }
 
     /*
