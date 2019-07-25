@@ -1,6 +1,7 @@
 use ggez::*;
 use ggez::graphics::*;
 
+#[derive(Clone)]
 pub struct Sprite {
     sheet: Image,
     clip: Rect,

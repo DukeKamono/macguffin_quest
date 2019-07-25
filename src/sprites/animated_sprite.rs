@@ -2,11 +2,13 @@
 //use ggez::graphics::*;
 use std::time::Duration;
 
+#[derive(Clone)]
 pub enum AnimationState {
     _Paused(Duration), // accumulated duration when paused
     Loop,
 }
 
+#[derive(Clone)]
 pub struct AnimatedSprite {
     sheet: Image,
     clips: Vec<Rect>,
