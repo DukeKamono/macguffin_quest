@@ -1,23 +1,23 @@
 use ggez::{Context, GameResult};
 use ggez::graphics::Rect;
 use super::super::{CollideEntity, DrawableEntity};
-use super::wall::Wall;
+use super::tile::Tile;
 
 pub struct Level {
-    walls: Vec<Wall>,
+    tiles: Vec<Tile>,
 }
 
 impl Level {
     // should a new() really be provided?
     // instead for level to come from level_builder
-    pub fn new(walls: Vec<Wall>) -> Level {
-        Level{ walls }
+    pub fn new(tiles: Vec<Tile>) -> Level {
+        Level{ tiles }
     }
 }
 
 impl DrawableEntity for Level {
     fn draw(&self, ctx: &mut Context) -> GameResult {
-        for w in &self.walls {
+        for w in &self.tiles {
             w.draw(ctx)?;
         }
         Ok(())
@@ -26,14 +26,14 @@ impl DrawableEntity for Level {
 
 impl CollideEntity for Level {
     fn get_hitbox(&self) -> Rect {
-        let mut r = self.walls.first().unwrap().get_hitbox();
-        for w in &self.walls {
+        let mut r = self.tiles.first().unwrap().get_hitbox();
+        for w in &self.tiles {
             r = r.combine_with(w.get_hitbox());
         }
         r
     }
 
     fn get_sub_hitboxs(&self) -> Vec<Rect> {
-        self.walls.iter().map(|w| w.get_hitbox()).collect()
+        self.tiles.iter().map(|w| w.get_hitbox()).collect()
     }
 }

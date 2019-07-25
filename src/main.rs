@@ -10,7 +10,7 @@ use entities::player::player::Player;
 // get blob struct to use
 use entities::enemies::blob::Blob;
 // get wall struct to use
-use entities::environment::{level::Level, level_builder::LevelBuilder, wall::Wall};
+use entities::environment::{level::Level, level_builder::LevelBuilder};
 
 mod sprites;
 //use sprites::sprite::Sprite;
@@ -111,10 +111,13 @@ fn main() {
     let mut player = Player::new(ctx);
     player.move_location(150f32, 150f32);
 
-    //let level = LevelBuilder::sample1(ctx);
-    let level = LevelBuilder::sample2(ctx);
-
     let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
+    
+    let mut lb = LevelBuilder::new(ctx, None);
+    lb.set_wall_image(&Sprite::new(&img, graphics::Rect::new(192f32, 768f32, 64f32, 64f32)).unwrap()).unwrap();
+    //let level = LevelBuilder::sample1(ctx);
+    let level = lb.sample2();
+
     let sprite = Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap();
     let animated = AnimatedBuilder::new(&img)
         .create_animated(graphics::Rect::new(0f32, 320f32, 64f32, 64f32), 6usize)
