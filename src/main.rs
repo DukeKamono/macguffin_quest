@@ -19,7 +19,7 @@ use sprites::*;
 
 struct MainState {
     player: Player,
-    blob: Blob,
+    blob: Vec<Blob>,
     level: Level,
     sprite: Sprite,
     animated: AnimatedSprite,
@@ -33,12 +33,21 @@ impl EventHandler for MainState {
 
         self.player.update(ctx);
 
-        if self.blob.collision(&self.player) {
-            self.player.take_dmg(self.blob.atk);
-        }
-
         if self.player.collision(&self.level) {
             self.player.move_location(playerx, playery);
+        }
+
+        for blob in &mut self.blob {
+            if blob.collision(&self.player) {
+                self.player.take_dmg(blob.atk);
+            }
+
+            if let Some(atk) = &self.player.atk_box {
+                if blob.collision(atk) {
+                    println!("blob took dmg");
+                    blob.take_dmg(self.player.atk);
+                }
+            }
         }
 
         self.animated.animate(timer::delta(ctx));
@@ -55,7 +64,10 @@ impl EventHandler for MainState {
         self.level.draw(ctx)?;
 
         self.player.draw(ctx)?;
-        self.blob.draw(ctx)?;
+
+        for blob in &self.blob {
+            blob.draw(ctx)?;
+        }
 
         let dp = graphics::DrawParam::default()
             .src(graphics::Rect::new(0.0, 0.0, 1.0, 1.0))
@@ -105,8 +117,15 @@ fn main() {
             .build()
             .unwrap();
 
+    // create player
     let mut player = Player::new(ctx);
     player.move_location(150f32, 150f32);
+
+    // create blobs (ie enemies)
+    let mut blob = Vec::new();
+    blob.push(Blob::new(ctx, 250.0, 250.0));
+    blob.push(Blob::new(ctx, 250.0, 350.0));
+    blob.push(Blob::new(ctx, 250.0, 150.0));
 
     // build level
     let img = graphics::Image::new(ctx, "/testwalls.png").unwrap();
@@ -143,7 +162,7 @@ fn main() {
     // create state
     let state = &mut MainState {
         player,
-        blob: Blob::new(ctx),
+        blob,
         level,
         sprite,
         animated,
