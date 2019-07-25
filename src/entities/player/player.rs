@@ -64,7 +64,6 @@ impl Player {
         }
 
         if keyboard::is_key_pressed(ctx, KeyCode::Space) {
-            println!("Attempting to attack. Atk: {}", self.atk);
             self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y));
         } else {
             self.atk_box = None;
@@ -79,14 +78,12 @@ impl Player {
     pub fn take_dmg(&mut self, dmg_to_take: f32) {
         self.hp -= dmg_to_take;
         // Check for death and maybe call a death function.
-        println!("hp is: {}", self.hp);
     }
 
     // With multiple weapons, we should make a new struct for each type and attach them to the player.
     pub fn draw_weapon(&self, ctx: &mut Context) {
         if let Some(atk) = &self.atk_box {
             atk.draw(ctx).expect("Failed to draw attack.");
-            println!("drawing?");
         }
     }
 }

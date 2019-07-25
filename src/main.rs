@@ -59,6 +59,8 @@ impl EventHandler for MainState {
         self.rotation += timer::duration_to_f64(timer::delta(ctx)) as f32;
         self.rotation %= 2.0 * std::f32::consts::PI;
 
+		// Should prob make UI update last all the time.
+		self.ui.update(ctx, self.player.hp);
         Ok(())
     }
 
@@ -126,6 +128,7 @@ fn main() {
     // create player
     let mut player = Player::new(ctx);
     player.move_location(150f32, 150f32);
+	let hp = player.hp;
 
     // create blobs (ie enemies)
     let mut blob = Vec::new();
@@ -170,7 +173,7 @@ fn main() {
         level,
         blob,
         player,
-		ui: UI::new(ctx),
+		ui: UI::new(ctx, "Adventurer".to_string(), hp),
         sprite,
         animated,
         rotation: 0f32,
