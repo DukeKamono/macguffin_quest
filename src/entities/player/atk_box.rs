@@ -11,7 +11,7 @@ pub struct AtkBox {
 }
 
 impl AtkBox {
-    pub fn new(ctx: &mut Context, Duration: f32, xpos: f32, ypos: f32) -> AtkBox {
+    pub fn new(ctx: &mut Context, duration: f32, xpos: f32, ypos: f32) -> AtkBox {
         // radius of circle
         let r = 50f32;
         // create hit box
@@ -30,7 +30,7 @@ impl AtkBox {
             .unwrap();
 
         AtkBox {
-            duration: Duration,
+            duration,
             x: xpos,
             y: ypos,
             hitbox: hb,
