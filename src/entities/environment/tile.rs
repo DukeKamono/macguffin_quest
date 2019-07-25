@@ -1,5 +1,5 @@
-use ggez::{GameResult, Context, nalgebra::Point2};
-use ggez::graphics::{DrawParam, draw, Rect};
+use ggez::graphics::{draw, DrawParam, Rect};
+use ggez::{nalgebra::Point2, Context, GameResult};
 
 use crate::sprites::Sprite;
 
@@ -14,10 +14,7 @@ impl Tile {
     pub fn new(image: &Sprite, xpos: f32, ypos: f32) -> Self {
         let image = image.clone();
         let hitbox = Rect::new(xpos, ypos, image.width(), image.height());
-        Tile{
-            image,
-            hitbox,
-        }
+        Tile { image, hitbox }
     }
 }
 

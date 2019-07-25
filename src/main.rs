@@ -44,7 +44,7 @@ impl EventHandler for MainState {
         self.animated.animate(timer::delta(ctx));
 
         self.rotation += timer::duration_to_f64(timer::delta(ctx)) as f32;
-        self.rotation = self.rotation % (2.0 * std::f32::consts::PI);
+        self.rotation %= 2.0 * std::f32::consts::PI;
 
         Ok(())
     }
@@ -60,26 +60,23 @@ impl EventHandler for MainState {
         let dp = graphics::DrawParam::default()
             .src(graphics::Rect::new(0.0, 0.0, 1.0, 1.0))
             .dest([736f32, 536f32])
-            .offset([0.5,0.5])
-            .scale([2.0,2.0])
+            .offset([0.5, 0.5])
+            .scale([2.0, 2.0])
             .rotation(self.rotation)
             .color(graphics::Color::new(
                 1.0 - self.rotation / (2.0 * std::f32::consts::PI),
                 self.rotation / (2.0 * std::f32::consts::PI),
                 self.rotation / (2.0 * std::f32::consts::PI),
                 1.0,
-            ))
-            ;
+            ));
         graphics::draw(ctx, &self.sprite, dp)?;
 
         let dp = graphics::DrawParam::default()
             .dest([736f32, 64f32])
-            .offset([0.5,0.5])
+            .offset([0.5, 0.5])
             .scale([2.0, 2.0])
-            .rotation(self.rotation)
-            ;
+            .rotation(self.rotation);
         graphics::draw(ctx, &self.animated, dp)?;
-
 
         // This presents the contents of ctx to the game.
         graphics::present(ctx)?;
@@ -112,10 +109,14 @@ fn main() {
     player.move_location(150f32, 150f32);
 
     let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
-    
+
     let mut lb = LevelBuilder::new(ctx, None);
     //lb.set_tile_image(0usize, &Sprite::new(&img, graphics::Rect::new(256f32, 640f32, 64f32, 64f32)).unwrap()).unwrap();
-    //lb.set_tile_image(1usize, &Sprite::new(&img, graphics::Rect::new(192f32, 768f32, 64f32, 64f32)).unwrap()).unwrap();
+    lb.set_tile_image(
+        1usize,
+        &Sprite::new(&img, graphics::Rect::new(192f32, 768f32, 64f32, 64f32)).unwrap(),
+    )
+    .unwrap();
     let level = lb.sample1();
 
     let sprite = Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap();

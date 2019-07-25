@@ -22,11 +22,9 @@ impl AnimatedSprite {
     pub fn new(sheet: &Image, clips: Vec<Rect>) -> GameResult<AnimatedSprite> {
         let sheet = sheet.clone();
         
-        if clips.len() == 0usize {
+        if clips.is_empty() {
             return Err(error::GameError::ResourceLoadError(
-                format!(
-                    "No clips to add to animated sprite"
-                )
+                "No clips to add to animated sprite".to_string()
             ));
         }
         let mut rect = Vec::new();
@@ -68,12 +66,12 @@ impl AnimatedSprite {
         }
     }
 
-    pub fn width(&self) -> f32 {
-        self.clips[self.current_frame].w * self.sheet.width() as f32
+    pub fn _width(&self) -> f32 {
+        self.clips[self.current_frame].w * f32::from(self.sheet.width())
     }
 
-    pub fn height(&self) -> f32 {
-        self.clips[self.current_frame].h * self.sheet.height() as f32
+    pub fn _height(&self) -> f32 {
+        self.clips[self.current_frame].h * f32::from(self.sheet.height())
     }
 
     /*

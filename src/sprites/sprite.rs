@@ -27,11 +27,11 @@ impl Sprite {
     }
 
     pub fn width(&self) -> f32 {
-        self.clip.w * self.sheet.width() as f32
+        self.clip.w * f32::from(self.sheet.width())
     }
 
     pub fn height(&self) -> f32 {
-        self.clip.h * self.sheet.height() as f32
+        self.clip.h * f32::from(self.sheet.height())
     }
 }
 

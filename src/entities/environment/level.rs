@@ -1,7 +1,7 @@
-use ggez::{Context, GameResult};
-use ggez::graphics::Rect;
 use super::super::{CollideEntity, DrawableEntity};
 use super::tile::Tile;
+use ggez::graphics::Rect;
+use ggez::{Context, GameResult};
 
 pub struct Level {
     tiles: Vec<Tile>,
@@ -11,7 +11,7 @@ impl Level {
     // should a new() really be provided?
     // instead for level to come from level_builder
     pub fn new(tiles: Vec<Tile>) -> Level {
-        Level{ tiles }
+        Level { tiles }
     }
 }
 
