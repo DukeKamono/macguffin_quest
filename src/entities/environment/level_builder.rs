@@ -57,13 +57,14 @@ impl LevelBuilder {
 
     pub fn sample1(&self) -> Level {
         let w = vec![
-            (350.0, 150.0, 1usize),
-            (350.0, 250.0, 1usize),
-            (350.0, 350.0, 1usize),
+            (350.0, 150.0, 1usize), (414.0, 150.0, 0usize),
+            (350.0, 250.0, 1usize), (414.0, 250.0, 0usize),
+            (350.0, 350.0, 1usize), (414.0, 350.0, 0usize),
         ];
         self.generate_level(w)
     }
 
+    // attempts to frame an 800x600 window (may overlap with poor image dimensions)
     pub fn sample2(&self) -> Level {
         let mut w = Vec::new();
         // top bottom
