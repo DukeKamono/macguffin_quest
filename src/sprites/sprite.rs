@@ -1,6 +1,7 @@
 use ggez::*;
 use ggez::graphics::*;
 
+#[derive(Clone)]
 pub struct Sprite {
     sheet: Image,
     clip: Rect,
@@ -23,6 +24,14 @@ impl Sprite {
         let clip = Rect::fraction(clip.x, clip.y, clip.w, clip.h, &sheet.dimensions());
 
         Ok(Sprite { sheet, clip })
+    }
+
+    pub fn width(&self) -> f32 {
+        self.clip.w * f32::from(self.sheet.width())
+    }
+
+    pub fn height(&self) -> f32 {
+        self.clip.h * f32::from(self.sheet.height())
     }
 }
 

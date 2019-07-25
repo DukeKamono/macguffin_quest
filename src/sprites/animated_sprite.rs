@@ -2,11 +2,13 @@
 //use ggez::graphics::*;
 use std::time::Duration;
 
+#[derive(Clone)]
 pub enum AnimationState {
     _Paused(Duration), // accumulated duration when paused
     Loop,
 }
 
+#[derive(Clone)]
 pub struct AnimatedSprite {
     sheet: Image,
     clips: Vec<Rect>,
@@ -20,11 +22,9 @@ impl AnimatedSprite {
     pub fn new(sheet: &Image, clips: Vec<Rect>) -> GameResult<AnimatedSprite> {
         let sheet = sheet.clone();
         
-        if clips.len() == 0usize {
+        if clips.is_empty() {
             return Err(error::GameError::ResourceLoadError(
-                format!(
-                    "No clips to add to animated sprite"
-                )
+                "No clips to add to animated sprite".to_string()
             ));
         }
         let mut rect = Vec::new();
@@ -64,6 +64,14 @@ impl AnimatedSprite {
         if self.current_frame >= self.clips.len() {
             self.current_frame = 0usize;
         }
+    }
+
+    pub fn _width(&self) -> f32 {
+        self.clips[self.current_frame].w * f32::from(self.sheet.width())
+    }
+
+    pub fn _height(&self) -> f32 {
+        self.clips[self.current_frame].h * f32::from(self.sheet.height())
     }
 
     /*

@@ -4,5 +4,5 @@
 // similar public requirement as noted in entities/mod.rs
 
 // Namespace of current player code
-pub mod player;
 pub mod atk_box;
+pub mod player;
