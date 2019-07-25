@@ -9,5 +9,8 @@ pub mod level;
 // Namespace of code to generate/load levels
 pub mod level_builder;
 
+// Namespace of basic tile that is used to form a level
+pub mod tile;
+
 // Namespace of current wall code
 pub mod wall;
