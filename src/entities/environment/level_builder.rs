@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use ggez::{Context, error::GameError, GameResult};
 use ggez::graphics::{Image, Rect, WHITE};
 
@@ -7,8 +9,7 @@ use super::tile::Tile;
 
 pub struct LevelBuilder {
     default: Sprite,
-    floor: Option<Sprite>,
-    wall: Option<Sprite>,
+    tile_image: HashMap<usize, Sprite>,
     tile_width: usize,
     tile_height: usize,
 }
@@ -19,12 +20,12 @@ impl LevelBuilder {
             Some(img) => img.clone(),
             None => Sprite::new(&Image::solid(ctx, 64u16, WHITE).unwrap(), Rect::new(0f32,0f32,64f32,64f32)).unwrap(),
         };
+        let tile_image = HashMap::new();
         let tile_width = default.width() as usize;
         let tile_height = default.height() as usize;
         LevelBuilder {
             default,
-            floor: None,
-            wall: None,
+            tile_image,
             tile_width,
             tile_height,
         }
@@ -46,15 +47,9 @@ impl LevelBuilder {
         }
     }
 
-    pub fn set_floor_image(&mut self, image: &Sprite) -> GameResult {
+    pub fn set_tile_image(&mut self, key: usize, image: &Sprite) -> GameResult {
         self.validate_image_size(image)?;
-        self.floor = Some(image.clone());
-        Ok(())
-    }
-
-    pub fn set_wall_image(&mut self, image: &Sprite) -> GameResult {
-        self.validate_image_size(image)?;
-        self.wall = Some(image.clone());
+        self.tile_image.insert(key, image.clone());
         Ok(())
     }
 
@@ -62,9 +57,9 @@ impl LevelBuilder {
 
     pub fn sample1(&self) -> Level {
         let w = vec![
-            (350.0, 150.0),
-            (350.0, 250.0),
-            (350.0, 350.0),
+            (350.0, 150.0, 1usize),
+            (350.0, 250.0, 1usize),
+            (350.0, 350.0, 1usize),
         ];
         self.generate_level(w)
     }
@@ -74,27 +69,31 @@ impl LevelBuilder {
         // top bottom
         for x in (0..800).step_by(self.tile_width) {
             for y in &[0, (600-self.tile_height)] {
-                w.push((x as f32, *y as f32));
+                w.push((x as f32, *y as f32, 1usize));
                 //println!("{},{}", x, y);
             }
         }
         // left right
         for x in &[0, (800-self.tile_width)] {
             for y in (self.tile_height..(600-self.tile_height)).step_by(self.tile_height) {
-                w.push((*x as f32, y as f32));
+                w.push((*x as f32, y as f32, 1usize));
                 //println!("{},{}", x, y);
             }
         }
         self.generate_level(w)
     }
 
-    fn generate_level(&self, points: Vec<(f32, f32)>) -> Level {
-        let wall_image = if let Some(image) = &self.wall {
-            image
-        } else {
-            &self.default
-        };
-        let tiles = points.iter().map(|p| Tile::new(&wall_image, p.0, p.1)).collect();
+    fn generate_level(&self, points: Vec<(f32, f32, usize)>) -> Level {
+        let tiles = points
+            .iter()
+            .map(|p| {
+                let image = match self.tile_image.get(&p.2) {
+                    Some(image) => image,
+                    None => &self.default,
+                };
+                Tile::new(&image, p.0, p.1)
+            })
+            .collect();
         Level::new(tiles)
     }
 }
