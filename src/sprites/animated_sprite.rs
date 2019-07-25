@@ -68,6 +68,14 @@ impl AnimatedSprite {
         }
     }
 
+    pub fn width(&self) -> f32 {
+        self.clips[self.current_frame].w
+    }
+
+    pub fn height(&self) -> f32 {
+        self.clips[self.current_frame].h
+    }
+
     /*
     // may be useful one day ... just not today
     // good to have them though

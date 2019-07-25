@@ -25,6 +25,14 @@ impl Sprite {
 
         Ok(Sprite { sheet, clip })
     }
+
+    pub fn width(&self) -> f32 {
+        self.clip.w
+    }
+
+    pub fn height(&self) -> f32 {
+        self.clip.h
+    }
 }
 
 impl Drawable for Sprite {
