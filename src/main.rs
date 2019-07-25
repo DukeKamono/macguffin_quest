@@ -12,12 +12,16 @@ use entities::enemies::blob::Blob;
 // get wall struct to use
 use entities::environment::wall::Wall;
 
+mod ui;
+use ui::UI;
+
 mod sprites;
 //use sprites::sprite::Sprite;
 //use sprites::animated_sprite::*;
 use sprites::*;
 
 struct MainState {
+	ui: UI,
     player: Player,
     blobs: Vec<Blob>,
     walls: Vec<Wall>,
@@ -62,7 +66,7 @@ impl EventHandler for MainState {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
-
+		
         for wall in &self.walls {
             wall.draw(ctx)?;
         }
@@ -95,7 +99,8 @@ impl EventHandler for MainState {
             .rotation(self.rotation)
             ;
         graphics::draw(ctx, &self.animated, dp)?;
-
+		
+		self.ui.draw(ctx);
 
         // This presents the contents of ctx to the game.
         graphics::present(ctx)?;
@@ -141,6 +146,7 @@ fn main() {
         .unwrap();
 
     let state = &mut MainState {
+		ui: UI::new(ctx),
         player: Player::new(ctx),
         blobs: blob_vec,
         walls: wall_vec,
