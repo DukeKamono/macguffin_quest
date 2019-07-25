@@ -10,7 +10,7 @@ use entities::player::player::Player;
 // get blob struct to use
 use entities::enemies::blob::Blob;
 // get wall struct to use
-use entities::environment::wall::Wall;
+use entities::environment::{level::Level, level_builder::LevelBuilder};
 
 mod ui;
 use ui::UI;
@@ -23,8 +23,8 @@ use sprites::*;
 struct MainState {
 	ui: UI,
     player: Player,
-    blobs: Vec<Blob>,
-    walls: Vec<Wall>,
+    blob: Vec<Blob>,
+    level: Level,
     sprite: Sprite,
     animated: AnimatedSprite,
     rotation: f32,
@@ -37,67 +37,61 @@ impl EventHandler for MainState {
 
         self.player.update(ctx);
 
-		for blob in &mut self.blobs {
-			if blob.collision(&self.player) {
-				self.player.take_dmg(blob.atk);
-			}
-			
-			if let Some(atk) = &self.player.atk_box {
-				if blob.collision(atk) {
-					println!("blob took dmg");
-					blob.take_dmg(self.player.atk);
-				}
-			}
-		}
-		
-        for wall in &self.walls {
-            if self.player.collision(wall) {
-                self.player.move_location(playerx, playery);
+        if self.player.collision(&self.level) {
+            self.player.move_location(playerx, playery);
+        }
+
+        for blob in &mut self.blob {
+            if blob.collision(&self.player) {
+                self.player.take_dmg(blob.atk);
+            }
+
+            if let Some(atk) = &self.player.atk_box {
+                if blob.collision(atk) {
+                    println!("blob took dmg");
+                    blob.take_dmg(self.player.atk);
+                }
             }
         }
 
         self.animated.animate(timer::delta(ctx));
 
         self.rotation += timer::duration_to_f64(timer::delta(ctx)) as f32;
-        self.rotation = self.rotation % (2.0 * std::f32::consts::PI);
+        self.rotation %= 2.0 * std::f32::consts::PI;
 
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
-		
-        for wall in &self.walls {
-            wall.draw(ctx)?;
-        }
+
+        self.level.draw(ctx)?;
 
         self.player.draw(ctx)?;
-		
-		for blob in &self.blobs {
-			blob.draw(ctx)?;
-		}
-		
+
+        for blob in &self.blob {
+            blob.draw(ctx)?;
+        }
+
         let dp = graphics::DrawParam::default()
             .src(graphics::Rect::new(0.0, 0.0, 1.0, 1.0))
             .dest([736f32, 536f32])
-            .offset([0.5,0.5])
-            .scale([2.0,2.0])
+            .offset([0.5, 0.5])
+            .scale([2.0, 2.0])
             .rotation(self.rotation)
             .color(graphics::Color::new(
                 1.0 - self.rotation / (2.0 * std::f32::consts::PI),
                 self.rotation / (2.0 * std::f32::consts::PI),
                 self.rotation / (2.0 * std::f32::consts::PI),
                 1.0,
-            ))
-            ;
+            ));
         graphics::draw(ctx, &self.sprite, dp)?;
 
         let dp = graphics::DrawParam::default()
             .dest([736f32, 64f32])
-            .offset([0.5,0.5])
+            .offset([0.5, 0.5])
             .scale([2.0, 2.0])
-            .rotation(self.rotation)
-            ;
+            .rotation(self.rotation);
         graphics::draw(ctx, &self.animated, dp)?;
 		
 		self.ui.draw(ctx);
@@ -111,7 +105,7 @@ impl EventHandler for MainState {
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) {
         match key {
             KeyCode::P => println!("Pause? Maybe latter."),
-            KeyCode::Escape => quit(ctx),
+            KeyCode::Escape => ggez::event::quit(ctx),
             // other keys to detect
             _ => { /* Do Nothing */ }
         }
@@ -129,27 +123,54 @@ fn main() {
             .build()
             .unwrap();
 
-    let mut wall_vec = Vec::new();
-    wall_vec.push(Wall::new(ctx, 350.0, 150.0));
-    wall_vec.push(Wall::new(ctx, 350.0, 250.0));
-    wall_vec.push(Wall::new(ctx, 350.0, 350.0));
+    // create player
+    let mut player = Player::new(ctx);
+    player.move_location(150f32, 150f32);
 
-	let mut blob_vec = Vec::new();
-	blob_vec.push(Blob::new(ctx, 250.0, 250.0));
-	blob_vec.push(Blob::new(ctx, 250.0, 350.0));
-	blob_vec.push(Blob::new(ctx, 250.0, 150.0));
-	
+    // create blobs (ie enemies)
+    let mut blob = Vec::new();
+    blob.push(Blob::new(ctx, 250.0, 250.0));
+    blob.push(Blob::new(ctx, 250.0, 350.0));
+    blob.push(Blob::new(ctx, 250.0, 150.0));
+
+    // build level
+    let img = graphics::Image::new(ctx, "/testwalls.png").unwrap();
+    let mut lb = LevelBuilder::new(ctx, None);
+    lb.set_tile_image(
+        0usize,
+        &Sprite::new(&img, graphics::Rect::new(0f32, 0f32, 64f32, 64f32)).unwrap(),
+    )
+    .unwrap();
+    lb.set_tile_image(
+        1usize,
+        &Sprite::new(&img, graphics::Rect::new(64f32, 0f32, 64f32, 64f32)).unwrap(),
+    )
+    .unwrap();
+    lb.set_tile_image(
+        2usize,
+        &Sprite::new(&img, graphics::Rect::new(128f32, 0f32, 64f32, 64f32)).unwrap(),
+    )
+    .unwrap();
+    lb.set_tile_image(
+        3usize,
+        &Sprite::new(&img, graphics::Rect::new(192f32, 0f32, 64f32, 64f32)).unwrap(),
+    )
+    .unwrap();
+    let level = lb.sample3();
+
+    // demo sprites
     let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
     let sprite = Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap();
     let animated = AnimatedBuilder::new(&img)
         .create_animated(graphics::Rect::new(0f32, 320f32, 64f32, 64f32), 6usize)
         .unwrap();
 
+    // create state
     let state = &mut MainState {
+        level,
+        blob,
+        player,
 		ui: UI::new(ctx),
-        player: Player::new(ctx),
-        blobs: blob_vec,
-        walls: wall_vec,
         sprite,
         animated,
         rotation: 0f32,
