@@ -9,7 +9,7 @@ pub struct UI {
 pub struct DmgText {
 	point: nalgebra::Point2<f32>,
 	text: graphics::Text,
-	duration: f32,
+	pub duration: f32,
 }
 
 impl UI {
@@ -29,53 +29,29 @@ impl UI {
 		let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
 		self.player_health = graphics::Text::new((health.to_string(), font, 22.0));
 		
+		// If there is a way to combine both of the next logic
+		// pieces then go for it.
 		self.dmg_text.retain(|x|
 			if let Some(d) = x {
-				println!("{}", d.duration);
-				if d.duration == 50.0 {
+				if d.duration == 20.0 {
 					false
 				}
 				else {
-					//d.duration += 1.0;
 					true
 				}
 			}
 			else
 			{
 				true
-			});
+		});
 			
-			for dmg in &self.dmg_text {
-				match dmg {
-					Some(d) => d.duration = d.duration + 1.0,
-					None => (),
-				};
+		// This combined with the previous would be fun to think about.
+		for dmg in &mut self.dmg_text {
+			if let Some(d) = dmg {
+				d.duration = d.duration + 1.0;
+				d.point.y -= 1.0;
 			}
-			
-			// Update syntax
-			//struct Point3d {
-			//	x: i32,
-			//	y: i32,
-			//	z: i32,
-			//}
-			//
-			//let mut point = Point3d { x: 0, y: 0, z: 0 };
-			//point = Point3d { y: 1, .. point };
-			
-			
-		//for dmg in &self.dmg_text {
-		//	if let Some(d) = dmg {
-		//		if d.duration == 10.0 {
-		//			let index = self.dmg_text.iter().position(|x| x == dmg).unwrap();
-		//			&self.dmg_text.remove(index);
-		//			//&self.dmg_text.remove(d);
-		//		}
-		//		else {
-		//			d.duration += 1.0;
-		//		}
-		//	}
-		//}
-		//self.dmg_text = Vec::new();
+		}
 	}
 	
 	pub fn update_dmg_text(&mut self, ctx: &mut Context, posx: f32, posy: f32, dmg: f32) {
@@ -91,7 +67,7 @@ impl UI {
 		
 		for dmg in &self.dmg_text {
 			if let Some(d) = dmg {
-				d.draw(ctx);//.expect("Error drawing dmg text");
+				d.draw(ctx);
 			}
 		}
 	}
@@ -103,10 +79,14 @@ impl DmgText {
         let dmg_t = graphics::Text::new((dmg.to_string(), font, 22.0));
 		
 		DmgText {
-			point: nalgebra::Point2::new(xpos, ypos),
+			point: nalgebra::Point2::new(xpos + 5.0, ypos + 2.0),// The magic numbers help float over the object.
 			text: dmg_t,
 			duration: 0.0f32,
 		}
+	}
+	
+	pub fn update(&mut self, ctx: &mut Context) {
+		self.duration += 1.0;
 	}
 
 	pub fn draw(&self, ctx: &mut Context) {
