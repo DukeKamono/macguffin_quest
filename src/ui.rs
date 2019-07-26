@@ -4,13 +4,19 @@ pub struct UI {
 	pub player_name: graphics::Text,
 	pub player_health: graphics::Text,
 	pub dmg_text: Vec<Option<DmgText>>,
+	//pub text_box: TextBox,
 }
 
 pub struct DmgText {
 	point: nalgebra::Point2<f32>,
 	text: graphics::Text,
-	pub duration: f32,
+	duration: f32,
 }
+
+//pub struct TextBox {
+//	talker: graphics::Image,
+//	text: graphics::Text,
+//}
 
 impl UI {
 	pub fn new(ctx: &mut Context, name: String, health: f32) -> UI {
@@ -22,6 +28,7 @@ impl UI {
 			player_name: p_name,
 			player_health: p_health,
 			dmg_text: Vec::new(),
+			//text_box: TextBox::new(ctx, "test".to_string()),
 		}
 	}
 	
@@ -71,6 +78,10 @@ impl UI {
 			}
 		}
 	}
+	
+	//pub fn draw_text_box(&mut self, ctx: &mut Context) {
+	//	
+	//}
 }
 
 impl DmgText {
@@ -84,12 +95,29 @@ impl DmgText {
 			duration: 0.0f32,
 		}
 	}
-	
-	pub fn update(&mut self, ctx: &mut Context) {
-		self.duration += 1.0;
-	}
 
 	pub fn draw(&self, ctx: &mut Context) {
 		graphics::draw(ctx, &self.text, graphics::DrawParam::default().dest(self.point) ).expect("ERROR drawing Dmg Text");
 	}
 }
+
+//impl TextBox {
+//	pub fn new(ctx: &mut Context, text: String) -> TextBox {
+//		let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
+//        let t = graphics::Text::new((text, font, 22.0));
+//		
+//		TextBox {
+//			text: t,
+//			talker: graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap(),
+//		}
+//	}
+//	
+//	pub fn update(&mut self, ctx: &mut Context) {
+//		
+//	}
+//
+//	pub fn draw(&self, ctx: &mut Context) {
+//		let point = nalgebra::Point2::new(1000.0, 100.0);
+//		graphics::draw(ctx, &self.text, graphics::DrawParam::default().dest(point) ).expect("ERROR drawing talk Text");
+//	}
+//}
