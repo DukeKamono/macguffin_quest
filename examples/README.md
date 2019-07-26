@@ -23,6 +23,9 @@ Based on [ggez guide Hello ggez](https://github.com/ggez/ggez/blob/master/docs/g
 * `move_circle`  
 Based on ggez [keyboard input documentation](https://docs.rs/ggez/0.5.0-rc.2/ggez/input/keyboard/index.html) example.  
 Takes in arrow key input from keyboard.
+* `screen_coord`  
+Tests moving the screen coordinates  
+Also makes use of draw queued text
 * `sprite_sheet`  
 Simple example to load a sprite sheet as Image and make use of it.  
 Sheet generated using this [tool](http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/#?sex=male&body=skeleton&eyes=none&legs=pants_red&clothes=formal&formal-shirt=1&formal-pants=1&formal-vest=1&mail=none&armor=none&tie=on&hair=shorthawk_green&arms=none&shoulders=none&spikes=none&bracers=leather&greaves=none&gloves=none&hat=none&=shoes_black&belt=none&bracelet=none&weapon=none&shield=none)
