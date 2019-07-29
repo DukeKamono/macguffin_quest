@@ -12,12 +12,16 @@ use entities::enemies::blob::Blob;
 // get wall struct to use
 use entities::environment::{level::Level, level_builder::LevelBuilder};
 
+mod ui;
+use ui::UI;
+
 mod sprites;
 //use sprites::sprite::Sprite;
 //use sprites::animated_sprite::*;
 use sprites::*;
 
 struct MainState {
+	ui: UI,
     player: Player,
     blob: Vec<Blob>,
     level: Level,
@@ -46,6 +50,7 @@ impl EventHandler for MainState {
                 if blob.collision(atk) {
                     println!("blob took dmg");
                     blob.take_dmg(self.player.atk);
+					self.ui.update_dmg_text(ctx, blob.x, blob.y, self.player.atk);
                 }
             }
         }
@@ -55,6 +60,8 @@ impl EventHandler for MainState {
         self.rotation += timer::duration_to_f64(timer::delta(ctx)) as f32;
         self.rotation %= 2.0 * std::f32::consts::PI;
 
+		// Should prob make UI update last all the time.
+		self.ui.update(ctx, self.player.hp);
         Ok(())
     }
 
@@ -89,6 +96,8 @@ impl EventHandler for MainState {
             .scale([2.0, 2.0])
             .rotation(self.rotation);
         graphics::draw(ctx, &self.animated, dp)?;
+		
+		self.ui.draw(ctx);
 
         // This presents the contents of ctx to the game.
         graphics::present(ctx)?;
@@ -120,6 +129,7 @@ fn main() {
     // create player
     let mut player = Player::new(ctx);
     player.move_location(150f32, 150f32);
+	let hp = player.hp;
 
     // create blobs (ie enemies)
     let mut blob = Vec::new();
@@ -161,9 +171,10 @@ fn main() {
 
     // create state
     let state = &mut MainState {
-        player,
-        blob,
         level,
+        blob,
+        player,
+		ui: UI::new(ctx, "Adventurer".to_string(), hp),
         sprite,
         animated,
         rotation: 0f32,

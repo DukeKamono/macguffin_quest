@@ -33,7 +33,6 @@ impl Blob {
     pub fn take_dmg(&mut self, dmg_to_take: f32) {
         self.hp -= dmg_to_take;
         // Check for death and maybe call a death function.
-        println!("hp is: {}", self.hp);
     }
 }
 
