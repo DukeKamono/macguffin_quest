@@ -17,7 +17,7 @@ fn main() {
             .build()
             .unwrap();
 
-    let mut state_machine = StateMachine::new();
+    let mut state_machine = StateMachine::new(ctx);
     
     //state_machine.new_main_state(ctx);
     //let state = &mut states::MainState::new(ctx);
