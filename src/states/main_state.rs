@@ -34,7 +34,7 @@ impl CustomEventHandler for MainState {
         let playerx = self.player.x;
         let playery = self.player.y;
 
-        self.player.update(ctx);
+        self.player.update(ctx, delta);
 
         if self.player.collision(&self.level) {
             self.player.move_location(playerx, playery);
