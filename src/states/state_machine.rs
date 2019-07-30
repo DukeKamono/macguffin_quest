@@ -1,46 +1,99 @@
-pub struct StateMachine {
-    //main_menu_state: Option<MainMenuState>,
-    //pub main_state: Option<MainState>,
-    //pause_state: Option<PauseState>,
-	current_state: Box<EventHandler>,
-	
-	//states: Vec<Box<EventHandler>>,
-	//current: usize,
+pub trait CustomEventHandler {
+    // required
+    fn update(&mut self, _ctx: &mut Context) -> HandlerMessage;
+    fn draw(&mut self, _ctx: &mut Context) -> GameResult;
+
+    // may be useful
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods, _repeat: bool) -> HandlerMessage { HandlerMessage::Keep }
+    
+    // add more EventHandler method wrappers as needed
 }
-use ggez::event::EventsLoop;
+
+pub enum HandlerMessage {
+    // no change needed, stick with current CustomEventHandler
+    Keep,
+    // leave current CustomEventHandler, going back to previous CustomEventHandler
+    Bail,
+    // spawn new CustomEventHandler on-top of current CustomEventHandler
+    Spawn(Box<CustomEventHandler>),
+    // change current CustomEventHandler into a new CustomEventHandler [Bail then Spawn]
+    Change(Box<CustomEventHandler>),
+    // an error occurred and needs reported
+    Error(GameError),
+}
+
+impl HandlerMessage {
+    fn handle(self, sm: &mut StateMachine) -> GameResult {
+        match self {
+            HandlerMessage::Keep => (),
+            HandlerMessage::Bail => {sm.pop(); ()},
+            HandlerMessage::Spawn(new) => sm.push(new),
+            HandlerMessage::Change(new) => {sm.pop(); sm.push(new)},
+            HandlerMessage::Error(err) => return Err(err),
+        };
+        Ok(())
+    }
+}
+
+pub struct StateMachine{
+    // Stack of States (top is active) [should quit if empty]
+	states: Vec<Box<CustomEventHandler>>,
+}
 
 impl StateMachine {
-    pub fn new(ctx: &mut Context) -> StateMachine {
+    pub fn new(state: Box<CustomEventHandler>) -> StateMachine {
+        let mut states = Vec::new();
+        states.push(state);
         StateMachine {
-            //main_menu_state: None,
-            //main_state: None,
-            //pause_state: None,
-			current_state: Box::new(MainState::new(ctx)),
+			states,
         }
     }
 
-    //pub fn new_main_state(&mut self, ctx: &mut Context) {
-    //    self.main_state = Some(MainState::new(ctx));
-    //}
+    pub fn push(&mut self, state: Box<CustomEventHandler>) {
+        self.states.push(state)
+    }
 
-    pub fn run(&mut self, ctx: &mut Context, event_loop: &mut EventsLoop) {
-        //self.new_main_state(ctx);
-        //let mut state = MainState::new(ctx);
-        // start game loop
-        match ggez::event::run(ctx, event_loop, self) {
-            Ok(_) => println!("Exiting Game."),
-            Err(e) => println!("Run event loop broke! {}", e),
+    pub fn pop(&mut self) -> Option<Box<CustomEventHandler>> {
+        self.states.pop()
+    }
+
+    fn is_empty(&self, ctx: &mut Context) -> bool {
+        if self.states.is_empty() {
+            event::quit(ctx);
+            return true
         }
+        false
     }
 }
 
 impl EventHandler for StateMachine {
 	fn update(&mut self, ctx: &mut Context) -> GameResult {
-		///self.current_state = PauseState::new(ctx);
-		self.current_state.update(ctx)
+        // if there are no states don't update anything, just quit
+        if self.is_empty(ctx) {
+            return Ok(())
+        }
+
+        // know that states has something in it so it is ok to unwrap
+        self.states.last_mut().unwrap().update(ctx).handle(self)
     }
     
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        self.current_state.draw(ctx)
+        // if there are no states don't draw anything, just quit
+        // note should already have been checked in StateMachine.update()
+        if self.is_empty(ctx) {
+            return Ok(())
+        }
+        self.states.last_mut().unwrap().draw(ctx)
+    }
+
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods, _repeat: bool) {
+        // if escape key is hit just quit
+        // if there are no states don't pass on anything, just quit
+        if keycode == KeyCode::Escape || self.is_empty(ctx) {
+            event::quit(ctx);
+            return
+        }
+
+        self.states.last_mut().unwrap().key_down_event(ctx, keycode, _keymods, _repeat).handle(self);
     }
 }

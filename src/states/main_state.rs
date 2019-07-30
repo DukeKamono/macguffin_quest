@@ -29,8 +29,8 @@ pub struct MainState {
     rotation: f32,
 }
 
-impl EventHandler for MainState {
-    fn update(&mut self, ctx: &mut Context) -> GameResult {
+impl CustomEventHandler for MainState {
+    fn update(&mut self, ctx: &mut Context) -> HandlerMessage {
         let playerx = self.player.x;
         let playery = self.player.y;
 
@@ -60,7 +60,8 @@ impl EventHandler for MainState {
 
         // Should prob make UI update last all the time.
         self.ui.update(ctx, self.player.hp);
-        Ok(())
+        
+        HandlerMessage::Keep
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
@@ -103,12 +104,13 @@ impl EventHandler for MainState {
         Ok(())
     }
 
-    fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) {
+    fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) -> HandlerMessage {
         match key {
-            KeyCode::P => println!("Pause? Maybe latter."),
-            //KeyCode::Escape => quit(ctx),
-            // other keys to detect
-            _ => { /* Do Nothing */ }
+            KeyCode::P => {
+                println!("Pause? Maybe latter.");
+                HandlerMessage::Keep
+            },
+            _ => HandlerMessage::Keep
         }
     }
 }
