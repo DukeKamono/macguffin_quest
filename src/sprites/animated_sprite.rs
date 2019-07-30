@@ -74,7 +74,7 @@ impl AnimatedSprite {
         self.clips[self.current_frame].h * f32::from(self.sheet.height())
     }
 
-    fn dimensions(&self) -> Option<Rect> {
+    pub fn dimensions(&self) -> Option<Rect> {
         let mut dim = self.sheet.dimensions();
         dim.w *= self.clips[self.current_frame].w;
         dim.h *= self.clips[self.current_frame].h;
