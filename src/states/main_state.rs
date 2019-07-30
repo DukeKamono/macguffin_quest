@@ -1,5 +1,3 @@
-
-
 // contains all the information on entities
 //mod entities;
 // get collison trait from entities
@@ -104,11 +102,11 @@ impl CustomEventHandler for MainState {
         Ok(())
     }
 
-    fn key_down_event(&mut self, _ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) -> HandlerMessage {
+    fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) -> HandlerMessage {
         match key {
             KeyCode::P => {
-                println!("Pause? Maybe latter.");
-                HandlerMessage::Keep
+				let state = Box::new(PauseState::new(ctx));
+                HandlerMessage::Spawn(state)
             },
             _ => HandlerMessage::Keep
         }
