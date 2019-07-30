@@ -26,27 +26,20 @@ impl UI {
 
     pub fn draw(&mut self, ctx: &mut Context) {
         let player_name_dest = nalgebra::Point2::new(100.0, 10.0);
-        graphics::draw(
-            ctx,
-            &self.player_name,
-            graphics::DrawParam::default().dest(player_name_dest),
-        )
-        .expect("ERROR drawing player name");
-
+        graphics::queue_text(ctx, &self.player_name, player_name_dest, Some(graphics::WHITE));
+        
         let player_health_dest = nalgebra::Point2::new(100.0, 30.0);
-        graphics::draw(
-            ctx,
-            &self.player_health,
-            graphics::DrawParam::default().dest(player_health_dest),
-        )
-        .expect("ERROR drawing player health");
+        graphics::queue_text(ctx, &self.player_health, player_health_dest, Some(graphics::WHITE));
+        
+        graphics::draw_queued_text(ctx, graphics::DrawParam::default(), None, graphics::FilterMode::Linear).expect("Error Drawing UI");
     }
 }
 
 
 /// Floating text (primarily for damage)
 
-const FLOAT_SPEED: f64 = 5f64; // move 5 units every second
+const FLOAT_SPEED: f64 = 25f64; // move 25 units every second
+const LIFETIME: Duration = Duration::from_millis(1000); // text lives one sec
 
 pub struct DmgText {
     point: nalgebra::Point2<f32>,
@@ -68,20 +61,16 @@ impl DmgText {
 
     pub fn update(&mut self, delta: Duration) {
         self.duration += delta;
-        let yinc = timer::duration_to_f64(delta) / FLOAT_SPEED;
+        let yinc = timer::duration_to_f64(delta) * FLOAT_SPEED;
         self.point.y -= yinc as f32;
     }
 
     pub fn live(&self) -> bool {
-        self.duration < Duration::from_millis(100000)
+        self.duration < LIFETIME
     }
 
     pub fn draw(&self, ctx: &mut Context) {
-        graphics::draw(
-            ctx,
-            &self.text,
-            graphics::DrawParam::default().dest(self.point),
-        )
-        .expect("ERROR drawing Dmg Text");
+        graphics::queue_text(ctx, &self.text, self.point, Some(graphics::WHITE));
+        graphics::draw_queued_text(ctx, graphics::DrawParam::default(), None, graphics::FilterMode::Linear).expect("Error Drawing DmgText");
     }
 }
