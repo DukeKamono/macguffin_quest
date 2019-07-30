@@ -28,6 +28,8 @@ pub enum Direction {
 pub enum Animations {
     Stand,
     Walking,
+    Cast,
+    Die,
 }
 
 pub struct Player {
@@ -47,6 +49,7 @@ impl Player {
         let mut sprite = HashMap::new();
         let sheet = Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
         let builder = AnimatedBuilder::new(&sheet);
+        // standing
         sprite.insert(
             (Animations::Stand, Direction::Up),
             builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 1usize).unwrap()
@@ -63,6 +66,7 @@ impl Player {
             (Animations::Stand, Direction::Right),
             builder.create_animated(Rect::new(0f32, 192f32, 64f32, 64f32), 1usize).unwrap()
         );
+        // walking
         sprite.insert(
             (Animations::Walking, Direction::Up),
             builder.create_animated(Rect::new(64f32, 0f32, 64f32, 64f32), 8usize).unwrap()
@@ -79,6 +83,29 @@ impl Player {
             (Animations::Walking, Direction::Right),
             builder.create_animated(Rect::new(64f32, 192f32, 64f32, 64f32), 8usize).unwrap()
         );
+        // casting
+        sprite.insert(
+            (Animations::Cast, Direction::Up),
+            builder.create_animated(Rect::new(64f32, 512f32, 64f32, 64f32), 6usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Cast, Direction::Left),
+            builder.create_animated(Rect::new(64f32, 576f32, 64f32, 64f32), 6usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Cast, Direction::Down),
+            builder.create_animated(Rect::new(64f32, 640f32, 64f32, 64f32), 6usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Cast, Direction::Right),
+            builder.create_animated(Rect::new(64f32, 704f32, 64f32, 64f32), 6usize).unwrap()
+        );
+        // die
+        sprite.insert(
+            (Animations::Die, Direction::Down),
+            builder.create_animated(Rect::new(64f32, 768f32, 64f32, 64f32), 5usize).unwrap()
+        );
+
 
         Player {
             x: 10.0,
@@ -103,7 +130,19 @@ impl Player {
             0.5
         }
 
-        if keyboard::is_key_pressed(ctx, KEY_RIGHT) {
+        self.atk_box = None;
+
+        // dead
+        if self.hp <= 0f32 {
+            self.animation = (Animations::Die, Direction::Down);
+        }
+        // attacking
+        else if keyboard::is_key_pressed(ctx, KeyCode::Space) {
+            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y));
+            self.animation.0 = Animations::Cast;
+        }
+        // walking animations
+        else if keyboard::is_key_pressed(ctx, KEY_RIGHT) {
             self.x += move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Right);
         } else if keyboard::is_key_pressed(ctx, KEY_LEFT) {
@@ -115,7 +154,9 @@ impl Player {
         } else if keyboard::is_key_pressed(ctx, KEY_DOWN) {
             self.y += move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Down);
-        } else {
+        }
+        // standing animation
+        else {
             self.animation.0 = Animations::Stand;
         }
 
