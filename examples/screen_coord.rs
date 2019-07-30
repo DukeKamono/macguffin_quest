@@ -1,7 +1,7 @@
-use ggez::{Context, ContextBuilder, GameResult, nalgebra as na, timer};
 use ggez::event::{self, EventHandler, KeyCode};
 use ggez::graphics::{self, DrawParam, Rect, Text};
 use ggez::input::keyboard;
+use ggez::{nalgebra as na, timer, Context, ContextBuilder, GameResult};
 
 struct MyStruct {
     text: Text,
@@ -16,7 +16,12 @@ impl MyStruct {
         let other = Text::new("|o|");
         let other_dest = na::Point2::new(0f32, 0f32);
         let screen_coord = graphics::screen_coordinates(ctx);
-        MyStruct { text, other, other_dest, screen_coord }
+        MyStruct {
+            text,
+            other,
+            other_dest,
+            screen_coord,
+        }
     }
 }
 
@@ -69,19 +74,11 @@ impl EventHandler for MyStruct {
             Some(graphics::BLACK),
         );
 
-        graphics::queue_text(
-            ctx,
-            &self.other,
-            self.other_dest,
-            Some(graphics::BLACK),
-        );
+        graphics::queue_text(ctx, &self.other, self.other_dest, Some(graphics::BLACK));
 
         // if any other text drawn using graphics::draw() the queue will be drawn
         // https://docs.rs/ggez/0.5.1/ggez/graphics/fn.draw_queued_text.html
-        graphics::draw_queued_text(
-            ctx,
-            DrawParam::default(),
-        )?;
+        graphics::draw_queued_text(ctx, DrawParam::default())?;
 
         graphics::present(ctx)?;
         timer::yield_now();
@@ -90,10 +87,9 @@ impl EventHandler for MyStruct {
 }
 
 fn main() {
-    let (mut ctx, mut event_loop) =
-       ContextBuilder::new("screen_coord", "people")
-           .build()
-           .unwrap();
+    let (mut ctx, mut event_loop) = ContextBuilder::new("screen_coord", "people")
+        .build()
+        .unwrap();
 
     let mut my_struct = MyStruct::new(&mut ctx);
 
