@@ -25,12 +25,18 @@ impl UI {
     }
 
     pub fn draw(&mut self, ctx: &mut Context) {
+        // make sure text queue is cleared
+        graphics::draw_queued_text(ctx, graphics::DrawParam::default(), None, graphics::FilterMode::Linear).expect("unable to clear queue");
+
+        // queue player name for drawing
         let player_name_dest = nalgebra::Point2::new(100.0, 10.0);
         graphics::queue_text(ctx, &self.player_name, player_name_dest, Some(graphics::WHITE));
         
+        // queue player health for drawing
         let player_health_dest = nalgebra::Point2::new(100.0, 30.0);
         graphics::queue_text(ctx, &self.player_health, player_health_dest, Some(graphics::WHITE));
         
+        // draw ui
         graphics::draw_queued_text(ctx, graphics::DrawParam::default(), None, graphics::FilterMode::Linear).expect("Error Drawing UI");
     }
 }
