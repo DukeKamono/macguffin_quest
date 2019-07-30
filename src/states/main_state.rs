@@ -29,6 +29,8 @@ pub struct MainState {
 
 impl CustomEventHandler for MainState {
     fn update(&mut self, ctx: &mut Context) -> HandlerMessage {
+        let delta = timer::delta(ctx);
+
         let playerx = self.player.x;
         let playery = self.player.y;
 
@@ -39,19 +41,20 @@ impl CustomEventHandler for MainState {
         }
 
         for blob in &mut self.blob {
+            blob.update(delta);
+
             if blob.collision(&self.player) {
                 self.player.take_dmg(blob.atk);
             }
 
             if let Some(atk) = &self.player.atk_box {
                 if blob.collision(atk) {
-                    blob.take_dmg(self.player.atk);
-                    //self.ui.update_dmg_text(ctx, blob.x, blob.y, self.player.atk);
+                    blob.take_dmg(ctx, self.player.atk);
                 }
             }
         }
 
-        self.animated.animate(timer::delta(ctx));
+        self.animated.animate(delta);
 
         self.rotation += timer::duration_to_f64(timer::delta(ctx)) as f32;
         self.rotation %= 2.0 * std::f32::consts::PI;
