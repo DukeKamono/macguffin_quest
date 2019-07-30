@@ -3,15 +3,15 @@ pub struct PauseState {
 }
 
 impl EventHandler for PauseState {
-    fn update(&mut self, ctx: &mut Context) -> GameResult {
+    fn update(&mut self, _ctx: &mut Context) -> GameResult {
         Ok(())
     }
     
-    fn draw(&mut self, ctx: &mut Context) -> GameResult {
+    fn draw(&mut self, _ctx: &mut Context) -> GameResult {
         Ok(())
     }
     
-    fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) {
+    fn key_down_event(&mut self, _ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) {
         match key {
             KeyCode::P => println!("Pause? Maybe latter."),
             //KeyCode::Escape => quit(ctx),
@@ -22,7 +22,7 @@ impl EventHandler for PauseState {
 }
 
 impl PauseState {
-    pub fn new(ctx: &mut Context) -> PauseState {
+    pub fn new(_ctx: &mut Context) -> PauseState {
         PauseState {
             
         }

@@ -4,7 +4,7 @@ pub trait CustomEventHandler {
     fn draw(&mut self, _ctx: &mut Context) -> GameResult;
 
     // may be useful
-    fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods, _repeat: bool) -> HandlerMessage { HandlerMessage::Keep }
+    fn key_down_event(&mut self, _ctx: &mut Context, _keycode: KeyCode, _keymods: KeyMods, _repeat: bool) -> HandlerMessage { HandlerMessage::Keep }
     
     // add more EventHandler method wrappers as needed
 }
@@ -83,10 +83,12 @@ impl EventHandler for StateMachine {
         if self.is_empty(ctx) {
             return Ok(())
         }
+
+        
         self.states.last_mut().unwrap().draw(ctx)
     }
 
-    fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods, _repeat: bool) {
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, keymods: KeyMods, repeat: bool) {
         // if escape key is hit just quit
         // if there are no states don't pass on anything, just quit
         if keycode == KeyCode::Escape || self.is_empty(ctx) {
@@ -94,6 +96,8 @@ impl EventHandler for StateMachine {
             return
         }
 
-        self.states.last_mut().unwrap().key_down_event(ctx, keycode, _keymods, _repeat).handle(self);
+        match self.states.last_mut().unwrap().key_down_event(ctx, keycode, keymods, repeat).handle(self) {
+            _ => (),
+        }
     }
 }

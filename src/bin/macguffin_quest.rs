@@ -1,10 +1,4 @@
-// contains all the information on entities
-mod entities;
-mod ui;
-mod sprites;
-
-mod states;
-use states::StateMachine;
+use macguffin_quest::states::*;
 
 fn main() {
     // create a context to access hardware (also creates event loop)
@@ -16,7 +10,7 @@ fn main() {
             .unwrap();
 
     // initial state to start game
-    let state = Box::new(states::MainState::new(ctx));
+    let state = Box::new(MainState::new(ctx));
 
     // create state machine to manage states (add initial state)
     let state_machine = &mut StateMachine::new(state);
