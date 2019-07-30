@@ -26,7 +26,8 @@ pub enum Direction {
 
 #[derive(PartialEq, Eq, Hash)]
 pub enum Animations {
-    Walking
+    Stand,
+    Walking,
 }
 
 pub struct Player {
@@ -46,6 +47,22 @@ impl Player {
         let mut sprite = HashMap::new();
         let sheet = Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
         let builder = AnimatedBuilder::new(&sheet);
+        sprite.insert(
+            (Animations::Stand, Direction::Up),
+            builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 1usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Stand, Direction::Left),
+            builder.create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 1usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Stand, Direction::Down),
+            builder.create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Stand, Direction::Right),
+            builder.create_animated(Rect::new(0f32, 192f32, 64f32, 64f32), 1usize).unwrap()
+        );
         sprite.insert(
             (Animations::Walking, Direction::Up),
             builder.create_animated(Rect::new(64f32, 0f32, 64f32, 64f32), 8usize).unwrap()
@@ -92,13 +109,14 @@ impl Player {
         } else if keyboard::is_key_pressed(ctx, KEY_LEFT) {
             self.x -= move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Left);
-        }
-        if keyboard::is_key_pressed(ctx, KEY_UP) {
+        } else if keyboard::is_key_pressed(ctx, KEY_UP) {
             self.y -= move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Up);
         } else if keyboard::is_key_pressed(ctx, KEY_DOWN) {
             self.y += move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Down);
+        } else {
+            self.animation.0 = Animations::Stand;
         }
 
         if keyboard::is_key_pressed(ctx, KeyCode::Space) {
