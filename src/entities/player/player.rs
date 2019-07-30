@@ -90,16 +90,6 @@ impl Player {
 
 impl DrawableEntity for Player {
     fn draw(&self, ctx: &mut Context) -> GameResult {
-        // change screen coords so it seems like following player
-        let hb = self.get_hitbox();
-        let swh = graphics::drawable_size(ctx);
-        let screen_shift = graphics::Rect::new(
-            self.x - hb.w / 2f32 - swh.0 / 2f32,
-            self.y - hb.h / 2f32 - swh.1 / 2f32,
-            swh.0,
-            swh.1);
-        graphics::set_screen_coordinates(ctx, screen_shift)?;
-
         self.draw_weapon(ctx);
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.sprite, dp)

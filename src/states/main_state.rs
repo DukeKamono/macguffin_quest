@@ -64,6 +64,16 @@ impl CustomEventHandler for MainState {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
+        
+        // change screen coords so it seems like following player
+        let hb = self.player.get_hitbox();
+        let swh = graphics::drawable_size(ctx);
+        let screen_shift = graphics::Rect::new(
+            self.player.x - hb.w / 2f32 - swh.0 / 2f32,
+            self.player.y - hb.h / 2f32 - swh.1 / 2f32,
+            swh.0,
+            swh.1);
+        graphics::set_screen_coordinates(ctx, screen_shift)?;
 
         self.level.draw(ctx)?;
 
@@ -93,6 +103,14 @@ impl CustomEventHandler for MainState {
             .scale([2.0, 2.0])
             .rotation(self.rotation);
         graphics::draw(ctx, &self.animated, dp)?;
+
+        
+        let screen_shift = graphics::Rect::new(
+            0f32,
+            0f32,
+            swh.0,
+            swh.1);
+        graphics::set_screen_coordinates(ctx, screen_shift)?;
         
         self.ui.draw(ctx);
 
