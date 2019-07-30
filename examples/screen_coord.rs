@@ -78,7 +78,7 @@ impl EventHandler for MyStruct {
 
         // if any other text drawn using graphics::draw() the queue will be drawn
         // https://docs.rs/ggez/0.5.1/ggez/graphics/fn.draw_queued_text.html
-        graphics::draw_queued_text(ctx, DrawParam::default())?;
+        graphics::draw_queued_text(ctx, DrawParam::default(), None, graphics::FilterMode::Linear)?;
 
         graphics::present(ctx)?;
         timer::yield_now();

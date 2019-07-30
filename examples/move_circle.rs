@@ -50,7 +50,7 @@ impl EventHandler for MainState {
         if let KeyCode::Q = key {
             if mods.contains(KeyMods::SHIFT & KeyMods::CTRL) {
                 println!("Terminating!");
-                ggez::quit(ctx);
+                ggez::event::quit(ctx);
             } else if mods.contains(KeyMods::SHIFT) || mods.contains(KeyMods::CTRL) {
                 println!("You need to hold both Shift and Control to quit.");
             } else {
