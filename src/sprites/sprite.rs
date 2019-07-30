@@ -33,6 +33,13 @@ impl Sprite {
     pub fn height(&self) -> f32 {
         self.clip.h * f32::from(self.sheet.height())
     }
+
+    pub fn dimensions(&self) -> Option<Rect> {
+        let mut dim = self.sheet.dimensions();
+        dim.w *= self.clip.w;
+        dim.h *= self.clip.h;
+        Some(dim)
+    }
 }
 
 impl Drawable for Sprite {
@@ -47,10 +54,7 @@ impl Drawable for Sprite {
     }
 
     fn dimensions(&self, _ctx: &mut Context) -> Option<Rect> {
-        let mut dim = self.sheet.dimensions();
-        dim.w *= self.clip.w;
-        dim.h *= self.clip.h;
-        Some(dim)
+        self.dimensions()
     }
 
     fn set_blend_mode(&mut self, mode: Option<BlendMode>) {

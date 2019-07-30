@@ -66,12 +66,19 @@ impl AnimatedSprite {
         }
     }
 
-    pub fn _width(&self) -> f32 {
+    pub fn width(&self) -> f32 {
         self.clips[self.current_frame].w * f32::from(self.sheet.width())
     }
 
-    pub fn _height(&self) -> f32 {
+    pub fn height(&self) -> f32 {
         self.clips[self.current_frame].h * f32::from(self.sheet.height())
+    }
+
+    fn dimensions(&self) -> Option<Rect> {
+        let mut dim = self.sheet.dimensions();
+        dim.w *= self.clips[self.current_frame].w;
+        dim.h *= self.clips[self.current_frame].h;
+        Some(dim)
     }
 
     /*
@@ -120,10 +127,7 @@ impl Drawable for AnimatedSprite {
     }
 
     fn dimensions(&self, _ctx: &mut Context) -> Option<Rect> {
-        let mut dim = self.sheet.dimensions();
-        dim.w *= self.clips[self.current_frame].w;
-        dim.h *= self.clips[self.current_frame].h;
-        Some(dim)
+        self.dimensions()
     }
 
     fn set_blend_mode(&mut self, mode: Option<BlendMode>) {
