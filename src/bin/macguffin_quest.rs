@@ -10,7 +10,7 @@ fn main() {
             .unwrap();
 
     // initial state to start game
-    let state = Box::new(MainState::new(ctx));
+    let state = Box::new(MainMenuState::new(ctx));
 
     // create state machine to manage states (add initial state)
     let state_machine = &mut StateMachine::new(state);
