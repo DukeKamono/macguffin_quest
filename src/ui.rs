@@ -1,4 +1,5 @@
 use ggez::*;
+use std::time::Duration;
 
 // user interface (ie player name and health for now)
 pub struct UI {
@@ -44,10 +45,13 @@ impl UI {
 
 
 /// Floating text (primarily for damage)
+
+const FLOAT_SPEED: f64 = 5f64; // move 5 units every second
+
 pub struct DmgText {
     point: nalgebra::Point2<f32>,
     text: graphics::Text,
-    duration: f32,
+    duration: Duration,
 }
 
 impl DmgText {
@@ -58,8 +62,18 @@ impl DmgText {
         DmgText {
             point: nalgebra::Point2::new(xpos + 5.0, ypos + 2.0), // The magic numbers help float over the object.
             text: dmg_t,
-            duration: 0.0f32,
+            duration: Duration::new(0, 0),
         }
+    }
+
+    pub fn update(&mut self, delta: Duration) {
+        self.duration += delta;
+        let yinc = timer::duration_to_f64(delta) / FLOAT_SPEED;
+        self.point.y -= yinc as f32;
+    }
+
+    pub fn live(&self) -> bool {
+        self.duration < Duration::from_millis(100000)
     }
 
     pub fn draw(&self, ctx: &mut Context) {
