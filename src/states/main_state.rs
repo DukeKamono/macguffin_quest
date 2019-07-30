@@ -29,6 +29,8 @@ pub struct MainState {
 
 impl CustomEventHandler for MainState {
     fn update(&mut self, ctx: &mut Context) -> HandlerMessage {
+        let delta = timer::delta(ctx);
+
         let playerx = self.player.x;
         let playery = self.player.y;
 
@@ -39,19 +41,20 @@ impl CustomEventHandler for MainState {
         }
 
         for blob in &mut self.blob {
+            blob.update(delta);
+
             if blob.collision(&self.player) {
                 self.player.take_dmg(blob.atk);
             }
 
             if let Some(atk) = &self.player.atk_box {
                 if blob.collision(atk) {
-                    blob.take_dmg(self.player.atk);
-                    self.ui.update_dmg_text(ctx, blob.x, blob.y, self.player.atk);
+                    blob.take_dmg(ctx, self.player.atk);
                 }
             }
         }
 
-        self.animated.animate(timer::delta(ctx));
+        self.animated.animate(delta);
 
         self.rotation += timer::duration_to_f64(timer::delta(ctx)) as f32;
         self.rotation %= 2.0 * std::f32::consts::PI;
@@ -64,6 +67,16 @@ impl CustomEventHandler for MainState {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
+        
+        // change screen coords so it seems like following player
+        let hb = self.player.get_hitbox();
+        let swh = graphics::drawable_size(ctx);
+        let screen_shift = graphics::Rect::new(
+            self.player.x - hb.w / 2f32 - swh.0 / 2f32,
+            self.player.y - hb.h / 2f32 - swh.1 / 2f32,
+            swh.0,
+            swh.1);
+        graphics::set_screen_coordinates(ctx, screen_shift)?;
 
         self.level.draw(ctx)?;
 
@@ -93,6 +106,14 @@ impl CustomEventHandler for MainState {
             .scale([2.0, 2.0])
             .rotation(self.rotation);
         graphics::draw(ctx, &self.animated, dp)?;
+
+        
+        let screen_shift = graphics::Rect::new(
+            0f32,
+            0f32,
+            swh.0,
+            swh.1);
+        graphics::set_screen_coordinates(ctx, screen_shift)?;
         
         self.ui.draw(ctx);
 

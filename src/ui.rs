@@ -1,22 +1,11 @@
 use ggez::*;
+use std::time::Duration;
 
+// user interface (ie player name and health for now)
 pub struct UI {
     pub player_name: graphics::Text,
     pub player_health: graphics::Text,
-    pub dmg_text: Vec<Option<DmgText>>,
-    //pub text_box: TextBox,
 }
-
-pub struct DmgText {
-    point: nalgebra::Point2<f32>,
-    text: graphics::Text,
-    duration: f32,
-}
-
-//pub struct TextBox {
-//	talker: graphics::Image,
-//	text: graphics::Text,
-//}
 
 impl UI {
     pub fn new(ctx: &mut Context, name: String, health: f32) -> UI {
@@ -27,69 +16,41 @@ impl UI {
         UI {
             player_name: p_name,
             player_health: p_health,
-            dmg_text: Vec::new(),
-            //text_box: TextBox::new(ctx, "test".to_string()),
         }
     }
 
     pub fn update(&mut self, ctx: &mut Context, health: f32) {
         let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
         self.player_health = graphics::Text::new((health.to_string(), font, 22.0));
-
-        // If there is a way to combine both of the next logic
-        // pieces then go for it.
-        self.dmg_text.retain(|x| {
-            if let Some(d) = x {
-                if d.duration == 20.0 {
-                    false
-                } else {
-                    true
-                }
-            } else {
-                true
-            }
-        });
-
-        // This combined with the previous would be fun to think about.
-        for dmg in &mut self.dmg_text {
-            if let Some(d) = dmg {
-                d.duration = d.duration + 1.0;
-                d.point.y -= 1.0;
-            }
-        }
-    }
-
-    pub fn update_dmg_text(&mut self, ctx: &mut Context, posx: f32, posy: f32, dmg: f32) {
-        self.dmg_text.push(Some(DmgText::new(ctx, posx, posy, dmg)));
     }
 
     pub fn draw(&mut self, ctx: &mut Context) {
+        // make sure text queue is cleared
+        graphics::draw_queued_text(ctx, graphics::DrawParam::default(), None, graphics::FilterMode::Linear).expect("unable to clear queue");
+
+        // queue player name for drawing
         let player_name_dest = nalgebra::Point2::new(100.0, 10.0);
-        graphics::draw(
-            ctx,
-            &self.player_name,
-            graphics::DrawParam::default().dest(player_name_dest),
-        )
-        .expect("ERROR drawing player name");
-
+        graphics::queue_text(ctx, &self.player_name, player_name_dest, Some(graphics::WHITE));
+        
+        // queue player health for drawing
         let player_health_dest = nalgebra::Point2::new(100.0, 30.0);
-        graphics::draw(
-            ctx,
-            &self.player_health,
-            graphics::DrawParam::default().dest(player_health_dest),
-        )
-        .expect("ERROR drawing player health");
-
-        for dmg in &self.dmg_text {
-            if let Some(d) = dmg {
-                d.draw(ctx);
-            }
-        }
+        graphics::queue_text(ctx, &self.player_health, player_health_dest, Some(graphics::WHITE));
+        
+        // draw ui
+        graphics::draw_queued_text(ctx, graphics::DrawParam::default(), None, graphics::FilterMode::Linear).expect("Error Drawing UI");
     }
+}
 
-    //pub fn draw_text_box(&mut self, ctx: &mut Context) {
-    //
-    //}
+
+/// Floating text (primarily for damage)
+
+const FLOAT_SPEED: f64 = 25f64; // move 25 units every second
+const LIFETIME: Duration = Duration::from_millis(1000); // text lives one sec
+
+pub struct DmgText {
+    point: nalgebra::Point2<f32>,
+    text: graphics::Text,
+    duration: Duration,
 }
 
 impl DmgText {
@@ -100,37 +61,22 @@ impl DmgText {
         DmgText {
             point: nalgebra::Point2::new(xpos + 5.0, ypos + 2.0), // The magic numbers help float over the object.
             text: dmg_t,
-            duration: 0.0f32,
+            duration: Duration::new(0, 0),
         }
     }
 
+    pub fn update(&mut self, delta: Duration) {
+        self.duration += delta;
+        let yinc = timer::duration_to_f64(delta) * FLOAT_SPEED;
+        self.point.y -= yinc as f32;
+    }
+
+    pub fn live(&self) -> bool {
+        self.duration < LIFETIME
+    }
+
     pub fn draw(&self, ctx: &mut Context) {
-        graphics::draw(
-            ctx,
-            &self.text,
-            graphics::DrawParam::default().dest(self.point),
-        )
-        .expect("ERROR drawing Dmg Text");
+        graphics::queue_text(ctx, &self.text, self.point, Some(graphics::WHITE));
+        graphics::draw_queued_text(ctx, graphics::DrawParam::default(), None, graphics::FilterMode::Linear).expect("Error Drawing DmgText");
     }
 }
-
-//impl TextBox {
-//	pub fn new(ctx: &mut Context, text: String) -> TextBox {
-//		let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
-//        let t = graphics::Text::new((text, font, 22.0));
-//
-//		TextBox {
-//			text: t,
-//			talker: graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap(),
-//		}
-//	}
-//
-//	pub fn update(&mut self, ctx: &mut Context) {
-//
-//	}
-//
-//	pub fn draw(&self, ctx: &mut Context) {
-//		let point = nalgebra::Point2::new(1000.0, 100.0);
-//		graphics::draw(ctx, &self.text, graphics::DrawParam::default().dest(point) ).expect("ERROR drawing talk Text");
-//	}
-//}
