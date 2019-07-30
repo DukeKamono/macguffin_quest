@@ -46,7 +46,7 @@ impl CustomEventHandler for MainState {
             if let Some(atk) = &self.player.atk_box {
                 if blob.collision(atk) {
                     blob.take_dmg(self.player.atk);
-                    self.ui.update_dmg_text(ctx, blob.x, blob.y, self.player.atk);
+                    //self.ui.update_dmg_text(ctx, blob.x, blob.y, self.player.atk);
                 }
             }
         }
