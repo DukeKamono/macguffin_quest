@@ -26,7 +26,7 @@ impl HandlerMessage {
     fn handle(self, sm: &mut StateMachine) -> GameResult {
         match self {
             HandlerMessage::Keep => (),
-            HandlerMessage::Bail => {sm.pop(); ()},
+            HandlerMessage::Bail => {sm.pop();},
             HandlerMessage::Spawn(new) => sm.push(new),
             HandlerMessage::Change(new) => {sm.pop(); sm.push(new)},
             HandlerMessage::Error(err) => return Err(err),

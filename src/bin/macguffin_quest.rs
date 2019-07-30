@@ -17,7 +17,7 @@ fn main() {
 
     // start game loop
     match ggez::event::run(ctx, event_loop, state_machine) {
-       Ok(_) => println!("Exiting Game."),
-       Err(e) => println!("Crashing Game! {}", e),
+        Ok(_) => println!("Exiting Game."),
+        Err(e) => println!("Crashing Game! {}", e),
     }
 }
