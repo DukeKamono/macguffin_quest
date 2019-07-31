@@ -1,4 +1,5 @@
 use crate::entities::player::player::Player;
+use crate::entities::environment::level::Level;
 use crate::entities::enemies::enemies::Enemy;
 use crate::entities::enemies::ai::AI;
 use ggez::nalgebra as na;
@@ -82,7 +83,7 @@ impl Enemy for Blob {
         }
     }
 
-    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player) {
+    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
         self.dmg_text.retain(|t| t.live());
         self.dmg_text.iter_mut().for_each(|t| t.update(delta));
 
@@ -91,14 +92,47 @@ impl Enemy for Blob {
             self.invulnerable += delta;
         }
         
-        if self.collision(player) {
-            player.take_dmg(self.atk);
-        }
-        
+		// Player's atk_box hits me
         if let Some(atk) = &player.atk_box {
             if self.collision(atk) {
                 self.take_dmg(ctx, player.atk);
             }
+        }
+		
+		// holding onto previous location
+		let xpos = self.x;
+		let ypos = self.y;
+		
+		// Move this out to ai later. Charge towards player.
+		if self.x != player.x {
+			if self.x > player.x {
+				self.x -= 1.0;
+			}
+			if self.x < player.x {
+				self.x += 1.0;
+			}
+		}
+		if self.y != player.y {
+			if self.y > player.y {
+				self.y -= 1.0;
+			}
+			if self.y < player.y {
+				self.y += 1.0;
+			}
+		}
+		
+		// after moving check wall collision
+		if self.collision(level) {
+			self.x = xpos;
+			self.y = ypos;
+		}
+		
+		// I touched the player.
+        if self.collision(player) {
+			// need attack animation
+            player.take_dmg(self.atk);
+			self.x = xpos;
+			self.y = ypos;
         }
     }
 

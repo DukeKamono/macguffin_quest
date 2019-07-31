@@ -1,11 +1,12 @@
 use crate::entities::DrawableEntity;
 use crate::entities::player::player::Player;
+use crate::entities::environment::level::Level;
 use std::time::Duration;
 use ggez::*;
 use crate::entities::enemies::ai::AI;
 
 pub trait Enemy: DrawableEntity {
-    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player);
+    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level);
     fn get_ai(&self) -> AI;
     fn islive(&self) -> bool;
 }
@@ -43,12 +44,12 @@ impl Enemy for Enemies {
         }
     }
 
-    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player) {
+    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
         // remove dead enemies
         self.enemies.retain(|e| e.islive());
 
         // update enemies
-        self.enemies.iter_mut().for_each(|e| e.update(ctx, delta, player));
+        self.enemies.iter_mut().for_each(|e| e.update(ctx, delta, player, level));
 
         if !self.islive() {
             // do something if there are no more enemies

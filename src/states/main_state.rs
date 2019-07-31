@@ -39,7 +39,7 @@ impl CustomEventHandler for MainState {
             self.player.move_location(playerx, playery);
         }
 
-        self.enemies.update(ctx, delta, &mut self.player);
+        self.enemies.update(ctx, delta, &mut self.player, &self.level);
 
         //for blob in &mut self.blob {
         //    blob.update(delta);

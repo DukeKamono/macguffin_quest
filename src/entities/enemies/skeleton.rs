@@ -1,4 +1,5 @@
 use crate::entities::player::player::Player;
+use crate::entities::environment::level::Level;
 use crate::entities::enemies::enemies::Enemy;
 use crate::entities::enemies::ai::AI;
 use ggez::nalgebra as na;
@@ -82,7 +83,7 @@ impl Enemy for Skeleton {
         }
     }
 
-    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player) {
+    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
         self.dmg_text.retain(|t| t.live());
         self.dmg_text.iter_mut().for_each(|t| t.update(delta));
         
