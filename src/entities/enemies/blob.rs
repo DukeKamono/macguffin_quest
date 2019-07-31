@@ -18,6 +18,7 @@ pub struct Blob {
     pub sprite: graphics::Image,
     pub hitbox: graphics::Rect,
     dmg_text: Vec<DmgText>,
+    pub invulnerable: Duration,
 }
 
 impl Blob {
@@ -35,13 +36,22 @@ impl Blob {
             sprite: img,
             hitbox: hb,
             dmg_text,
+            invulnerable: Duration::new(1u64, 0u32),
         }
     }
 
     pub fn take_dmg(&mut self, ctx: &mut Context, dmg_to_take: f32) {
-        self.hp -= dmg_to_take;
-        self.dmg_text.push(DmgText::new(ctx, self.x, self.y, dmg_to_take));
-        // Check for death and maybe call a death function.
+        if !self.invulnerable() {
+            self.hp -= dmg_to_take;
+            self.invulnerable = Duration::new(0u64, 0u32);
+            self.dmg_text.push(DmgText::new(ctx, self.x, self.y, dmg_to_take));
+            // Check for death and maybe call a death function.
+        }
+    }
+
+    // returns if blob should be able to take damage (time is 1/4 sec)
+    fn invulnerable(&self) -> bool {
+        self.invulnerable < Duration::from_millis(250u64)
     }
 }
 
@@ -75,6 +85,11 @@ impl Enemy for Blob {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player) {
         self.dmg_text.retain(|t| t.live());
         self.dmg_text.iter_mut().for_each(|t| t.update(delta));
+
+        // cool down invulnerable of blob
+        if self.invulnerable() {
+            self.invulnerable += delta;
+        }
         
         if self.collision(player) {
             player.take_dmg(self.atk);
