@@ -9,7 +9,7 @@ use std::time::Duration;
 use super::super::{CollideEntity, DrawableEntity};
 use crate::ui::DmgText;
 
-pub struct Blob {
+pub struct Skeleton {
     pub x: f32,
     pub y: f32,
     pub hp: f32,
@@ -20,16 +20,16 @@ pub struct Blob {
     dmg_text: Vec<DmgText>,
 }
 
-impl Blob {
-    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> Blob {
+impl Skeleton {
+    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> Skeleton {
         let img = graphics::Image::new(ctx, "/blob.png").unwrap();
         let hb = img.dimensions();
         let dmg_text = Vec::new();
 
-        Blob {
+        Skeleton {
             x: xpos,
             y: ypos,
-            hp: 10.0,
+            hp: 20.0,
             atk: 3.0,
             def: 1.0,
             sprite: img,
@@ -50,7 +50,7 @@ impl Blob {
     }
 }
 
-impl DrawableEntity for Blob {
+impl DrawableEntity for Skeleton {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.sprite, dp)?;
@@ -61,7 +61,7 @@ impl DrawableEntity for Blob {
     }
 }
 
-impl CollideEntity for Blob {
+impl CollideEntity for Skeleton {
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self.hitbox;
         r.x = self.x;
@@ -70,7 +70,7 @@ impl CollideEntity for Blob {
     }
 }
 
-impl Enemy for Blob {
+impl Enemy for Skeleton {
     fn get_ai(&self) -> AI {
         AI {
         

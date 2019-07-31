@@ -6,6 +6,7 @@ use super::entities::{CollideEntity, DrawableEntity};
 use super::entities::player::player::Player;
 // get blob struct to use
 use super::entities::enemies::blob::Blob;
+use super::entities::enemies::skeleton::Skeleton;
 use super::entities::enemies::enemies::*;
 // get wall struct to use
 use super::entities::environment::{level::Level, level_builder::LevelBuilder};
@@ -146,13 +147,12 @@ impl MainState {
         let hp = player.hp;
 
         // create blobs (ie enemies)
-        //let mut blob = vec!(Box::new(Blob::new(ctx, 250.0, 250.0)));
-        //let mut blob = Vec::new();
-        //blob.push(Box::new(Blob::new(ctx, 250.0, 250.0)));
-        //blob.push(Box::new(Blob::new(ctx, 250.0, 350.0)));
-        //blob.push(Box::new(Blob::new(ctx, 250.0, 150.0)));
-        let blob = Box::new(Blob::new(ctx, 250.0, 250.0));
-        let e = Enemies::new(ctx, blob);
+        //let mut blob = vec![Box::new(Blob::new(ctx, 250.0, 250.0))];
+        let mut e = Enemies::new();
+        e.push(Box::new(Blob::new(ctx, 250.0, 250.0)));
+        e.push(Box::new(Blob::new(ctx, 250.0, 350.0)));
+        e.push(Box::new(Blob::new(ctx, 250.0, 150.0)));
+        e.push(Box::new(Skeleton::new(ctx, 550.0, 350.0)));
 
         // build level
         let img = graphics::Image::new(ctx, "/testwalls.png").unwrap();
