@@ -7,7 +7,7 @@ use crate::entities::enemies::ai::AI;
 pub trait Enemy: DrawableEntity {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player);
     fn get_ai(&self) -> AI;
-    fn isdead(&mut self) -> bool;
+    fn islive(&self) -> bool;
 }
 
 pub struct Enemies {
@@ -25,19 +25,6 @@ impl Enemies {
     pub fn push(&mut self, enemy: Box<dyn Enemy>) {
         self.enemies.push(enemy)
     }
-
-     // Remove enemies.
-    //pub fn remove(&mut self, enemy: Box<dyn Enemy>) {
-    //    let mut i = 0;
-    //    while i != self.enemies.len() {
-    //        if self.enemies[i].isdead() {
-    //           let val = self.enemies.remove(i);
-    //           // your code here
-    //        } else {
-    //            i += 1;
-    //        }
-    //    }
-    //}
 }
 
 impl DrawableEntity for Enemies {
@@ -57,25 +44,20 @@ impl Enemy for Enemies {
     }
 
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player) {
-        for me in &mut self.enemies {
-            me.update(ctx, delta, player);
-        }
-        if self.isdead() {
-            // I don't like this implementation. I was tired, sorry.
-            // I guess we can add death animation check here?
+        // remove dead enemies
+        self.enemies.retain(|e| e.islive());
+
+        // update enemies
+        self.enemies.iter_mut().for_each(|e| e.update(ctx, delta, player));
+
+        if !self.islive() {
+            // do something if there are no more enemies
+            // maybe spawn some new ones
         }
     }
 
-    // Always returns true...... sorry
-    fn isdead(&mut self) -> bool {
-        let mut i = 0;
-        while i != self.enemies.len() {
-            if self.enemies[i].isdead() {
-               self.enemies.remove(i);
-            } else {
-                i += 1;
-            }
-        }
-        true
+    // returns true if there are enemies
+    fn islive(&self) -> bool {
+        !self.enemies.is_empty()
     }
 }

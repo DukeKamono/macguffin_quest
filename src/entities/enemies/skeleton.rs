@@ -102,10 +102,7 @@ impl Enemy for Skeleton {
         }
     }
 
-    fn isdead(&mut self) -> bool {
-        if self.hp <= 0.0 {
-            return true;
-        }
-        false
+    fn islive(&self) -> bool {
+        self.hp > 0.0
     }
 }
