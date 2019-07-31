@@ -103,7 +103,7 @@ impl Player {
         // die
         sprite.insert(
             (Animations::Die, Direction::Down),
-            builder.create_animated(Rect::new(64f32, 768f32, 64f32, 64f32), 5usize).unwrap()
+            builder.create_animated_once(Rect::new(64f32, 768f32, 64f32, 64f32), 5usize).unwrap()
         );
 
 
