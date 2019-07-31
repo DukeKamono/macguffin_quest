@@ -15,9 +15,9 @@ pub enum HandlerMessage {
     // leave current CustomEventHandler, going back to previous CustomEventHandler
     Bail,
     // spawn new CustomEventHandler on-top of current CustomEventHandler
-    Spawn(Box<CustomEventHandler>),
+    Spawn(Box<dyn CustomEventHandler>),
     // change current CustomEventHandler into a new CustomEventHandler [Bail then Spawn]
-    Change(Box<CustomEventHandler>),
+    Change(Box<dyn CustomEventHandler>),
     // an error occurred and needs reported
     Error(GameError),
 }
@@ -37,23 +37,23 @@ impl HandlerMessage {
 
 pub struct StateMachine{
     // Stack of States (top is active) [should quit if empty]
-	states: Vec<Box<CustomEventHandler>>,
+    states: Vec<Box<dyn CustomEventHandler>>,
 }
 
 impl StateMachine {
-    pub fn new(state: Box<CustomEventHandler>) -> StateMachine {
+    pub fn new(state: Box<dyn CustomEventHandler>) -> StateMachine {
         let mut states = Vec::new();
         states.push(state);
         StateMachine {
-			states,
+            states,
         }
     }
 
-    pub fn push(&mut self, state: Box<CustomEventHandler>) {
+    pub fn push(&mut self, state: Box<dyn CustomEventHandler>) {
         self.states.push(state)
     }
 
-    pub fn pop(&mut self) -> Option<Box<CustomEventHandler>> {
+    pub fn pop(&mut self) -> Option<Box<dyn CustomEventHandler>> {
         self.states.pop()
     }
 
@@ -67,7 +67,7 @@ impl StateMachine {
 }
 
 impl EventHandler for StateMachine {
-	fn update(&mut self, ctx: &mut Context) -> GameResult {
+    fn update(&mut self, ctx: &mut Context) -> GameResult {
         // if there are no states don't update anything, just quit
         if self.is_empty(ctx) {
             return Ok(())

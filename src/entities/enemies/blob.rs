@@ -1,3 +1,6 @@
+use crate::entities::player::player::Player;
+use crate::entities::enemies::enemies::Enemy;
+use crate::entities::enemies::ai::AI;
 use ggez::nalgebra as na;
 use ggez::*;
 use std::time::Duration;
@@ -64,5 +67,38 @@ impl CollideEntity for Blob {
         r.x = self.x;
         r.y = self.y;
         r
+    }
+}
+
+impl Enemy for Blob {
+    fn take_dmg(&mut self, ctx: &mut Context, dmg_to_take: f32) {
+        //self.hp -= dmg_to_take;
+        //self.dmg_text.push(DmgText::new(ctx, self.x, self.y, dmg_to_take));
+        // Check for death and maybe call a death function.
+    }
+
+    fn get_ai(&self) -> AI {
+        AI {
+        
+        }
+    }
+
+    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player) {
+        self.update(delta);
+        
+        if self.collision(player) {
+            player.take_dmg(self.atk);
+        }
+        
+        if let Some(atk) = &player.atk_box {
+            if self.collision(atk) {
+                self.take_dmg(ctx, player.atk);
+            }
+        }
+    }
+
+    fn draw(&self, ctx: &mut Context) -> GameResult {
+        //self.draw(ctx);
+        Ok(())
     }
 }

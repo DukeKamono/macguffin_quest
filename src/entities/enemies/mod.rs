@@ -5,3 +5,7 @@
 
 // Namespace of current blob code
 pub mod blob;
+
+pub mod ai;
+
+pub mod enemies;

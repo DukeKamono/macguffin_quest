@@ -6,6 +6,7 @@ use super::entities::{CollideEntity, DrawableEntity};
 use super::entities::player::player::Player;
 // get blob struct to use
 use super::entities::enemies::blob::Blob;
+use super::entities::enemies::enemies::*;
 // get wall struct to use
 use super::entities::environment::{level::Level, level_builder::LevelBuilder};
 
@@ -20,7 +21,7 @@ use super::sprites::*;
 pub struct MainState {
     ui: UI,
     player: Player,
-    blob: Vec<Blob>,
+    enemies: Enemies,//Vec<Box<dyn Enemy>>,
     level: Level,
     sprite: Sprite,
     animated: AnimatedSprite,
@@ -40,19 +41,21 @@ impl CustomEventHandler for MainState {
             self.player.move_location(playerx, playery);
         }
 
-        for blob in &mut self.blob {
-            blob.update(delta);
+        self.enemies.update(ctx, delta, &mut self.player);
 
-            if blob.collision(&self.player) {
-                self.player.take_dmg(blob.atk);
-            }
-
-            if let Some(atk) = &self.player.atk_box {
-                if blob.collision(atk) {
-                    blob.take_dmg(ctx, self.player.atk);
-                }
-            }
-        }
+        //for blob in &mut self.blob {
+        //    blob.update(delta);
+        //
+        //    if blob.collision(&self.player) {
+        //        self.player.take_dmg(blob.atk);
+        //    }
+        //
+        //    if let Some(atk) = &self.player.atk_box {
+        //        if blob.collision(atk) {
+        //            blob.take_dmg(ctx, self.player.atk);
+        //        }
+        //    }
+        //}
 
         self.animated.animate(delta);
 
@@ -82,9 +85,10 @@ impl CustomEventHandler for MainState {
 
         self.player.draw(ctx)?;
 
-        for blob in &self.blob {
-            blob.draw(ctx)?;
-        }
+        self.enemies.draw(ctx);
+        //for blob in &self.blob {
+        //    blob.draw(ctx)?;
+        //}
 
         let dp = graphics::DrawParam::default()
             .src(graphics::Rect::new(0.0, 0.0, 1.0, 1.0))
@@ -126,7 +130,7 @@ impl CustomEventHandler for MainState {
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) -> HandlerMessage {
         match key {
             KeyCode::P => {
-				let state = Box::new(PauseState::new(ctx));
+                let state = Box::new(PauseState::new(ctx));
                 HandlerMessage::Spawn(state)
             },
             _ => HandlerMessage::Keep
@@ -142,10 +146,13 @@ impl MainState {
         let hp = player.hp;
 
         // create blobs (ie enemies)
-        let mut blob = Vec::new();
-        blob.push(Blob::new(ctx, 250.0, 250.0));
-        blob.push(Blob::new(ctx, 250.0, 350.0));
-        blob.push(Blob::new(ctx, 250.0, 150.0));
+        //let mut blob = vec!(Box::new(Blob::new(ctx, 250.0, 250.0)));
+        //let mut blob = Vec::new();
+        //blob.push(Box::new(Blob::new(ctx, 250.0, 250.0)));
+        //blob.push(Box::new(Blob::new(ctx, 250.0, 350.0)));
+        //blob.push(Box::new(Blob::new(ctx, 250.0, 150.0)));
+        let blob = Box::new(Blob::new(ctx, 250.0, 250.0));
+        let e = Enemies::new(ctx, blob);
 
         // build level
         let img = graphics::Image::new(ctx, "/testwalls.png").unwrap();
@@ -182,7 +189,7 @@ impl MainState {
         // create state
         MainState {
             level,
-            blob,
+            enemies: e,
             player,
             ui: UI::new(ctx, "Adventurer".to_string(), hp),
             sprite,

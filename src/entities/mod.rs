@@ -37,7 +37,7 @@ pub trait CollideEntity {
     }
 
     // true / false if two CollideEntity's overlap (ie collide)
-    fn collision(&self, other: &CollideEntity) -> bool {
+    fn collision(&self, other: &dyn CollideEntity) -> bool {
         // could improve this using iterator chains... maybe
         for myhb in self.get_sub_hitboxs() {
             for ohb in other.get_sub_hitboxs() {
