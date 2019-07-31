@@ -24,9 +24,6 @@ pub struct MainState {
     player: Player,
     enemies: Enemies,//Vec<Box<dyn Enemy>>,
     level: Level,
-    sprite: Sprite,
-    animated: AnimatedSprite,
-    rotation: f32,
 }
 
 impl CustomEventHandler for MainState {
@@ -36,7 +33,7 @@ impl CustomEventHandler for MainState {
         let playerx = self.player.x;
         let playery = self.player.y;
 
-        self.player.update(ctx);
+        self.player.update(ctx, delta);
 
         if self.player.collision(&self.level) {
             self.player.move_location(playerx, playery);
@@ -58,10 +55,6 @@ impl CustomEventHandler for MainState {
         //    }
         //}
 
-        self.animated.animate(delta);
-
-        self.rotation += timer::duration_to_f64(timer::delta(ctx)) as f32;
-        self.rotation %= 2.0 * std::f32::consts::PI;
 
         // Should prob make UI update last all the time.
         self.ui.update(ctx, self.player.hp);
@@ -75,50 +68,19 @@ impl CustomEventHandler for MainState {
         // change screen coords so it seems like following player
         let hb = self.player.get_hitbox();
         let swh = graphics::drawable_size(ctx);
-        let screen_shift = graphics::Rect::new(
+        MainState::set_screen_coordinates(ctx,
             self.player.x - hb.w / 2f32 - swh.0 / 2f32,
-            self.player.y - hb.h / 2f32 - swh.1 / 2f32,
-            swh.0,
-            swh.1);
-        graphics::set_screen_coordinates(ctx, screen_shift)?;
+            self.player.y - hb.h / 2f32 - swh.1 / 2f32
+        )?;
 
         self.level.draw(ctx)?;
 
         self.player.draw(ctx)?;
 
-        self.enemies.draw(ctx);
-        //for blob in &self.blob {
-        //    blob.draw(ctx)?;
-        //}
-
-        let dp = graphics::DrawParam::default()
-            .src(graphics::Rect::new(0.0, 0.0, 1.0, 1.0))
-            .dest([736f32, 536f32])
-            .offset([0.5, 0.5])
-            .scale([2.0, 2.0])
-            .rotation(self.rotation)
-            .color(graphics::Color::new(
-                1.0 - self.rotation / (2.0 * std::f32::consts::PI),
-                self.rotation / (2.0 * std::f32::consts::PI),
-                self.rotation / (2.0 * std::f32::consts::PI),
-                1.0,
-            ));
-        graphics::draw(ctx, &self.sprite, dp)?;
-
-        let dp = graphics::DrawParam::default()
-            .dest([736f32, 64f32])
-            .offset([0.5, 0.5])
-            .scale([2.0, 2.0])
-            .rotation(self.rotation);
-        graphics::draw(ctx, &self.animated, dp)?;
 
         
-        let screen_shift = graphics::Rect::new(
-            0f32,
-            0f32,
-            swh.0,
-            swh.1);
-        graphics::set_screen_coordinates(ctx, screen_shift)?;
+        // reset screen coordinates for drawing UI
+        MainState::set_screen_coordinates(ctx, 0f32, 0f32)?;
         
         self.ui.draw(ctx);
 
@@ -179,22 +141,22 @@ impl MainState {
         .unwrap();
         let level = lb.sample3();
 
-        // demo sprites
-        let img = graphics::Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
-        let sprite = Sprite::new(&img, graphics::Rect::new(0f32, 128f32, 64f32, 64f32)).unwrap();
-        let animated = AnimatedBuilder::new(&img)
-            .create_animated(graphics::Rect::new(0f32, 320f32, 64f32, 64f32), 6usize)
-            .unwrap();
-
         // create state
         MainState {
             level,
             enemies: e,
             player,
             ui: UI::new(ctx, "Adventurer".to_string(), hp),
-            sprite,
-            animated,
-            rotation: 0f32,
         }
+    }
+
+    fn set_screen_coordinates(ctx: &mut Context, x: f32, y: f32) -> GameResult {
+        let swh = graphics::drawable_size(ctx);
+        let screen_shift = graphics::Rect::new(
+            x,
+            y,
+            swh.0,
+            swh.1);
+        graphics::set_screen_coordinates(ctx, screen_shift)
     }
 }

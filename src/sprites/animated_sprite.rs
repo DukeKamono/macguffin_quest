@@ -2,10 +2,11 @@
 //use ggez::graphics::*;
 use std::time::Duration;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum AnimationState {
-    _Paused(Duration), // accumulated duration when paused
+    Paused(Duration), // accumulated duration when paused
     Loop,
+    Once,
 }
 
 #[derive(Clone)]
@@ -19,7 +20,7 @@ pub struct AnimatedSprite {
 }
 
 impl AnimatedSprite {
-    pub fn new(sheet: &Image, clips: Vec<Rect>) -> GameResult<AnimatedSprite> {
+    pub fn new(sheet: &Image, clips: Vec<Rect>, animation: Option<AnimationState>) -> GameResult<AnimatedSprite> {
         let sheet = sheet.clone();
         
         if clips.is_empty() {
@@ -41,6 +42,11 @@ impl AnimatedSprite {
                 ));
             }
         }
+
+        let state = match animation {
+            Some(ani) => ani,
+            None => AnimationState::Loop,
+        };
         
         Ok(AnimatedSprite {
             sheet,
@@ -48,12 +54,12 @@ impl AnimatedSprite {
             current_frame: 0usize,
             frame_rate: Duration::new(0, 250_000_000),
             accumulated: Duration::new(0, 0),
-            state: AnimationState::Loop,
+            state,
         })
     }
 
     pub fn animate(&mut self, delta: Duration) {
-        if let AnimationState::_Paused(_) = self.state {
+        if let AnimationState::Paused(_) = self.state {
             return;
         }
         self.accumulated += delta;
@@ -61,17 +67,33 @@ impl AnimatedSprite {
             self.accumulated -= self.frame_rate;
             self.current_frame += 1usize;
         }
-        if self.current_frame >= self.clips.len() {
+        if self.state == AnimationState::Once && self.current_frame >= self.clips.len() {
+            self.current_frame -= 1usize;
+        } else if self.current_frame >= self.clips.len() {
             self.current_frame = 0usize;
         }
     }
 
-    pub fn _width(&self) -> f32 {
+    pub fn width(&self) -> f32 {
         self.clips[self.current_frame].w * f32::from(self.sheet.width())
     }
 
-    pub fn _height(&self) -> f32 {
+    pub fn height(&self) -> f32 {
         self.clips[self.current_frame].h * f32::from(self.sheet.height())
+    }
+
+    pub fn dimensions(&self) -> Option<Rect> {
+        let mut dim = self.sheet.dimensions();
+        dim.w *= self.clips[self.current_frame].w;
+        dim.h *= self.clips[self.current_frame].h;
+        Some(dim)
+    }
+
+    pub fn once_animation(&mut self) {
+        if let AnimationState::Paused(a) = self.state {
+            self.accumulated = a;
+        }
+        self.state = AnimationState::Once;
     }
 
     /*
@@ -120,10 +142,7 @@ impl Drawable for AnimatedSprite {
     }
 
     fn dimensions(&self, _ctx: &mut Context) -> Option<Rect> {
-        let mut dim = self.sheet.dimensions();
-        dim.w *= self.clips[self.current_frame].w;
-        dim.h *= self.clips[self.current_frame].h;
-        Some(dim)
+        self.dimensions()
     }
 
     fn set_blend_mode(&mut self, mode: Option<BlendMode>) {
