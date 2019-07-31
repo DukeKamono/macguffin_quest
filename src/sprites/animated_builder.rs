@@ -21,6 +21,17 @@ impl AnimatedBuilder {
             xpos += clip.w;
             max_frames -= 1usize;
         }
-        AnimatedSprite::new(&self.sheet, clips)
+        AnimatedSprite::new(&self.sheet, clips, None)
+    }
+
+    pub fn create_animated_once(&self, clip: Rect, max_frames: usize) -> GameResult<AnimatedSprite> {
+        let ani = self.create_animated(clip, max_frames);
+        match ani {
+            Ok(mut mation) => {
+                mation.once_animation();
+                Ok(mation)
+            }
+            Err(_) => ani,
+        }
     }
 }
