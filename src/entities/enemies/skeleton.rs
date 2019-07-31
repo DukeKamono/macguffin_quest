@@ -22,7 +22,7 @@ pub struct Skeleton {
 
 impl Skeleton {
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> Skeleton {
-        let img = graphics::Image::new(ctx, "/blob.png").unwrap();
+        let img = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
         let hb = img.dimensions();
         let dmg_text = Vec::new();
 
@@ -42,11 +42,6 @@ impl Skeleton {
         self.hp -= dmg_to_take;
         self.dmg_text.push(DmgText::new(ctx, self.x, self.y, dmg_to_take));
         // Check for death and maybe call a death function.
-    }
-
-    pub fn update(&mut self, delta: Duration) {
-        self.dmg_text.retain(|t| t.live());
-        self.dmg_text.iter_mut().for_each(|t| t.update(delta));
     }
 }
 
@@ -78,7 +73,8 @@ impl Enemy for Skeleton {
     }
 
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player) {
-        self.update(delta);
+        self.dmg_text.retain(|t| t.live());
+        self.dmg_text.iter_mut().for_each(|t| t.update(delta));
         
         if self.collision(player) {
             player.take_dmg(self.atk);
@@ -89,5 +85,12 @@ impl Enemy for Skeleton {
                 self.take_dmg(ctx, player.atk);
             }
         }
+    }
+
+    fn isdead(&mut self) -> bool {
+        if self.hp <= 0.0 {
+            return true;
+        }
+        false
     }
 }

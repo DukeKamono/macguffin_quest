@@ -77,7 +77,7 @@ impl CustomEventHandler for MainState {
 
         self.player.draw(ctx)?;
 
-
+        self.enemies.draw(ctx)?;
         
         // reset screen coordinates for drawing UI
         MainState::set_screen_coordinates(ctx, 0f32, 0f32)?;

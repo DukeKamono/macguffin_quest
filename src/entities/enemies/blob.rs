@@ -43,11 +43,6 @@ impl Blob {
         self.dmg_text.push(DmgText::new(ctx, self.x, self.y, dmg_to_take));
         // Check for death and maybe call a death function.
     }
-
-    pub fn update(&mut self, delta: Duration) {
-        self.dmg_text.retain(|t| t.live());
-        self.dmg_text.iter_mut().for_each(|t| t.update(delta));
-    }
 }
 
 impl DrawableEntity for Blob {
@@ -78,7 +73,8 @@ impl Enemy for Blob {
     }
 
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player) {
-        self.update(delta);
+        self.dmg_text.retain(|t| t.live());
+        self.dmg_text.iter_mut().for_each(|t| t.update(delta));
         
         if self.collision(player) {
             player.take_dmg(self.atk);
@@ -89,5 +85,12 @@ impl Enemy for Blob {
                 self.take_dmg(ctx, player.atk);
             }
         }
+    }
+
+    fn isdead(&mut self) -> bool {
+        if self.hp <= 0.0 {
+            return true;
+        }
+        false
     }
 }

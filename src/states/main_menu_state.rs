@@ -10,16 +10,16 @@ impl CustomEventHandler for MainMenuState {
     }
     
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-		graphics::clear(ctx, graphics::BLACK);
-		let point = nalgebra::Point2::new(350.0, 250.0);
-		
-		graphics::draw(
+        graphics::clear(ctx, graphics::BLACK);
+        let point = nalgebra::Point2::new(350.0, 250.0);
+        
+        graphics::draw(
             ctx,
             &self.text,
             graphics::DrawParam::default().dest(point),
         )
         .expect("ERROR drawing Paused Text");
-		
+        
         graphics::present(ctx)?;
         timer::yield_now();
         Ok(())
@@ -38,10 +38,10 @@ impl CustomEventHandler for MainMenuState {
 
 impl MainMenuState {
     pub fn new(ctx: &mut Context) -> MainMenuState {
-		let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
-		let t = graphics::Text::new(("Macguffin Quest\nPress Enter to Start".to_string(), font, 22.0));
+        let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
+        let t = graphics::Text::new(("Macguffin Quest\nPress Enter to Start".to_string(), font, 22.0));
         MainMenuState {
-			text: t,
+            text: t,
         }
     }
 }
