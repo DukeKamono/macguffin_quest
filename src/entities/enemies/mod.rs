@@ -10,3 +10,5 @@ pub mod skeleton;
 pub mod ai;
 
 pub mod enemies;
+
+pub mod sight;

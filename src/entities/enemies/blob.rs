@@ -9,6 +9,7 @@ use std::time::Duration;
 
 use super::super::{CollideEntity, DrawableEntity};
 use crate::ui::DmgText;
+use crate::entities::enemies::sight::*;
 
 pub struct Blob {
     pub x: f32,
@@ -20,6 +21,7 @@ pub struct Blob {
     pub hitbox: graphics::Rect,
     dmg_text: Vec<DmgText>,
     pub invulnerable: Duration,
+	pub line_of_sight: LineOfSight,
 	pub ai_type: AITypes,
 }
 
@@ -39,6 +41,7 @@ impl Blob {
             hitbox: hb,
             dmg_text,
             invulnerable: Duration::new(1u64, 0u32),
+			line_of_sight: LineOfSight::new(xpos, ypos),
 			ai_type: ai_type,
         }
     }
@@ -79,7 +82,7 @@ impl CollideEntity for Blob {
 }
 
 impl Enemy for Blob {
-    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
+    fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, _level: &Level) {
         self.dmg_text.retain(|t| t.live());
         self.dmg_text.iter_mut().for_each(|t| t.update(delta));
 
@@ -94,13 +97,60 @@ impl Enemy for Blob {
                 self.take_dmg(ctx, player.atk);
             }
         }
-		//let mut t = AI::new(AITypes::MeleeDirect);
-		//let mut s = Box::new(Blob::new(ctx, 250.0, 150.0, AITypes::MeleeDirect));
-		//t.update(delta, s, player, level);
-		//t.update(delta, self, player, level);
     }
 
     fn islive(&self) -> bool {
         self.hp > 0.0
     }
+	
+	fn get_aitype(&mut self) -> &AITypes {
+		let ai = &self.ai_type;
+		ai
+	}
+	
+	fn chase_player(&mut self, _delta: Duration, player: &mut Player, level: &Level) {
+		// holding onto previous location
+		let xpos = self.x;
+		let ypos = self.y;
+		
+		// Charge towards player.
+		if self.x != player.x {
+			if self.x > player.x {
+				self.x -= 1.0;
+			}
+			if self.x < player.x {
+				self.x += 1.0;
+			}
+		}
+		if self.y != player.y {
+			if self.y > player.y {
+				self.y -= 1.0;
+			}
+			if self.y < player.y {
+				self.y += 1.0;
+			}
+		}
+		
+		// Check wall collision
+		if self.collision(level) {
+			self.x = xpos;
+			self.y = ypos;
+		}
+		
+		// I touched the player.
+		if self.collision(player) {
+			// need attack animation
+			player.take_dmg(self.atk);
+			self.x = xpos;
+			self.y = ypos;
+		}
+	}
+	
+	fn chase_player_sight(&mut self, delta: Duration, player: &mut Player, level: &Level) {
+		self.line_of_sight.update(self.x - 100.0, self.y - 100.0, 200.0, 200.0);
+		
+		if self.line_of_sight.collision(player) {// && !self.line_of_sight.collision(level) {
+			self.chase_player(delta, player, level);
+		}
+	}
 }
