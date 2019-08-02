@@ -1,7 +1,7 @@
 use crate::entities::player::player::Player;
 use crate::entities::environment::level::Level;
 use crate::entities::enemies::enemies::Enemy;
-use crate::entities::enemies::ai::AI;
+use crate::entities::enemies::ai::*;
 use ggez::nalgebra as na;
 use ggez::*;
 use std::time::Duration;
@@ -20,10 +20,11 @@ pub struct Blob {
     pub hitbox: graphics::Rect,
     dmg_text: Vec<DmgText>,
     pub invulnerable: Duration,
+	pub ai_type: AITypes,
 }
 
 impl Blob {
-    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> Blob {
+    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, ai_type: AITypes) -> Blob {
         let img = graphics::Image::new(ctx, "/blob.png").unwrap();
         let hb = img.dimensions();
         let dmg_text = Vec::new();
@@ -38,6 +39,7 @@ impl Blob {
             hitbox: hb,
             dmg_text,
             invulnerable: Duration::new(1u64, 0u32),
+			ai_type: ai_type,
         }
     }
 
@@ -77,12 +79,6 @@ impl CollideEntity for Blob {
 }
 
 impl Enemy for Blob {
-    fn get_ai(&self) -> AI {
-        AI {
-        
-        }
-    }
-
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
         self.dmg_text.retain(|t| t.live());
         self.dmg_text.iter_mut().for_each(|t| t.update(delta));
@@ -98,42 +94,10 @@ impl Enemy for Blob {
                 self.take_dmg(ctx, player.atk);
             }
         }
-		
-		// holding onto previous location
-		let xpos = self.x;
-		let ypos = self.y;
-		
-		// Move this out to ai later. Charge towards player.
-		if self.x != player.x {
-			if self.x > player.x {
-				self.x -= 1.0;
-			}
-			if self.x < player.x {
-				self.x += 1.0;
-			}
-		}
-		if self.y != player.y {
-			if self.y > player.y {
-				self.y -= 1.0;
-			}
-			if self.y < player.y {
-				self.y += 1.0;
-			}
-		}
-		
-		// after moving check wall collision
-		if self.collision(level) {
-			self.x = xpos;
-			self.y = ypos;
-		}
-		
-		// I touched the player.
-        if self.collision(player) {
-			// need attack animation
-            player.take_dmg(self.atk);
-			self.x = xpos;
-			self.y = ypos;
-        }
+		//let mut t = AI::new(AITypes::MeleeDirect);
+		//let mut s = Box::new(Blob::new(ctx, 250.0, 150.0, AITypes::MeleeDirect));
+		//t.update(delta, s, player, level);
+		//t.update(delta, self, player, level);
     }
 
     fn islive(&self) -> bool {

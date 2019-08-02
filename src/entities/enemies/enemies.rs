@@ -7,7 +7,6 @@ use crate::entities::enemies::ai::AI;
 
 pub trait Enemy: DrawableEntity {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level);
-    fn get_ai(&self) -> AI;
     fn islive(&self) -> bool;
 }
 
@@ -38,18 +37,15 @@ impl DrawableEntity for Enemies {
 }
 
 impl Enemy for Enemies {
-    fn get_ai(&self) -> AI {
-        AI {
-        
-        }
-    }
-
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
         // remove dead enemies
         self.enemies.retain(|e| e.islive());
 
+		
+		let mut t = AI::new();
         // update enemies
-        self.enemies.iter_mut().for_each(|e| e.update(ctx, delta, player, level));
+        self.enemies.iter_mut().for_each(|e| {e.update(ctx, delta, player, level); t.update(delta, e, player, level)});
+		//self.enemies.iter().for_each(|e| t.update(delta, e, player, level));
 
         if !self.islive() {
             // do something if there are no more enemies

@@ -77,12 +77,6 @@ impl CollideEntity for Skeleton {
 }
 
 impl Enemy for Skeleton {
-    fn get_ai(&self) -> AI {
-        AI {
-        
-        }
-    }
-
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
         self.dmg_text.retain(|t| t.live());
         self.dmg_text.iter_mut().for_each(|t| t.update(delta));

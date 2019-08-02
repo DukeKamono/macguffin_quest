@@ -19,6 +19,8 @@ use super::ui::UI;
 //use sprites::animated_sprite::*;
 use super::sprites::*;
 
+use crate::entities::enemies::ai::AITypes;
+
 pub struct MainState {
     ui: UI,
     player: Player,
@@ -111,9 +113,9 @@ impl MainState {
         // create blobs (ie enemies)
         //let mut blob = vec![Box::new(Blob::new(ctx, 250.0, 250.0))];
         let mut e = Enemies::new();
-        e.push(Box::new(Blob::new(ctx, 250.0, 250.0)));
-        e.push(Box::new(Blob::new(ctx, 250.0, 350.0)));
-        e.push(Box::new(Blob::new(ctx, 250.0, 150.0)));
+        e.push(Box::new(Blob::new(ctx, 250.0, 250.0, AITypes::MeleeDirect)));
+        e.push(Box::new(Blob::new(ctx, 250.0, 350.0, AITypes::MeleeDirect)));
+        e.push(Box::new(Blob::new(ctx, 250.0, 150.0, AITypes::MeleeDirect)));
         e.push(Box::new(Skeleton::new(ctx, 550.0, 350.0)));
 
         // build level
