@@ -21,8 +21,8 @@ pub struct Skeleton {
     pub hitbox: graphics::Rect,
     dmg_text: Vec<DmgText>,
     pub invulnerable: Duration,
-	pub line_of_sight: LineOfSight,
-	pub ai_type: AITypes,
+    pub line_of_sight: LineOfSight,
+    pub ai_type: AITypes,
 }
 
 impl Skeleton {
@@ -41,8 +41,8 @@ impl Skeleton {
             hitbox: hb,
             dmg_text,
             invulnerable: Duration::new(1u64, 0u32),
-			line_of_sight: LineOfSight::new(xpos, ypos),
-			ai_type,
+            line_of_sight: LineOfSight::new(xpos, ypos),
+            ai_type,
         }
     }
 
@@ -53,10 +53,10 @@ impl Skeleton {
             self.dmg_text.push(DmgText::new(ctx, self.x, self.y, player.stats.atk));
             // Check for death and maybe call a death function.
         }
-		
-		if self.hp <= 0.0 {
-			player.stats.check_for_level_up(5);
-		}
+        
+        if self.hp <= 0.0 {
+            player.stats.check_for_level_up(5);
+        }
     }
 
     // returns if skeleton should be able to take damage (time is 1/4 sec)
@@ -95,7 +95,7 @@ impl Enemy for Skeleton {
             self.invulnerable += delta;
         }
         
-		// Player's atk_box hits me
+        // Player's atk_box hits me
         if let Some(atk) = &player.atk_box {
             if self.collision(atk) {
                 self.take_dmg(ctx, player);
@@ -106,51 +106,51 @@ impl Enemy for Skeleton {
     fn islive(&self) -> bool {
         self.hp > 0.0
     }
-	
-	fn get_aitype(&mut self) -> &AITypes {
-		&self.ai_type
-	}
-	
-	fn chase_player(&mut self, _delta: Duration, player: &mut Player, level: &Level) {
-		// holding onto previous location
-		let xpos = self.x;
-		let ypos = self.y;
-		
-		// Charge towards player.
-		if self.x >= player.x {
-			self.x -= 1.0;
-		}
-		if self.x <= player.x {
-			self.x += 1.0;
-		}
+    
+    fn get_aitype(&mut self) -> &AITypes {
+        &self.ai_type
+    }
+    
+    fn chase_player(&mut self, _delta: Duration, player: &mut Player, level: &Level) {
+        // holding onto previous location
+        let xpos = self.x;
+        let ypos = self.y;
+        
+        // Charge towards player.
+        if self.x >= player.x {
+            self.x -= 1.0;
+        }
+        if self.x <= player.x {
+            self.x += 1.0;
+        }
 
-		if self.y >= player.y {
-			self.y -= 1.0;
-		}
-		if self.y <= player.y {
-			self.y += 1.0;
-		}
-		
-		// Check wall collision
-		if self.collision(level) {
-			self.x = xpos;
-			self.y = ypos;
-		}
-		
-		// I touched the player.
-		if self.collision(player) {
-			// need attack animation
-			player.take_dmg(self.atk);
-			self.x = xpos;
-			self.y = ypos;
-		}
-	}
-	
-	fn chase_player_sight(&mut self, delta: Duration, player: &mut Player, level: &Level) {
-		self.line_of_sight.update(self.x - 100.0, self.y - 100.0, 200.0, 200.0);
-		
-		if self.line_of_sight.collision(player) {// && !self.line_of_sight.collision(level) {
-			self.chase_player(delta, player, level);
-		}
-	}
+        if self.y >= player.y {
+            self.y -= 1.0;
+        }
+        if self.y <= player.y {
+            self.y += 1.0;
+        }
+        
+        // Check wall collision
+        if self.collision(level) {
+            self.x = xpos;
+            self.y = ypos;
+        }
+        
+        // I touched the player.
+        if self.collision(player) {
+            // need attack animation
+            player.take_dmg(self.atk);
+            self.x = xpos;
+            self.y = ypos;
+        }
+    }
+    
+    fn chase_player_sight(&mut self, delta: Duration, player: &mut Player, level: &Level) {
+        self.line_of_sight.update(self.x - 100.0, self.y - 100.0, 200.0, 200.0);
+        
+        if self.line_of_sight.collision(player) {// && !self.line_of_sight.collision(level) {
+            self.chase_player(delta, player, level);
+        }
+    }
 }

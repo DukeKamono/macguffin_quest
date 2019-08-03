@@ -44,16 +44,16 @@ impl CustomEventHandler for MainState {
         self.enemies.update(ctx, delta, &mut self.player, &self.level);
 
         // Should prob make UI update last all the time.
-        self.ui.update(ctx, self.player.stats.hp, self.player.stats.max_hp, self.player.stats.lv);
+        self.ui.update(ctx, self.player.stats.hp, self.player.stats.max_hp, self.player.stats.mp, self.player.stats.max_mp, self.player.stats.lv);
         
-		// Should prob have it delayed untill after death animation...
-		if self.player.stats.hp <= 0.0 {
-			let state = Box::new(GameOverState::new(ctx));
+        // Should prob have it delayed untill after death animation...
+        if self.player.stats.hp <= 0.0 {
+            let state = Box::new(GameOverState::new(ctx));
             HandlerMessage::Change(state)
-		}
-		else {
-			HandlerMessage::Keep
-		}
+        }
+        else {
+            HandlerMessage::Keep
+        }
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
@@ -96,13 +96,15 @@ impl CustomEventHandler for MainState {
 }
 
 impl MainState {
-    pub fn new(ctx: &mut Context) -> MainState {
+    pub fn new(ctx: &mut Context, chosen_player: String) -> MainState {
          // create player
-        let mut player = Player::new(ctx);
+        let mut player = Player::new(ctx, chosen_player);
         player.move_location(150f32, 150f32);
         let hp = player.stats.hp;
-		let max_hp = player.stats.max_hp;
-		let lv = player.stats.lv;
+        let max_hp = player.stats.max_hp;
+        let mp = player.stats.mp;
+        let max_mp = player.stats.max_mp;
+        let lv = player.stats.lv;
 
         // create enemies
         let mut e = Enemies::new();
@@ -141,7 +143,7 @@ impl MainState {
             level,
             enemies: e,
             player,
-            ui: UI::new(ctx, "Adventurer".to_string(), hp, max_hp, lv),
+            ui: UI::new(ctx, "Adventurer".to_string(), hp, max_hp, mp, max_mp, lv),
         }
     }
 

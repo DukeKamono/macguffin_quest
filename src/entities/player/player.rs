@@ -21,25 +21,27 @@ pub enum Animations {
     Stand,
     Walking,
     Cast,
+    Slash,
     Die,
 }
 
 pub struct Player {
     pub x: f32,
     pub y: f32,
-	pub stats: Stats,
+    pub stats: Stats,
     pub sprite: HashMap<(Animations, Direction), AnimatedSprite>,
     pub animation: (Animations, Direction),
     pub atk_box: Option<AtkBox>,
     pub attacking: bool,
+    pub atk_cooldown: Duration,
     pub invulnerable: Duration,
-	pub direction: Direction,
+    pub direction: Direction,
 }
 
 impl Player {
-    pub fn new(ctx: &mut Context) -> Player {
+    pub fn new(ctx: &mut Context, chosen_player: String) -> Player {
         let mut sprite = HashMap::new();
-        let sheet = Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
+        let sheet = Image::new(ctx, chosen_player).unwrap();
         let builder = AnimatedBuilder::new(&sheet);
         // standing
         sprite.insert(
@@ -92,6 +94,23 @@ impl Player {
             (Animations::Cast, Direction::Right),
             builder.create_animated(Rect::new(64f32, 704f32, 64f32, 64f32), 6usize).unwrap()
         );
+        // slashing
+        sprite.insert(
+            (Animations::Slash, Direction::Up),
+            builder.create_animated(Rect::new(64f32, 256f32, 64f32, 64f32), 6usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Slash, Direction::Left),
+            builder.create_animated(Rect::new(64f32, 320f32, 64f32, 64f32), 6usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Slash, Direction::Down),
+            builder.create_animated(Rect::new(64f32, 384f32, 64f32, 64f32), 6usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Slash, Direction::Right),
+            builder.create_animated(Rect::new(64f32, 448f32, 64f32, 64f32), 6usize).unwrap()
+        );
         // die
         sprite.insert(
             (Animations::Die, Direction::Down),
@@ -102,24 +121,25 @@ impl Player {
         Player {
             x: 10.0,
             y: 10.0,
-			stats: Stats::new(1, 0, 30.0, 3.0, 2.0, 1.0, 15.0),
+            stats: Stats::new(1, 0, 30.0, 150, 3.0, 2.0, 1.0, 15.0),
             sprite,
             animation: (Animations::Walking, Direction::Right),
             atk_box: None,
             attacking: false,
+            atk_cooldown: Duration::new(0u64, 0u32),
             invulnerable: Duration::new(0u64, 0u32),
-			direction: Direction::Right, // Starting direction?
+            direction: Direction::Right, // Starting direction?
         }
     }
 
-    // Increase or decrease `position_x` by 0.5, or by 5.0 if Shift is held.
+    // Increase or decrease `position_x` by 2.5, or by 5.0 if Shift is held.
     pub fn update(&mut self, ctx: &mut Context, delta: Duration) {
         // private function to return correct speed
         fn move_increment(ctx: &mut Context) -> f32 {
             if keyboard::is_mod_active(ctx, KeyMods::SHIFT) {
                 return 5.0;
             }
-            0.5
+            2.5
         }
 
         // clear attack box in case player is not attacking any more
@@ -130,36 +150,46 @@ impl Player {
             self.invulnerable += delta;
         }
 
+        if !self.atk_cooldown() {
+            self.atk_cooldown += delta;
+        }
+
         // dead
         if self.stats.hp <= 0f32 {
             self.animation = (Animations::Die, Direction::Down);
         }
-        // attacking
-        else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.stats.hp > 0f32 {
-            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y, &self.direction));
+        // casting
+        else if keyboard::is_key_pressed(ctx, KeyCode::Q) && self.stats.hp > 0f32 && self.stats.mp > 0 {
+            self.atk_box = Some(AtkBox::new(ctx, 5.0, self.x, self.y, 25.0, 25.0, &self.direction, 50.0));
             self.animation.0 = Animations::Cast;
+            self.stats.mp -= 1;
+        }
+        // slashing
+        else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.stats.hp > 0f32 { //&& self.atk_cooldown() {
+            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y, 5.0, 5.0, &self.direction, 50.0));
+            self.animation.0 = Animations::Slash;
+            self.atk_cooldown = Duration::new(0u64, 0u32);
         }
         // walking animations
         else if keyboard::is_key_pressed(ctx, KEY_RIGHT) {
             self.x += move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Right);
-			self.direction = Direction::Right;
+            self.direction = Direction::Right;
         } else if keyboard::is_key_pressed(ctx, KEY_LEFT) {
             self.x -= move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Left);
-			self.direction = Direction::Left;
+            self.direction = Direction::Left;
         } else if keyboard::is_key_pressed(ctx, KEY_UP) {
             self.y -= move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Up);
-			self.direction = Direction::Up;
+            self.direction = Direction::Up;
         } else if keyboard::is_key_pressed(ctx, KEY_DOWN) {
             self.y += move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Down);
-			self.direction = Direction::Down;
+            self.direction = Direction::Down;
         }
         // standing animation
         else {
-			self.atk_box = None;
             self.animation.0 = Animations::Stand;
         }
 
@@ -170,6 +200,10 @@ impl Player {
     // player is invulnerable for 1/4
     fn invulnerable(&self) -> bool {
         self.invulnerable < Duration::from_millis(250u64)
+    }
+
+    fn atk_cooldown(&self) -> bool {
+        self.atk_cooldown > Duration::from_millis(350u64)
     }
 
     pub fn move_location(&mut self, xinc: f32, yinc: f32) {

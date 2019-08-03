@@ -9,7 +9,7 @@ impl CustomEventHandler for PauseState {
     
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
-        let point = nalgebra::Point2::new(350.0, 250.0);
+        let point = nalgebra::Point2::new(250.0, 175.0);
         
         graphics::draw(
             ctx,

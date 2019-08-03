@@ -4,6 +4,8 @@ pub struct Stats {
 	pub exp: u32,
 	pub hp: f32,
 	pub max_hp: f32,
+	pub mp: u32,
+	pub max_mp: u32,
 	pub atk: f32,
 	pub def: f32,
 	pub spd: f32,
@@ -11,12 +13,14 @@ pub struct Stats {
 }
 
 impl Stats {
-	pub fn new(lv: u32, exp: u32, hp: f32, atk: f32, def: f32, spd: f32, mag: f32) -> Stats {
+	pub fn new(lv: u32, exp: u32, hp: f32, mp: u32, atk: f32, def: f32, spd: f32, mag: f32) -> Stats {
 		Stats {
 			lv,
 			exp,
 			hp,
 			max_hp: hp,
+			mp,
+			max_mp: mp,
 			atk,
 			def,
 			spd,
@@ -41,5 +45,7 @@ impl Stats {
 			3 => { self.atk += 1.0; self.hp += 5.0; self.max_hp += 5.0; self.def += 2.0; },
 			_ => { self.hp += 5.0; self.max_hp += 5.0; },
 		}
+
+		self.mp = self.max_mp;
 	}
 }

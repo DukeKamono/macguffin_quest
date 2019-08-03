@@ -5,27 +5,31 @@ use std::time::Duration;
 pub struct UI {
     pub player_name: graphics::Text,
     pub player_health: graphics::Text,
-	pub player_level: graphics::Text,
+    pub player_mp: graphics::Text,
+    pub player_level: graphics::Text,
 }
 
 impl UI {
-    pub fn new(ctx: &mut Context, name: String, health: f32, max_health: f32, level: u32) -> UI {
+    pub fn new(ctx: &mut Context, name: String, health: f32, max_health: f32, mp: u32, max_mp: u32, level: u32) -> UI {
         let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
         let p_name = graphics::Text::new((name, font, 22.0));
-        let p_health = graphics::Text::new((health.to_string() + &"/".to_string() + &max_health.to_string(), font, 22.0));
-		let lev = graphics::Text::new(("Level: ".to_string() + &level.to_string(), font, 22.0));
+        let p_health = graphics::Text::new(("hp: ".to_string() + &health.to_string() + &"/".to_string() + &max_health.to_string(), font, 22.0));
+        let p_mp = graphics::Text::new(("mp: ".to_string() + &mp.to_string() + &"/".to_string() + &max_mp.to_string(), font, 22.0));
+        let lev = graphics::Text::new(("Level: ".to_string() + &level.to_string(), font, 22.0));
 
         UI {
             player_name: p_name,
             player_health: p_health,
-			player_level: lev,
+            player_mp: p_mp,
+            player_level: lev,
         }
     }
 
-    pub fn update(&mut self, ctx: &mut Context, health: f32, max_health: f32, level: u32) {
+    pub fn update(&mut self, ctx: &mut Context, health: f32, max_health: f32, mp: u32, max_mp: u32, level: u32) {
         let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
-        self.player_health = graphics::Text::new((health.to_string() + &"/".to_string() + &max_health.to_string(), font, 22.0));
-		self.player_level = graphics::Text::new(("Level: ".to_string() + &level.to_string(), font, 22.0));
+        self.player_health = graphics::Text::new(("hp: ".to_string() + &health.to_string() + &"/".to_string() + &max_health.to_string(), font, 22.0));
+        self.player_mp = graphics::Text::new(("mp: ".to_string() + &mp.to_string() + &"/".to_string() + &max_mp.to_string(), font, 22.0));
+        self.player_level = graphics::Text::new(("Level: ".to_string() + &level.to_string(), font, 22.0));
     }
 
     pub fn draw(&mut self, ctx: &mut Context) {
@@ -39,8 +43,12 @@ impl UI {
         // queue player health for drawing
         let player_health_dest = nalgebra::Point2::new(100.0, 30.0);
         graphics::queue_text(ctx, &self.player_health, player_health_dest, Some(graphics::WHITE));
-		
-		// queue player level for drawing
+
+        // queue player mp for drawing
+        let player_mp_dest = nalgebra::Point2::new(200.0, 30.0);
+        graphics::queue_text(ctx, &self.player_mp, player_mp_dest, Some(graphics::WHITE));
+        
+        // queue player level for drawing
         let player_level_dest = nalgebra::Point2::new(100.0, 50.0);
         graphics::queue_text(ctx, &self.player_level, player_level_dest, Some(graphics::WHITE));
         

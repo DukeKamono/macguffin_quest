@@ -11,21 +11,21 @@ pub struct AtkBox {
 }
 
 impl AtkBox {
-    pub fn new(ctx: &mut Context, duration: f32, xpos: f32, ypos: f32, direction: & Direction) -> AtkBox {
-		
-		let mut xpos = xpos;
-		let mut ypos = ypos;
-		
-		// The player is kinda off centered and these values need to be adjusted.
-		match direction {
-			Direction::Up => ypos -= 50.0,
-			Direction::Down => ypos += 50.0,
-			Direction::Left => xpos -= 50.0,
-			Direction::Right => xpos += 50.0,
-		}
-		
+    pub fn new(ctx: &mut Context, duration: f32, xpos: f32, ypos: f32, width: f32, height: f32, direction: &Direction, offset: f32) -> AtkBox {
+        
+        let mut xpos = xpos;
+        let mut ypos = ypos;
+        
+        // The player is kinda off centered and these values need to be adjusted.
+        match direction {
+            Direction::Up => ypos -= offset,
+            Direction::Down => ypos += offset,
+            Direction::Left => xpos -= offset,
+            Direction::Right => xpos += offset,
+        }
+        
         // radius of circle
-        let r = 50f32;
+        let r = width + height;
         // create hit box
         let hb = graphics::Rect::new(0.0, 0.0, r * 2.0, r * 2.0);
         // create mesh

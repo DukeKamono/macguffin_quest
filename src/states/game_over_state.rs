@@ -9,7 +9,7 @@ impl CustomEventHandler for GameOverState {
     
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
-        let point = nalgebra::Point2::new(350.0, 250.0);
+        let point = nalgebra::Point2::new(250.0, 175.0);
         
         graphics::draw(
             ctx,
@@ -25,11 +25,7 @@ impl CustomEventHandler for GameOverState {
     
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) -> HandlerMessage {
         match key {
-            KeyCode::R => {
-                let state = Box::new(MainState::new(ctx));
-                HandlerMessage::Change(state)
-            },
-             KeyCode::Q => {
+             KeyCode::Return => {
                 let state = Box::new(MainMenuState::new(ctx));
                 HandlerMessage::Change(state)
             },
@@ -41,7 +37,7 @@ impl CustomEventHandler for GameOverState {
 impl GameOverState {
     pub fn new(ctx: &mut Context) -> GameOverState {
         let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
-        let t = graphics::Text::new(("GAME OVER!\nPress R to Restart\nPress Q to Quit".to_string(), font, 22.0));
+        let t = graphics::Text::new(("GAME OVER!\nPress Enter To Go Back To The Main Menu".to_string(), font, 22.0));
         GameOverState {
             text: t,
         }
