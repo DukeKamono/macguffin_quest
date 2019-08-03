@@ -6,3 +6,4 @@
 // Namespace of current player code
 pub mod atk_box;
 pub mod player;
+pub mod stats;

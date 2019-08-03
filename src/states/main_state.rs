@@ -44,10 +44,10 @@ impl CustomEventHandler for MainState {
         self.enemies.update(ctx, delta, &mut self.player, &self.level);
 
         // Should prob make UI update last all the time.
-        self.ui.update(ctx, self.player.hp);
+        self.ui.update(ctx, self.player.stats.hp, self.player.stats.max_hp, self.player.stats.lv);
         
 		// Should prob have it delayed untill after death animation...
-		if self.player.hp <= 0.0 {
+		if self.player.stats.hp <= 0.0 {
 			let state = Box::new(GameOverState::new(ctx));
             HandlerMessage::Change(state)
 		}
@@ -100,7 +100,9 @@ impl MainState {
          // create player
         let mut player = Player::new(ctx);
         player.move_location(150f32, 150f32);
-        let hp = player.hp;
+        let hp = player.stats.hp;
+		let max_hp = player.stats.max_hp;
+		let lv = player.stats.lv;
 
         // create enemies
         let mut e = Enemies::new();
@@ -139,7 +141,7 @@ impl MainState {
             level,
             enemies: e,
             player,
-            ui: UI::new(ctx, "Adventurer".to_string(), hp),
+            ui: UI::new(ctx, "Adventurer".to_string(), hp, max_hp, lv),
         }
     }
 

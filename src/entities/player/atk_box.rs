@@ -16,11 +16,12 @@ impl AtkBox {
 		let mut xpos = xpos;
 		let mut ypos = ypos;
 		
+		// The player is kinda off centered and these values need to be adjusted.
 		match direction {
 			Direction::Up => ypos -= 50.0,
 			Direction::Down => ypos += 50.0,
 			Direction::Left => xpos -= 50.0,
-			Direction::Right => xpos += 0.0,
+			Direction::Right => xpos += 50.0,
 		}
 		
         // radius of circle

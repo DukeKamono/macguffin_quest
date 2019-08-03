@@ -5,7 +5,7 @@ use ggez::*;
 use ggez::graphics::{Image, Rect};
 use std::collections::HashMap;
 use std::time::Duration;
-
+use super::stats::Stats;
 use super::super::{CollideEntity, DrawableEntity, Direction};
 use super::atk_box::AtkBox;
 use crate::sprites::*;
@@ -27,9 +27,7 @@ pub enum Animations {
 pub struct Player {
     pub x: f32,
     pub y: f32,
-    pub hp: f32,
-    pub atk: f32,
-    pub def: f32,
+	pub stats: Stats,
     pub sprite: HashMap<(Animations, Direction), AnimatedSprite>,
     pub animation: (Animations, Direction),
     pub atk_box: Option<AtkBox>,
@@ -104,9 +102,7 @@ impl Player {
         Player {
             x: 10.0,
             y: 10.0,
-            hp: 30.0,
-            atk: 3.0,
-            def: 2.0,
+			stats: Stats::new(1, 0, 30.0, 3.0, 2.0, 1.0, 15.0),
             sprite,
             animation: (Animations::Walking, Direction::Right),
             atk_box: None,
@@ -135,11 +131,11 @@ impl Player {
         }
 
         // dead
-        if self.hp <= 0f32 {
+        if self.stats.hp <= 0f32 {
             self.animation = (Animations::Die, Direction::Down);
         }
         // attacking
-        else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.hp > 0f32 {
+        else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.stats.hp > 0f32 {
             self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y, &self.direction));
             self.animation.0 = Animations::Cast;
         }
@@ -183,9 +179,9 @@ impl Player {
 
     pub fn take_dmg(&mut self, dmg_to_take: f32) {
         if !self.invulnerable() {
-            self.hp -= dmg_to_take;
-            if self.hp < 0f32 {
-                self.hp = 0f32;
+            self.stats.hp -= dmg_to_take;
+            if self.stats.hp < 0f32 {
+                self.stats.hp = 0f32;
             }
             self.invulnerable = Duration::new(0u64, 0u32);
             // Check for death and maybe call a death function.

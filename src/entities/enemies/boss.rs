@@ -46,16 +46,20 @@ impl Boss {
         }
     }
 
-    pub fn take_dmg(&mut self, ctx: &mut Context, dmg_to_take: f32) {
+    pub fn take_dmg(&mut self, ctx: &mut Context, player: &mut Player) {
         if !self.invulnerable() {
-            self.hp -= dmg_to_take;
+            self.hp -= player.stats.atk;
             self.invulnerable = Duration::new(0u64, 0u32);
-            self.dmg_text.push(DmgText::new(ctx, self.x, self.y, dmg_to_take));
+            self.dmg_text.push(DmgText::new(ctx, self.x, self.y, player.stats.atk));
             // Check for death and maybe call a death function.
         }
+		
+		if self.hp <= 0.0 {
+			player.stats.check_for_level_up(5);
+		}
     }
-
-    // returns if Boss should be able to take damage (time is 1/4 sec)
+	
+	// returns if boss should be able to take damage (time is 1/4 sec)
     fn invulnerable(&self) -> bool {
         self.invulnerable < Duration::from_millis(250u64)
     }
@@ -90,14 +94,11 @@ impl Enemy for Boss {
         if self.invulnerable() {
             self.invulnerable += delta;
         }
-
-        if self.collision(player) {
-            player.take_dmg(self.atk);
-        }
         
+		// Player's atk_box hits me
         if let Some(atk) = &player.atk_box {
             if self.collision(atk) {
-                self.take_dmg(ctx, player.atk);
+                self.take_dmg(ctx, player);
             }
         }
     }
