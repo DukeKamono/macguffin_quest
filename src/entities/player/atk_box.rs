@@ -30,7 +30,7 @@ impl AtkBox {
             .unwrap();
 
         AtkBox {
-            duration: duration,
+            duration,
             x: xpos,
             y: ypos,
             hitbox: hb,

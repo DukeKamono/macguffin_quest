@@ -42,7 +42,7 @@ impl Blob {
             dmg_text,
             invulnerable: Duration::new(1u64, 0u32),
 			line_of_sight: LineOfSight::new(xpos, ypos),
-			ai_type: ai_type,
+			ai_type,
         }
     }
 
@@ -104,8 +104,7 @@ impl Enemy for Blob {
     }
 	
 	fn get_aitype(&mut self) -> &AITypes {
-		let ai = &self.ai_type;
-		ai
+		&self.ai_type
 	}
 	
 	fn chase_player(&mut self, _delta: Duration, player: &mut Player, level: &Level) {
@@ -114,21 +113,18 @@ impl Enemy for Blob {
 		let ypos = self.y;
 		
 		// Charge towards player.
-		if self.x != player.x {
-			if self.x > player.x {
-				self.x -= 1.0;
-			}
-			if self.x < player.x {
-				self.x += 1.0;
-			}
+		if self.x >= player.x {
+			self.x -= 1.0;
 		}
-		if self.y != player.y {
-			if self.y > player.y {
-				self.y -= 1.0;
-			}
-			if self.y < player.y {
-				self.y += 1.0;
-			}
+		if self.x <= player.x {
+			self.x += 1.0;
+		}
+
+		if self.y >= player.y {
+			self.y -= 1.0;
+		}
+		if self.y <= player.y {
+			self.y += 1.0;
 		}
 		
 		// Check wall collision

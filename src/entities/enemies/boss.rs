@@ -11,7 +11,7 @@ use super::super::{CollideEntity, DrawableEntity};
 use crate::ui::DmgText;
 use crate::entities::enemies::sight::*;
 
-pub struct Skeleton {
+pub struct Boss {
     pub x: f32,
     pub y: f32,
     pub hp: f32,
@@ -25,13 +25,13 @@ pub struct Skeleton {
 	pub ai_type: AITypes,
 }
 
-impl Skeleton {
-    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, ai_type: AITypes) -> Skeleton {
+impl Boss {
+    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, ai_type: AITypes) -> Boss {
         let img = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
         let hb = img.dimensions();
         let dmg_text = Vec::new();
 
-        Skeleton {
+        Boss {
             x: xpos,
             y: ypos,
             hp: 20.0,
@@ -55,13 +55,13 @@ impl Skeleton {
         }
     }
 
-    // returns if skeleton should be able to take damage (time is 1/4 sec)
+    // returns if Boss should be able to take damage (time is 1/4 sec)
     fn invulnerable(&self) -> bool {
         self.invulnerable < Duration::from_millis(250u64)
     }
 }
 
-impl DrawableEntity for Skeleton {
+impl DrawableEntity for Boss {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.sprite, dp)?;
@@ -72,7 +72,7 @@ impl DrawableEntity for Skeleton {
     }
 }
 
-impl CollideEntity for Skeleton {
+impl CollideEntity for Boss {
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self.hitbox;
         r.x = self.x;
@@ -81,12 +81,12 @@ impl CollideEntity for Skeleton {
     }
 }
 
-impl Enemy for Skeleton {
+impl Enemy for Boss {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, _level: &Level) {
         self.dmg_text.retain(|t| t.live());
         self.dmg_text.iter_mut().for_each(|t| t.update(delta));
         
-        // cool down invulnerable of skeleton
+        // cool down invulnerable of Boss
         if self.invulnerable() {
             self.invulnerable += delta;
         }

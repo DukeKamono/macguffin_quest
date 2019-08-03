@@ -3,6 +3,7 @@ use crate::entities::environment::level::Level;
 use crate::entities::enemies::enemies::Enemy;
 use std::time::Duration;
 
+#[derive(Default)]
 pub struct AI {
 	//ai_type: AITypes,
 }

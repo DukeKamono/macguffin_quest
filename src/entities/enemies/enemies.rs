@@ -13,6 +13,7 @@ pub trait Enemy: DrawableEntity {
 	fn chase_player_sight(&mut self, delta: Duration, player: &mut Player, level: &Level);
 }
 
+#[derive(Default)]
 pub struct Enemies {
     enemies: Vec<Box<dyn Enemy>>,
 }

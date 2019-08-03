@@ -11,3 +11,7 @@ include!("./main_state.rs");
 include!("./pause_state.rs");
 
 include!("./main_menu_state.rs");
+
+include!("./game_over_state.rs");
+
+include!("./victory_state.rs");

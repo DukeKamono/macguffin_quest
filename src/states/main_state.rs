@@ -46,7 +46,13 @@ impl CustomEventHandler for MainState {
         // Should prob make UI update last all the time.
         self.ui.update(ctx, self.player.hp);
         
-        HandlerMessage::Keep
+		if self.player.hp <= 0.0 {
+			let state = Box::new(GameOverState::new(ctx));
+            HandlerMessage::Change(state)
+		}
+		else {
+			HandlerMessage::Keep
+		}
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
