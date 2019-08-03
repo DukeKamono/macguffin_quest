@@ -6,7 +6,7 @@ use ggez::graphics::{Image, Rect};
 use std::collections::HashMap;
 use std::time::Duration;
 
-use super::super::{CollideEntity, DrawableEntity};
+use super::super::{CollideEntity, DrawableEntity, Direction};
 use super::atk_box::AtkBox;
 use crate::sprites::*;
 
@@ -15,14 +15,6 @@ const KEY_UP: KeyCode = KeyCode::W;
 const KEY_DOWN: KeyCode = KeyCode::S;
 const KEY_RIGHT: KeyCode = KeyCode::D;
 const KEY_LEFT: KeyCode = KeyCode::A;
-
-#[derive(PartialEq, Eq, Hash)]
-pub enum Direction {
-    Up,
-    Left,
-    Down,
-    Right,
-}
 
 #[derive(PartialEq, Eq, Hash)]
 pub enum Animations {
@@ -43,6 +35,7 @@ pub struct Player {
     pub atk_box: Option<AtkBox>,
     pub attacking: bool,
     pub invulnerable: Duration,
+	pub direction: Direction,
 }
 
 impl Player {
@@ -119,6 +112,7 @@ impl Player {
             atk_box: None,
             attacking: false,
             invulnerable: Duration::new(0u64, 0u32),
+			direction: Direction::Right, // Starting direction?
         }
     }
 
@@ -145,33 +139,32 @@ impl Player {
             self.animation = (Animations::Die, Direction::Down);
         }
         // attacking
-        else if keyboard::is_key_pressed(ctx, KeyCode::Space) {
-            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y));
+        else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.hp > 0f32 {
+            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y, &self.direction));
             self.animation.0 = Animations::Cast;
         }
         // walking animations
         else if keyboard::is_key_pressed(ctx, KEY_RIGHT) {
             self.x += move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Right);
+			self.direction = Direction::Right;
         } else if keyboard::is_key_pressed(ctx, KEY_LEFT) {
             self.x -= move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Left);
+			self.direction = Direction::Left;
         } else if keyboard::is_key_pressed(ctx, KEY_UP) {
             self.y -= move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Up);
+			self.direction = Direction::Up;
         } else if keyboard::is_key_pressed(ctx, KEY_DOWN) {
             self.y += move_increment(ctx);
             self.animation = (Animations::Walking, Direction::Down);
+			self.direction = Direction::Down;
         }
         // standing animation
         else {
+			self.atk_box = None;
             self.animation.0 = Animations::Stand;
-        }
-
-        if keyboard::is_key_pressed(ctx, KeyCode::Space) {
-            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y));
-        } else {
-            self.atk_box = None;
         }
 
         self.sprite.get_mut(&self.animation).unwrap().animate(delta);

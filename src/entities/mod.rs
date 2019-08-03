@@ -18,6 +18,14 @@ pub mod environment;
 use ggez::graphics::Rect;
 use ggez::{Context, GameResult};
 
+#[derive(PartialEq, Eq, Hash)]
+pub enum Direction {
+    Up,
+    Left,
+    Down,
+    Right,
+}
+
 // trait used to mark drawable entities
 // must implement ggez::graphics::Drawable (but not right now)
 pub trait DrawableEntity /*: Drawable */ {

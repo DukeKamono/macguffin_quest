@@ -1,6 +1,6 @@
 use ggez::*;
 
-use super::super::{CollideEntity, DrawableEntity};
+use super::super::{CollideEntity, DrawableEntity, Direction};
 
 pub struct AtkBox {
     pub duration: f32,
@@ -11,7 +11,18 @@ pub struct AtkBox {
 }
 
 impl AtkBox {
-    pub fn new(ctx: &mut Context, duration: f32, xpos: f32, ypos: f32) -> AtkBox {
+    pub fn new(ctx: &mut Context, duration: f32, xpos: f32, ypos: f32, direction: & Direction) -> AtkBox {
+		
+		let mut xpos = xpos;
+		let mut ypos = ypos;
+		
+		match direction {
+			Direction::Up => ypos -= 50.0,
+			Direction::Down => ypos += 50.0,
+			Direction::Left => xpos -= 50.0,
+			Direction::Right => xpos += 0.0,
+		}
+		
         // radius of circle
         let r = 50f32;
         // create hit box

@@ -46,6 +46,7 @@ impl CustomEventHandler for MainState {
         // Should prob make UI update last all the time.
         self.ui.update(ctx, self.player.hp);
         
+		// Should prob have it delayed untill after death animation...
 		if self.player.hp <= 0.0 {
 			let state = Box::new(GameOverState::new(ctx));
             HandlerMessage::Change(state)
