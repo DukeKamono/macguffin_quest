@@ -8,16 +8,16 @@ impl CustomEventHandler for PauseState {
     }
     
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-		graphics::clear(ctx, graphics::BLACK);
-		let point = nalgebra::Point2::new(350.0, 250.0);
-		
-		graphics::draw(
+        graphics::clear(ctx, graphics::BLACK);
+        let point = nalgebra::Point2::new(350.0, 250.0);
+        
+        graphics::draw(
             ctx,
             &self.text,
             graphics::DrawParam::default().dest(point),
         )
         .expect("ERROR drawing Paused Text");
-		
+        
         graphics::present(ctx)?;
         timer::yield_now();
         Ok(())
@@ -28,7 +28,7 @@ impl CustomEventHandler for PauseState {
             KeyCode::P => {
                 HandlerMessage::Bail
             },
-			 KeyCode::Q => {
+             KeyCode::Q => {
                 let state = Box::new(MainMenuState::new(ctx));
                 HandlerMessage::Change(state)
             },
@@ -39,10 +39,10 @@ impl CustomEventHandler for PauseState {
 
 impl PauseState {
     pub fn new(ctx: &mut Context) -> PauseState {
-		let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
-		let t = graphics::Text::new(("Paused\nPress Q to Quit".to_string(), font, 22.0));
+        let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
+        let t = graphics::Text::new(("Paused\nPress P to Unpause\nPress Q to Quit".to_string(), font, 22.0));
         PauseState {
-			text: t,
+            text: t,
         }
     }
 }

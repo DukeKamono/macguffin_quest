@@ -1,10 +1,8 @@
-// Right now this is a PauseState Clone :(
-// I want to add more to this later. (Art, settings section, etc)
-pub struct MainMenuState {
+pub struct VictoryState {
     text: graphics::Text,
 }
 
-impl CustomEventHandler for MainMenuState {
+impl CustomEventHandler for VictoryState {
     fn update(&mut self, _ctx: &mut Context) -> HandlerMessage {
         HandlerMessage::Keep
     }
@@ -27,20 +25,20 @@ impl CustomEventHandler for MainMenuState {
     
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) -> HandlerMessage {
         match key {
-            KeyCode::Return => {
-                let state = Box::new(MainState::new(ctx));
-                HandlerMessage::Spawn(state)
+             KeyCode::Q => {
+                let state = Box::new(MainMenuState::new(ctx));
+                HandlerMessage::Change(state)
             },
             _ => HandlerMessage::Keep
         }
     }
 }
 
-impl MainMenuState {
-    pub fn new(ctx: &mut Context) -> MainMenuState {
+impl VictoryState {
+    pub fn new(ctx: &mut Context) -> VictoryState {
         let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
-        let t = graphics::Text::new(("Macguffin Quest\nPress Enter to Start".to_string(), font, 22.0));
-        MainMenuState {
+        let t = graphics::Text::new(("You Found the MacGuffin!!!\n\nyay..\n\nPress Q to Quit".to_string(), font, 22.0));
+        VictoryState {
             text: t,
         }
     }

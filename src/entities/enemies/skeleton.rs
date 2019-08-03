@@ -11,7 +11,7 @@ use super::super::{CollideEntity, DrawableEntity};
 use crate::ui::DmgText;
 use crate::entities::enemies::sight::*;
 
-pub struct Blob {
+pub struct Skeleton {
     pub x: f32,
     pub y: f32,
     pub hp: f32,
@@ -25,16 +25,16 @@ pub struct Blob {
 	pub ai_type: AITypes,
 }
 
-impl Blob {
-    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, ai_type: AITypes) -> Blob {
-        let img = graphics::Image::new(ctx, "/blob.png").unwrap();
+impl Skeleton {
+    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, ai_type: AITypes) -> Skeleton {
+        let img = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
         let hb = img.dimensions();
         let dmg_text = Vec::new();
 
-        Blob {
+        Skeleton {
             x: xpos,
             y: ypos,
-            hp: 10.0,
+            hp: 20.0,
             atk: 3.0,
             def: 1.0,
             sprite: img,
@@ -55,13 +55,13 @@ impl Blob {
         }
     }
 
-    // returns if blob should be able to take damage (time is 1/4 sec)
+    // returns if skeleton should be able to take damage (time is 1/4 sec)
     fn invulnerable(&self) -> bool {
         self.invulnerable < Duration::from_millis(250u64)
     }
 }
 
-impl DrawableEntity for Blob {
+impl DrawableEntity for Skeleton {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.sprite, dp)?;
@@ -72,7 +72,7 @@ impl DrawableEntity for Blob {
     }
 }
 
-impl CollideEntity for Blob {
+impl CollideEntity for Skeleton {
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self.hitbox;
         r.x = self.x;
@@ -81,17 +81,20 @@ impl CollideEntity for Blob {
     }
 }
 
-impl Enemy for Blob {
+impl Enemy for Skeleton {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, _level: &Level) {
         self.dmg_text.retain(|t| t.live());
         self.dmg_text.iter_mut().for_each(|t| t.update(delta));
-
-        // cool down invulnerable of blob
+        
+        // cool down invulnerable of skeleton
         if self.invulnerable() {
             self.invulnerable += delta;
         }
+
+        if self.collision(player) {
+            player.take_dmg(self.atk);
+        }
         
-		// Player's atk_box hits me
         if let Some(atk) = &player.atk_box {
             if self.collision(atk) {
                 self.take_dmg(ctx, player.atk);

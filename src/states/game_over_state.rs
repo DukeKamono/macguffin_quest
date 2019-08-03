@@ -1,10 +1,8 @@
-// Right now this is a PauseState Clone :(
-// I want to add more to this later. (Art, settings section, etc)
-pub struct MainMenuState {
+pub struct GameOverState {
     text: graphics::Text,
 }
 
-impl CustomEventHandler for MainMenuState {
+impl CustomEventHandler for GameOverState {
     fn update(&mut self, _ctx: &mut Context) -> HandlerMessage {
         HandlerMessage::Keep
     }
@@ -18,7 +16,7 @@ impl CustomEventHandler for MainMenuState {
             &self.text,
             graphics::DrawParam::default().dest(point),
         )
-        .expect("ERROR drawing Paused Text");
+        .expect("ERROR drawing Game Over Text");
         
         graphics::present(ctx)?;
         timer::yield_now();
@@ -27,20 +25,24 @@ impl CustomEventHandler for MainMenuState {
     
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) -> HandlerMessage {
         match key {
-            KeyCode::Return => {
+            KeyCode::R => {
                 let state = Box::new(MainState::new(ctx));
-                HandlerMessage::Spawn(state)
+                HandlerMessage::Change(state)
+            },
+             KeyCode::Q => {
+                let state = Box::new(MainMenuState::new(ctx));
+                HandlerMessage::Change(state)
             },
             _ => HandlerMessage::Keep
         }
     }
 }
 
-impl MainMenuState {
-    pub fn new(ctx: &mut Context) -> MainMenuState {
+impl GameOverState {
+    pub fn new(ctx: &mut Context) -> GameOverState {
         let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
-        let t = graphics::Text::new(("Macguffin Quest\nPress Enter to Start".to_string(), font, 22.0));
-        MainMenuState {
+        let t = graphics::Text::new(("GAME OVER!\nPress R to Restart\nPress Q to Quit".to_string(), font, 22.0));
+        GameOverState {
             text: t,
         }
     }

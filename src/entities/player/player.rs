@@ -42,6 +42,7 @@ pub struct Player {
     pub animation: (Animations, Direction),
     pub atk_box: Option<AtkBox>,
     pub attacking: bool,
+    pub invulnerable: Duration,
 }
 
 impl Player {
@@ -117,6 +118,7 @@ impl Player {
             animation: (Animations::Walking, Direction::Right),
             atk_box: None,
             attacking: false,
+            invulnerable: Duration::new(0u64, 0u32),
         }
     }
 
@@ -130,7 +132,13 @@ impl Player {
             0.5
         }
 
+        // clear attack box in case player is not attacking any more
         self.atk_box = None;
+
+        // cool down invulnerable of player
+        if self.invulnerable() {
+            self.invulnerable += delta;
+        }
 
         // dead
         if self.hp <= 0f32 {
@@ -169,14 +177,26 @@ impl Player {
         self.sprite.get_mut(&self.animation).unwrap().animate(delta);
     }
 
+    // returns if player should be able to take damage
+    // player is invulnerable for 1/4
+    fn invulnerable(&self) -> bool {
+        self.invulnerable < Duration::from_millis(250u64)
+    }
+
     pub fn move_location(&mut self, xinc: f32, yinc: f32) {
         self.x = xinc;
         self.y = yinc;
     }
 
     pub fn take_dmg(&mut self, dmg_to_take: f32) {
-        self.hp -= dmg_to_take;
-        // Check for death and maybe call a death function.
+        if !self.invulnerable() {
+            self.hp -= dmg_to_take;
+            if self.hp < 0f32 {
+                self.hp = 0f32;
+            }
+            self.invulnerable = Duration::new(0u64, 0u32);
+            // Check for death and maybe call a death function.
+        }
     }
 
     // With multiple weapons, we should make a new struct for each type and attach them to the player.
