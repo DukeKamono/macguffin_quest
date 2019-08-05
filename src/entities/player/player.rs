@@ -160,13 +160,13 @@ impl Player {
         }
         // casting
         else if keyboard::is_key_pressed(ctx, KeyCode::Q) && self.stats.hp > 0f32 && self.stats.mp > 0 {
-            self.atk_box = Some(AtkBox::new(ctx, 5.0, self.x, self.y, 25.0, 25.0, &self.direction, 50.0));
+            self.atk_box = Some(AtkBox::new(ctx, 5.0, self.x, self.y, 25.0, 25.0, &self.direction, 5.0));
             self.animation.0 = Animations::Cast;
             self.stats.mp -= 1;
         }
         // slashing
         else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.stats.hp > 0f32 { //&& self.atk_cooldown() {
-            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y, 5.0, 5.0, &self.direction, 50.0));
+            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y, 5.0, 5.0, &self.direction, 5.0));
             self.animation.0 = Animations::Slash;
             self.atk_cooldown = Duration::new(0u64, 0u32);
         }
@@ -233,7 +233,7 @@ impl Player {
 impl DrawableEntity for Player {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         self.draw_weapon(ctx);
-        let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
+        let dp = graphics::DrawParam::default().offset(nalgebra::Point2::new(0.5, 0.5)).dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, self.sprite.get(&self.animation).unwrap(), dp)
     }
 }
@@ -241,8 +241,8 @@ impl DrawableEntity for Player {
 impl CollideEntity for Player {
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self.sprite.get(&self.animation).unwrap().dimensions().unwrap();
-        r.x = self.x;
-        r.y = self.y;
+        r.x = self.x - r.w/2.0;
+        r.y = self.y - r.h/2.0;
         r
     }
 }

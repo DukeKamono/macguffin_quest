@@ -53,7 +53,7 @@ impl AtkBox {
 
 impl DrawableEntity for AtkBox {
     fn draw(&self, ctx: &mut Context) -> GameResult {
-        let dp = graphics::DrawParam::default().dest(nalgebra::Point2::new(self.x, self.y));
+        let dp = graphics::DrawParam::default().offset(nalgebra::Point2::new(0.5, 0.5)).dest(nalgebra::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.shape, dp)
     }
 }
@@ -61,8 +61,8 @@ impl DrawableEntity for AtkBox {
 impl CollideEntity for AtkBox {
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self.hitbox;
-        r.x = self.x;
-        r.y = self.y;
+        r.x = self.x - r.w/2.0;
+        r.y = self.y - r.h/2.0;
         r
     }
 }
