@@ -13,31 +13,22 @@ pub struct AtkBox {
 impl AtkBox {
     pub fn new(ctx: &mut Context, duration: f32, xpos: f32, ypos: f32, width: f32, height: f32, direction: &Direction, offset: f32) -> AtkBox {
         
-        let mut xpos = xpos;
-        let mut ypos = ypos;
+        //let mut xpos = xpos;
+        //let mut ypos = ypos;
         
         // The player is kinda off centered and these values need to be adjusted.
-        match direction {
-            Direction::Up => ypos -= offset,
-            Direction::Down => ypos += offset,
-            Direction::Left => xpos -= offset,
-            Direction::Right => xpos += offset,
-        }
+        //match direction {
+        //    Direction::Up => ypos -= offset,
+        //    Direction::Down => ypos += offset,
+        //    Direction::Left => xpos -= offset,
+        //    Direction::Right => xpos += offset,
+        //}
         
-        // radius of circle
-        let r = width + height;
         // create hit box
-        let hb = graphics::Rect::new(0.0, 0.0, r * 2.0, r * 2.0);
+        let hb = graphics::Rect::new(offset+50.0, offset, width, height);
         // create mesh
-        let circle = graphics::MeshBuilder::new()
-            .circle(
-                graphics::DrawMode::fill(),
-                nalgebra::Point2::new(r, r),
-                r,
-                1.0,
-                graphics::WHITE,
-            )
-            .rectangle(graphics::DrawMode::stroke(1.0), hb, graphics::WHITE)
+        let square = graphics::MeshBuilder::new()
+            .rectangle(graphics::DrawMode::fill(), hb, graphics::WHITE)
             .build(ctx)
             .unwrap();
 
@@ -46,7 +37,7 @@ impl AtkBox {
             x: xpos,
             y: ypos,
             hitbox: hb,
-            shape: circle,
+            shape: square,
         }
     }
 }
@@ -61,8 +52,8 @@ impl DrawableEntity for AtkBox {
 impl CollideEntity for AtkBox {
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self.hitbox;
-        r.x = self.x - r.w/2.0;
-        r.y = self.y - r.h/2.0;
+        r.x = self.x;
+        r.y = self.y;
         r
     }
 }
