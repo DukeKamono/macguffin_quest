@@ -43,6 +43,23 @@ impl State {
 }
 
 impl EventHandler for State {
+    fn mouse_motion_event(&mut self, _ctx: &mut Context, x: f32, y: f32, _dx: f32, _dy: f32) {
+        self.mouse_position.x = f32::floor((x + self.screen.x) / 64f32) * 64f32;
+        self.mouse_position.y = f32::floor((y + self.screen.y) / 64f32) * 64f32;
+    }
+
+    fn mouse_button_down_event(&mut self, _ctx: &mut Context, button: mouse::MouseButton, _x: f32, _y: f32) {
+        match button {
+            mouse::MouseButton::Left => println!("left click"),
+            mouse::MouseButton::Right => println!("right click"),
+            _ => println!("other mouse click"),
+        }
+    }
+
+    fn mouse_wheel_event(&mut self, _ctx: &mut Context, x: f32, y: f32) {
+        println!("mouse wheel x{} y{}", x, y);
+    }
+    
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         // move screen
         if keyboard::is_key_pressed(ctx, KeyCode::D) {
@@ -54,11 +71,6 @@ impl EventHandler for State {
         } else if keyboard::is_key_pressed(ctx, KeyCode::S) {
             self.screen.y += 4f32;
         }
-
-        // update mouse position
-        self.mouse_position = mouse::position(ctx);
-        self.mouse_position.x = f32::floor((self.mouse_position.x + self.screen.x) / 64f32) * 64f32;
-        self.mouse_position.y = f32::floor((self.mouse_position.y + self.screen.y) / 64f32) * 64f32;
 
         Ok(())
     }
