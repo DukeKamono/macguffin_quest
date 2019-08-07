@@ -6,15 +6,21 @@ use ggez::*;
 use macguffin_quest::entities::DrawableEntity;
 use macguffin_quest::entities::environment::level_builder::LevelBuilder;
 use macguffin_quest::entities::environment::level::Level;
+use macguffin_quest::sprites::Sprite;
 
 struct State {
     screen: Rect, // used to move image around screen
 
     mouse_position: mint::Point2<f32>, // adjusted position of the mouse
 
+    tile_value: usize, // value of currently selected tile type
+
     sheet: Image, // sheet to be used for tiles
 
     level: Level, // level being designed
+
+    vector_tiles: Vec<(f32, f32, usize)>, // generate level from
+    vector_types: Vec<Sprite>, // various tile images (after sheet is split up)
 }
 
 impl State {
@@ -26,19 +32,57 @@ impl State {
         // get position of mouse
         let mouse_position = mouse::position(ctx);
 
+        // initially selected tile
+        let tile_value = 0usize;
+
         // tile sprite sheet
         let sheet = Image::new(ctx, "/testwalls.png").unwrap();
 
         // create basic level to build
-        let builder = LevelBuilder::new(ctx, None);
+        let mut builder = LevelBuilder::new(ctx, None);
         let level = builder.sample3();
+
+        // new level tile information
+        let vector_tiles = Vec::new();
+        let vector_types = State::tileize(&mut builder, & sheet);
 
         State {
             screen,
             mouse_position,
+            tile_value,
             sheet,
             level,
+            vector_tiles,
+            vector_types,
         }
+    }
+
+    fn tileize(build: &mut LevelBuilder, img: &Image) -> Vec<Sprite> {
+        let mut ret_value = Vec::new();
+
+        let mut w = 0f32; // counting
+        let width = f32::floor(img.width() as f32 / 64f32); // max
+        let mut h = 0f32; // counting
+        let height = f32::floor(img.height() as f32 / 64f32); // max
+
+        //println!("{} {}", width, height);
+
+        // do the tiling
+        while h < height {
+            w = 0f32;
+            while w < width {
+                ret_value.push(Sprite::new(img, Rect::new(w * 64f32, h * 64f32, 64f32, 64f32)).unwrap());
+                build.set_tile_image(
+                    ret_value.len() - 1usize,
+                    ret_value.last().unwrap(),
+                ).unwrap();
+                w += 1f32;
+            }
+            h += 1f32;
+        }
+        //println!("{:?}", ret_value);
+        //println!("{:?}", ret_value.len());
+        ret_value
     }
 }
 
@@ -56,8 +100,14 @@ impl EventHandler for State {
         }
     }
 
-    fn mouse_wheel_event(&mut self, _ctx: &mut Context, x: f32, y: f32) {
-        println!("mouse wheel x{} y{}", x, y);
+    fn mouse_wheel_event(&mut self, _ctx: &mut Context, _x: f32, y: f32) {
+        //println!("mouse wheel x{} y{}", x, y);
+        if y > 0f32 && self.tile_value < self.vector_types.len() - 1usize {
+            self.tile_value += 1usize;
+        } else if y < 0f32 && self.tile_value > usize::min_value() {
+            self.tile_value -= 1usize;
+        }
+        println!("{}", self.tile_value);
     }
     
     fn update(&mut self, ctx: &mut Context) -> GameResult {
@@ -89,7 +139,7 @@ impl EventHandler for State {
         let dp = DrawParam::default()
             .dest(self.mouse_position)
             ;
-        graphics::draw(ctx, &self.sheet, dp)?;
+        graphics::draw(ctx, &self.vector_types[self.tile_value], dp)?;
         
         // display frame
         graphics::present(ctx)?;
