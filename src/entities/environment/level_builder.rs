@@ -56,7 +56,13 @@ impl LevelBuilder {
 
     //pub from_level_file() -> ???;
 
-    pub fn _sample1(&self) -> Level {
+    // empty level
+    pub fn sample0(&self) -> Level {
+        let w = Vec::new();
+        self.generate_level(w)
+    }
+
+    pub fn sample1(&self) -> Level {
         let w = vec![
             (350.0, 150.0, 1usize),
             (414.0, 150.0, 0usize),
@@ -69,7 +75,7 @@ impl LevelBuilder {
     }
 
     // attempts to frame an 800x600 window (may overlap with poor image dimensions)
-    pub fn _sample2(&self) -> Level {
+    pub fn sample2(&self) -> Level {
         let mut w = Vec::new();
         // top bottom
         for x in (0..800).step_by(self.tile_width) {

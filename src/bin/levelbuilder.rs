@@ -1,6 +1,6 @@
 use ggez::event::{EventHandler, KeyCode};
 use ggez::input::{keyboard, mouse};
-use ggez::graphics::{DrawParam, Image, Rect};
+use ggez::graphics::{DrawParam, Image, Mesh, Rect};
 use ggez::*;
 
 use macguffin_quest::entities::DrawableEntity;
@@ -12,11 +12,11 @@ struct State {
     screen: Rect, // used to move image around screen
 
     mouse_position: mint::Point2<f32>, // adjusted position of the mouse
+    click_start: Option<mint::Point2<f32>>, // start of click
 
     tile_value: usize, // value of currently selected tile type
 
-    sheet: Image, // sheet to be used for tiles
-
+    builder: LevelBuilder, // used to build levels
     level: Level, // level being designed
 
     vector_tiles: Vec<(f32, f32, usize)>, // generate level from
@@ -31,6 +31,7 @@ impl State {
 
         // get position of mouse
         let mouse_position = mouse::position(ctx);
+        let click_start = None;
 
         // initially selected tile
         let tile_value = 0usize;
@@ -40,7 +41,7 @@ impl State {
 
         // create basic level to build
         let mut builder = LevelBuilder::new(ctx, None);
-        let level = builder.sample3();
+        let level = builder.sample0();
 
         // new level tile information
         let vector_tiles = Vec::new();
@@ -49,8 +50,9 @@ impl State {
         State {
             screen,
             mouse_position,
+            click_start,
             tile_value,
-            sheet,
+            builder,
             level,
             vector_tiles,
             vector_types,
@@ -60,16 +62,15 @@ impl State {
     fn tileize(build: &mut LevelBuilder, img: &Image) -> Vec<Sprite> {
         let mut ret_value = Vec::new();
 
-        let mut w = 0f32; // counting
         let width = f32::floor(img.width() as f32 / 64f32); // max
-        let mut h = 0f32; // counting
         let height = f32::floor(img.height() as f32 / 64f32); // max
 
         //println!("{} {}", width, height);
 
         // do the tiling
+        let mut h = 0f32; // counting
         while h < height {
-            w = 0f32;
+            let mut w = 0f32; // counting
             while w < width {
                 ret_value.push(Sprite::new(img, Rect::new(w * 64f32, h * 64f32, 64f32, 64f32)).unwrap());
                 build.set_tile_image(
@@ -92,11 +93,25 @@ impl EventHandler for State {
         self.mouse_position.y = f32::floor((y + self.screen.y) / 64f32) * 64f32;
     }
 
-    fn mouse_button_down_event(&mut self, _ctx: &mut Context, button: mouse::MouseButton, _x: f32, _y: f32) {
+    fn mouse_button_down_event(&mut self, _ctx: &mut Context, button: mouse::MouseButton, x: f32, y: f32) {
         match button {
             mouse::MouseButton::Left => println!("left click"),
             mouse::MouseButton::Right => println!("right click"),
             _ => println!("other mouse click"),
+        }
+        if button == mouse::MouseButton::Left {
+            self.click_start = Some([x, y].into());
+        }
+    }
+
+    fn mouse_button_up_event(&mut self, _ctx: &mut Context, button: mouse::MouseButton, _x: f32, _y: f32) {
+        match button {
+            mouse::MouseButton::Left => println!("left released"),
+            mouse::MouseButton::Right => println!("right released"),
+            _ => println!("other mouse released"),
+        }
+        if button == mouse::MouseButton::Left {
+            self.click_start = None;
         }
     }
 
@@ -107,7 +122,7 @@ impl EventHandler for State {
         } else if y < 0f32 && self.tile_value > usize::min_value() {
             self.tile_value -= 1usize;
         }
-        println!("{}", self.tile_value);
+        //println!("{}", self.tile_value);
     }
     
     fn update(&mut self, ctx: &mut Context) -> GameResult {
@@ -140,6 +155,18 @@ impl EventHandler for State {
             .dest(self.mouse_position)
             ;
         graphics::draw(ctx, &self.vector_types[self.tile_value], dp)?;
+
+        if let Some(point) = self.click_start {
+            let mut mouse_position = mouse::position(ctx);
+            mouse_position.x += self.screen.x;
+            mouse_position.y += self.screen.y;
+            if mouse_position == point {
+                mouse_position.x += 1f32;
+                mouse_position.y += 1f32;
+            }
+            let line = Mesh::new_line(ctx, &[point, mouse_position], 8f32, graphics::WHITE)?;
+            graphics::draw(ctx, &line, DrawParam::default())?;
+        }
         
         // display frame
         graphics::present(ctx)?;
