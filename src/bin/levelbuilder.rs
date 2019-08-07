@@ -1,5 +1,5 @@
-use ggez::event::EventHandler;
-use ggez::input::mouse;
+use ggez::event::{EventHandler, KeyCode};
+use ggez::input::{keyboard, mouse};
 use ggez::graphics::{DrawParam, Image, Rect};
 use ggez::*;
 
@@ -44,10 +44,21 @@ impl State {
 
 impl EventHandler for State {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
+        // move screen
+        if keyboard::is_key_pressed(ctx, KeyCode::D) {
+            self.screen.x += 4f32;
+        } else if keyboard::is_key_pressed(ctx, KeyCode::A) {
+            self.screen.x -= 4f32;
+        } else if keyboard::is_key_pressed(ctx, KeyCode::W) {
+            self.screen.y -= 4f32;
+        } else if keyboard::is_key_pressed(ctx, KeyCode::S) {
+            self.screen.y += 4f32;
+        }
+
         // update mouse position
         self.mouse_position = mouse::position(ctx);
-        self.mouse_position.x = f32::floor(self.mouse_position.x / 64f32) * 64f32;
-        self.mouse_position.y = f32::floor(self.mouse_position.y / 64f32) * 64f32;
+        self.mouse_position.x = f32::floor((self.mouse_position.x + self.screen.x) / 64f32) * 64f32;
+        self.mouse_position.y = f32::floor((self.mouse_position.y + self.screen.y) / 64f32) * 64f32;
 
         Ok(())
     }
