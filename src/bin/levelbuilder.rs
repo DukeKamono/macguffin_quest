@@ -10,6 +10,8 @@ use macguffin_quest::entities::environment::level::Level;
 struct State {
     screen: Rect, // used to move image around screen
 
+    mouse_position: mint::Point2<f32>, // adjusted position of the mouse
+
     sheet: Image, // sheet to be used for tiles
 
     level: Level, // level being designed
@@ -21,6 +23,9 @@ impl State {
         let (width, height) = graphics::drawable_size(ctx);
         let screen = Rect::new(0f32, 0f32, width, height);
 
+        // get position of mouse
+        let mouse_position = mouse::position(ctx);
+
         // tile sprite sheet
         let sheet = Image::new(ctx, "/testwalls.png").unwrap();
 
@@ -30,6 +35,7 @@ impl State {
 
         State {
             screen,
+            mouse_position,
             sheet,
             level,
         }
@@ -37,8 +43,12 @@ impl State {
 }
 
 impl EventHandler for State {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult {
-        //nothing to do
+    fn update(&mut self, ctx: &mut Context) -> GameResult {
+        // update mouse position
+        self.mouse_position = mouse::position(ctx);
+        self.mouse_position.x = f32::floor(self.mouse_position.x / 64f32) * 64f32;
+        self.mouse_position.y = f32::floor(self.mouse_position.y / 64f32) * 64f32;
+
         Ok(())
     }
     
@@ -54,7 +64,7 @@ impl EventHandler for State {
 
         // draw mouse placement
         let dp = DrawParam::default()
-            .dest(mouse::position(ctx))
+            .dest(self.mouse_position)
             ;
         graphics::draw(ctx, &self.sheet, dp)?;
         
