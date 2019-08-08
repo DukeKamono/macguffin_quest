@@ -120,6 +120,16 @@ impl EventHandler for State {
                     .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
                     .collect()
             );
+        } else if mouse::button_pressed(ctx, mouse::MouseButton::Right) {
+            // update tile
+            let point = self.mouse_position;
+            self.map_tiles.remove(&(point.x as i64, point.y as i64));
+            // build level with new tile
+            self.level = self.builder.generate_level(
+                self.map_tiles.iter()
+                    .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
+                    .collect()
+            );
         }
 
         Ok(())
