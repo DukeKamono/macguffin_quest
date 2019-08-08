@@ -64,7 +64,7 @@ impl State {
             let x = key.0;
             let y = key.1;
             let t = value;
-            let output = format!("{} {} {}", x, y, t);
+            let output = format!("{} {} {}\n", x, y, t);
             file.write(output.as_bytes()).unwrap();
         }
     }
