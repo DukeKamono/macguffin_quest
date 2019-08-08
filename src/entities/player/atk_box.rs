@@ -1,4 +1,5 @@
 use ggez::*;
+use std::mem;
 
 use super::super::{CollideEntity, DrawableEntity, Direction};
 
@@ -13,24 +14,29 @@ pub struct AtkBox {
 impl AtkBox {
     pub fn new(ctx: &mut Context, duration: f32, xpos: f32, ypos: f32, width: f32, height: f32, direction: &Direction, offset: f32) -> AtkBox {
         
-        //let mut xpos = xpos;
-        //let mut ypos = ypos;
+        let mut xpos = xpos;
+        let mut ypos = ypos;
+		let mut h: &f32 = &height;
+		let mut w: &f32 = &width;
         
         // The player is kinda off centered and these values need to be adjusted.
-        //match direction {
-        //    Direction::Up => ypos -= offset,
-        //    Direction::Down => ypos += offset,
-        //    Direction::Left => xpos -= offset,
-        //    Direction::Right => xpos += offset,
-        //}
+        match direction {
+            Direction::Up => { ypos -= offset; mem::swap(&mut h, &mut w); },
+            Direction::Down => { ypos += offset; mem::swap(&mut h, &mut w); },
+            Direction::Left => xpos -= offset,
+            Direction::Right => xpos += offset,
+        }
         
         // create hit box
-        let hb = graphics::Rect::new(offset+50.0, offset, width, height);
+        let hb = graphics::Rect::new(0.0, 0.0, *w, *h);
         // create mesh
         let square = graphics::MeshBuilder::new()
             .rectangle(graphics::DrawMode::fill(), hb, graphics::WHITE)
             .build(ctx)
             .unwrap();
+			
+		xpos = xpos - hb.w / 2f32;
+		ypos = ypos - hb.h / 2f32;
 
         AtkBox {
             duration,
@@ -44,7 +50,7 @@ impl AtkBox {
 
 impl DrawableEntity for AtkBox {
     fn draw(&self, ctx: &mut Context) -> GameResult {
-        let dp = graphics::DrawParam::default().offset(nalgebra::Point2::new(0.5, 0.5)).dest(nalgebra::Point2::new(self.x, self.y));
+        let dp = graphics::DrawParam::default().dest(nalgebra::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.shape, dp)
     }
 }

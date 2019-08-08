@@ -45,11 +45,11 @@ impl UI {
         graphics::queue_text(ctx, &self.player_health, player_health_dest, Some(graphics::WHITE));
 
         // queue player mp for drawing
-        let player_mp_dest = nalgebra::Point2::new(200.0, 30.0);
+        let player_mp_dest = nalgebra::Point2::new(100.0, 50.0);
         graphics::queue_text(ctx, &self.player_mp, player_mp_dest, Some(graphics::WHITE));
         
         // queue player level for drawing
-        let player_level_dest = nalgebra::Point2::new(100.0, 50.0);
+        let player_level_dest = nalgebra::Point2::new(100.0, 70.0);
         graphics::queue_text(ctx, &self.player_level, player_level_dest, Some(graphics::WHITE));
         
         // draw ui
@@ -63,20 +63,20 @@ impl UI {
 const FLOAT_SPEED: f64 = 25f64; // move 25 units every second
 const LIFETIME: Duration = Duration::from_millis(1000); // text lives one sec
 
-pub struct DmgText {
+pub struct FloatingText {
     point: nalgebra::Point2<f32>,
     text: graphics::Text,
     duration: Duration,
 }
 
-impl DmgText {
-    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, dmg: f32) -> DmgText {
+impl FloatingText {
+    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, text: String) -> FloatingText {
         let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
-        let dmg_t = graphics::Text::new((dmg.to_string(), font, 22.0));
+        let t = graphics::Text::new((text, font, 22.0));
 
-        DmgText {
+        FloatingText {
             point: nalgebra::Point2::new(xpos + 5.0, ypos + 2.0), // The magic numbers help float over the object.
-            text: dmg_t,
+            text: t,
             duration: Duration::new(0, 0),
         }
     }
@@ -93,6 +93,6 @@ impl DmgText {
 
     pub fn draw(&self, ctx: &mut Context) {
         graphics::queue_text(ctx, &self.text, self.point, Some(graphics::WHITE));
-        graphics::draw_queued_text(ctx, graphics::DrawParam::default(), None, graphics::FilterMode::Linear).expect("Error Drawing DmgText");
+        graphics::draw_queued_text(ctx, graphics::DrawParam::default(), None, graphics::FilterMode::Linear).expect("Error Drawing FloatingText");
     }
 }

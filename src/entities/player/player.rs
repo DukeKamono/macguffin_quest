@@ -10,6 +10,8 @@ use super::super::{CollideEntity, DrawableEntity, Direction};
 use super::atk_box::AtkBox;
 use crate::sprites::*;
 
+use crate::ui::FloatingText;
+
 // constant values for keys used to determine movement
 const KEY_UP: KeyCode = KeyCode::W;
 const KEY_DOWN: KeyCode = KeyCode::S;
@@ -36,6 +38,9 @@ pub struct Player {
     pub atk_cooldown: Duration,
     pub invulnerable: Duration,
     pub direction: Direction,
+	pub macguffin: bool,
+	pub cooldown: Duration,
+    floating_text: Vec<FloatingText>,
 }
 
 impl Player {
@@ -116,7 +121,8 @@ impl Player {
             (Animations::Die, Direction::Down),
             builder.create_animated_once(Rect::new(64f32, 768f32, 64f32, 64f32), 5usize).unwrap()
         );
-
+		
+        let floating_text = Vec::new();
 
         Player {
             x: 10.0,
@@ -129,6 +135,9 @@ impl Player {
             atk_cooldown: Duration::new(0u64, 0u32),
             invulnerable: Duration::new(0u64, 0u32),
             direction: Direction::Right, // Starting direction?
+			macguffin: false,
+			cooldown: Duration::new(1u64, 0u32),
+            floating_text,
         }
     }
 
@@ -160,13 +169,13 @@ impl Player {
         }
         // casting
         else if keyboard::is_key_pressed(ctx, KeyCode::Q) && self.stats.hp > 0f32 && self.stats.mp > 0 {
-            self.atk_box = Some(AtkBox::new(ctx, 5.0, self.x, self.y, 25.0, 25.0, &self.direction, 5.0));
+            self.atk_box = Some(AtkBox::new(ctx, 5.0, self.x, self.y, 64.0, 80.0, &self.direction, 40.0));
             self.animation.0 = Animations::Cast;
             self.stats.mp -= 1;
         }
         // slashing
         else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.stats.hp > 0f32 { //&& self.atk_cooldown() {
-            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y, 5.0, 5.0, &self.direction, 5.0));
+            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y, 32.0, 64.0, &self.direction, 40.0));
             self.animation.0 = Animations::Slash;
             self.atk_cooldown = Duration::new(0u64, 0u32);
         }
@@ -194,6 +203,14 @@ impl Player {
         }
 
         self.sprite.get_mut(&self.animation).unwrap().animate(delta);
+		
+		self.floating_text.retain(|t| t.live());
+        self.floating_text.iter_mut().for_each(|t| t.update(delta));
+
+        // cooldown
+        if self.pick_up_cooldown() {
+            self.cooldown += delta;
+        }
     }
 
     // returns if player should be able to take damage
@@ -202,8 +219,21 @@ impl Player {
         self.invulnerable < Duration::from_millis(250u64)
     }
 
+	// This is still in the works
     fn atk_cooldown(&self) -> bool {
         self.atk_cooldown > Duration::from_millis(350u64)
+    }
+	
+	// player pick_up item text. should be combined with other text stuff...
+	pub fn pick_up(&mut self, ctx: &mut Context, text: String) {
+		if !self.pick_up_cooldown() {
+            self.cooldown = Duration::new(0u64, 0u32);
+			self.floating_text.push(FloatingText::new(ctx, self.x, self.y, text));
+		}
+	}
+	
+    fn pick_up_cooldown(&self) -> bool {
+        self.cooldown < Duration::from_millis(250u64)
     }
 
     pub fn move_location(&mut self, xinc: f32, yinc: f32) {

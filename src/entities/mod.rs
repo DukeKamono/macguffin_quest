@@ -14,6 +14,12 @@ pub mod enemies;
 // Namespace for things related to the environment (ie level)
 pub mod environment;
 
+// Namespace for things related to items
+pub mod items;
+
+// Namespace for things related to npcs
+pub mod npcs;
+
 // required by traits
 use ggez::graphics::Rect;
 use ggez::{Context, GameResult};

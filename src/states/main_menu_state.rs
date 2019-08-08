@@ -37,11 +37,11 @@ impl CustomEventHandler for MainMenuState {
         match key {
             KeyCode::E => {
                 self.chosen_player = "/elf_fighter.png".to_string();
-                self.text = graphics::Text::new(("Macguffin Quest\n\n\nYou Chose the Elf Fighter!\n\nPress Enter to Start".to_string(), font, 22.0));
+                self.text = graphics::Text::new(("Macguffin Quest\n\n\nYou Chose the Elf Fighter!\n\nInstructions:\nASWD: Move\nQ: Spell\nSpace: Attack\nHold Shift to Run\n\nPress Enter to Start".to_string(), font, 22.0));
             },
             KeyCode::S => {
                 self.chosen_player = "/dapper-skeleton-sheet.png".to_string();
-                self.text = graphics::Text::new(("Macguffin Quest\n\n\nYou Chose the Dapper Skeleton!\n\nPress Enter to Start".to_string(), font, 22.0));
+                self.text = graphics::Text::new(("Macguffin Quest\n\n\nYou Chose the Dapper Skeleton!\n\nInstructions:\nASWD: Move\nQ: Spell\nSpace: Attack\nHold Shift to Run\n\nPress Enter to Start".to_string(), font, 22.0));
             },
             _ => {
                 self.chosen_player = "".to_string();
