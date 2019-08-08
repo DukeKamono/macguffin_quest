@@ -114,12 +114,11 @@ impl EventHandler for State {
         }
         if button == mouse::MouseButton::Left {
             // add new tiles
-            /*let mut point = self.click_start.unwrap();
+            let mut point = self.click_start.unwrap();
             point.x = f32::floor((point.x + self.screen.x) / 64f32) * 64f32;
             point.y = f32::floor((point.y + self.screen.y) / 64f32) * 64f32;
             self.map_tiles.insert((point.x as i64, point.y as i64), self.tile_value);
-            */
-            
+
             // build level with new tiles
             self.level = self.builder.generate_level(
                 self.map_tiles.iter()
