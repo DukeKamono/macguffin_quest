@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use ggez::event::{EventHandler, KeyCode};
 use ggez::input::{keyboard, mouse};
-use ggez::graphics::{DrawParam, Image, Mesh, Rect};
+use ggez::graphics::{DrawParam, Image, Rect};
 use ggez::*;
 
 use macguffin_quest::entities::DrawableEntity;
@@ -14,7 +14,6 @@ struct State {
     screen: Rect, // used to move image around screen
 
     mouse_position: mint::Point2<f32>, // adjusted position of the mouse
-    click_start: Option<mint::Point2<f32>>, // start of click
 
     tile_value: usize, // value of currently selected tile type
 
@@ -33,7 +32,6 @@ impl State {
 
         // get position of mouse
         let mouse_position = mouse::position(ctx);
-        let click_start = None;
 
         // initially selected tile
         let tile_value = 0usize;
@@ -52,7 +50,6 @@ impl State {
         State {
             screen,
             mouse_position,
-            click_start,
             tile_value,
             builder,
             level,
@@ -66,8 +63,6 @@ impl State {
 
         let width = f32::floor(img.width() as f32 / 64f32); // max
         let height = f32::floor(img.height() as f32 / 64f32); // max
-
-        //println!("{} {}", width, height);
 
         // do the tiling
         let mut h = 0f32; // counting
@@ -83,8 +78,6 @@ impl State {
             }
             h += 1f32;
         }
-        //println!("{:?}", ret_value);
-        //println!("{:?}", ret_value.len());
         ret_value
     }
 }
@@ -93,42 +86,6 @@ impl EventHandler for State {
     fn mouse_motion_event(&mut self, _ctx: &mut Context, x: f32, y: f32, _dx: f32, _dy: f32) {
         self.mouse_position.x = f32::floor((x + self.screen.x) / 64f32) * 64f32;
         self.mouse_position.y = f32::floor((y + self.screen.y) / 64f32) * 64f32;
-    }
-
-    fn mouse_button_down_event(&mut self, _ctx: &mut Context, button: mouse::MouseButton, x: f32, y: f32) {
-        match button {
-            mouse::MouseButton::Left => println!("left click"),
-            mouse::MouseButton::Right => println!("right click"),
-            _ => println!("other mouse click"),
-        }
-        if button == mouse::MouseButton::Left {
-            self.click_start = Some([x, y].into());
-        }
-    }
-
-    fn mouse_button_up_event(&mut self, _ctx: &mut Context, button: mouse::MouseButton, _x: f32, _y: f32) {
-        match button {
-            mouse::MouseButton::Left => println!("left released"),
-            mouse::MouseButton::Right => println!("right released"),
-            _ => println!("other mouse released"),
-        }
-        if button == mouse::MouseButton::Left {
-            // add new tiles
-            let mut point = self.click_start.unwrap();
-            point.x = f32::floor((point.x + self.screen.x) / 64f32) * 64f32;
-            point.y = f32::floor((point.y + self.screen.y) / 64f32) * 64f32;
-            self.map_tiles.insert((point.x as i64, point.y as i64), self.tile_value);
-
-            // build level with new tiles
-            self.level = self.builder.generate_level(
-                self.map_tiles.iter()
-                    .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
-                    .collect()
-            );
-            
-            // no longer tracking line (hope!)
-            self.click_start = None;
-        }
     }
 
     fn mouse_wheel_event(&mut self, _ctx: &mut Context, _x: f32, y: f32) {
@@ -153,6 +110,18 @@ impl EventHandler for State {
             self.screen.y += 4f32;
         }
 
+        if mouse::button_pressed(ctx, mouse::MouseButton::Left) {
+            // update tile
+            let point = self.mouse_position;
+            self.map_tiles.insert((point.x as i64, point.y as i64), self.tile_value);
+            // build level with new tile
+            self.level = self.builder.generate_level(
+                self.map_tiles.iter()
+                    .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
+                    .collect()
+            );
+        }
+
         Ok(())
     }
     
@@ -171,18 +140,6 @@ impl EventHandler for State {
             .dest(self.mouse_position)
             ;
         graphics::draw(ctx, &self.vector_types[self.tile_value], dp)?;
-
-        if let Some(point) = self.click_start {
-            let mut mouse_position = mouse::position(ctx);
-            mouse_position.x += self.screen.x;
-            mouse_position.y += self.screen.y;
-            if mouse_position == point {
-                mouse_position.x += 1f32;
-                mouse_position.y += 1f32;
-            }
-            let line = Mesh::new_line(ctx, &[point, mouse_position], 8f32, graphics::WHITE)?;
-            graphics::draw(ctx, &line, DrawParam::default())?;
-        }
         
         // display frame
         graphics::present(ctx)?;
