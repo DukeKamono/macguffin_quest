@@ -47,6 +47,8 @@ impl CustomEventHandler for MainState {
         let playerx = self.player.x;
         let playery = self.player.y;
 		
+		self.player.update(ctx, delta);
+		
         if self.player.collision(&self.level) {
             self.player.move_location(playerx, playery);
         }
@@ -89,7 +91,6 @@ impl CustomEventHandler for MainState {
 			}
 		}
 		self.macguffin_man.update(delta);
-		self.player.update(ctx, delta);
         self.enemies.update(ctx, delta, &mut self.player, &self.level);
 		
         // Should prob make UI update last all the time.
