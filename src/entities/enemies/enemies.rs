@@ -1,9 +1,11 @@
 use crate::entities::DrawableEntity;
 use crate::entities::player::player::Player;
+use crate::entities::enemies::ghost::Ghost;
 use crate::entities::environment::level::Level;
 use std::time::Duration;
 use ggez::*;
 use crate::entities::enemies::ai::*;
+use rand::prelude::*;
 
 pub trait Enemy: DrawableEntity {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level);
@@ -11,6 +13,7 @@ pub trait Enemy: DrawableEntity {
     fn get_aitype(&mut self) -> &AITypes;
     fn chase_player(&mut self, _delta: Duration, player: &mut Player, level: &Level);
     fn chase_player_sight(&mut self, delta: Duration, player: &mut Player, level: &Level);
+	fn spawn(&self) -> bool;
 }
 
 #[derive(Default)]
@@ -42,6 +45,8 @@ impl DrawableEntity for Enemies {
 
 impl Enemy for Enemies {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
+		let mut spawning = false;
+		
         // remove dead enemies
         self.enemies.retain(|e| e.islive());
         
@@ -50,8 +55,17 @@ impl Enemy for Enemies {
         self.enemies.iter_mut().for_each(|e| {
             e.update(ctx, delta, player, level);
             ai.update(delta, e, player, level);
+			// I need to find a better spot for this spawning, keeps spawning ghosts if spawn comes back true. (boss only)
+			if e.spawn() {
+				spawning = true;
+			}
         });
-
+		
+		if spawning {
+			let mut rng = thread_rng();
+			self.enemies.push(Box::new(Ghost::new(ctx, rng.gen_range(0, 800) as f32, rng.gen_range(0, 800) as f32, AITypes::MeleeDirect)));
+		}
+		
         if !self.islive() {
             // do something if there are no more enemies
             // maybe spawn some new ones
@@ -73,4 +87,8 @@ impl Enemy for Enemies {
     
     fn chase_player_sight(&mut self, _delta: Duration, _player: &mut Player, _level: &Level) {
     }
+	
+	fn spawn(&self) -> bool {
+		true
+	}
 }

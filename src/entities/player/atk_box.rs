@@ -1,4 +1,5 @@
 use ggez::*;
+use std::mem;
 
 use super::super::{CollideEntity, DrawableEntity, Direction};
 
@@ -15,38 +16,34 @@ impl AtkBox {
         
         let mut xpos = xpos;
         let mut ypos = ypos;
+		let mut h: &f32 = &height;
+		let mut w: &f32 = &width;
         
         // The player is kinda off centered and these values need to be adjusted.
         match direction {
-            Direction::Up => ypos -= offset,
-            Direction::Down => ypos += offset,
+            Direction::Up => { ypos -= offset; mem::swap(&mut h, &mut w); },
+            Direction::Down => { ypos += offset; mem::swap(&mut h, &mut w); },
             Direction::Left => xpos -= offset,
             Direction::Right => xpos += offset,
         }
         
-        // radius of circle
-        let r = width + height;
         // create hit box
-        let hb = graphics::Rect::new(0.0, 0.0, r * 2.0, r * 2.0);
+        let hb = graphics::Rect::new(0.0, 0.0, *w, *h);
         // create mesh
-        let circle = graphics::MeshBuilder::new()
-            .circle(
-                graphics::DrawMode::fill(),
-                nalgebra::Point2::new(r, r),
-                r,
-                1.0,
-                graphics::WHITE,
-            )
-            .rectangle(graphics::DrawMode::stroke(1.0), hb, graphics::WHITE)
+        let square = graphics::MeshBuilder::new()
+            .rectangle(graphics::DrawMode::fill(), hb, graphics::WHITE)
             .build(ctx)
             .unwrap();
+			
+		xpos = xpos - hb.w / 2f32;
+		ypos = ypos - hb.h / 2f32;
 
         AtkBox {
             duration,
             x: xpos,
             y: ypos,
             hitbox: hb,
-            shape: circle,
+            shape: square,
         }
     }
 }

@@ -8,7 +8,7 @@ use std::time::Duration;
 //use rand::prelude::*;
 
 use super::super::{CollideEntity, DrawableEntity};
-use crate::ui::DmgText;
+use crate::ui::FloatingText;
 use crate::entities::enemies::sight::*;
 
 pub struct Blob {
@@ -19,7 +19,7 @@ pub struct Blob {
     pub def: f32,
     pub sprite: graphics::Image,
     pub hitbox: graphics::Rect,
-    dmg_text: Vec<DmgText>,
+    floating_text: Vec<FloatingText>,
     pub invulnerable: Duration,
     pub line_of_sight: LineOfSight,
     pub ai_type: AITypes,
@@ -29,7 +29,7 @@ impl Blob {
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, ai_type: AITypes) -> Blob {
         let img = graphics::Image::new(ctx, "/blob.png").unwrap();
         let hb = img.dimensions();
-        let dmg_text = Vec::new();
+        let floating_text = Vec::new();
 
         Blob {
             x: xpos,
@@ -39,7 +39,7 @@ impl Blob {
             def: 1.0,
             sprite: img,
             hitbox: hb,
-            dmg_text,
+            floating_text,
             invulnerable: Duration::new(1u64, 0u32),
             line_of_sight: LineOfSight::new(xpos, ypos),
             ai_type,
@@ -50,7 +50,7 @@ impl Blob {
         if !self.invulnerable() {
             self.hp -= player.stats.atk;
             self.invulnerable = Duration::new(0u64, 0u32);
-            self.dmg_text.push(DmgText::new(ctx, self.x, self.y, player.stats.atk));
+            self.floating_text.push(FloatingText::new(ctx, self.x, self.y, player.stats.atk.to_string()));
             // Check for death and maybe call a death function.
         }
         
@@ -70,7 +70,7 @@ impl DrawableEntity for Blob {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.sprite, dp)?;
 
-        self.dmg_text.iter().for_each(|t| t.draw(ctx));
+        self.floating_text.iter().for_each(|t| t.draw(ctx));
 
         Ok(())
     }
@@ -87,8 +87,8 @@ impl CollideEntity for Blob {
 
 impl Enemy for Blob {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, _level: &Level) {
-        self.dmg_text.retain(|t| t.live());
-        self.dmg_text.iter_mut().for_each(|t| t.update(delta));
+        self.floating_text.retain(|t| t.live());
+        self.floating_text.iter_mut().for_each(|t| t.update(delta));
 
         // cool down invulnerable of blob
         if self.invulnerable() {
@@ -153,4 +153,8 @@ impl Enemy for Blob {
             self.chase_player(delta, player, level);
         }
     }
+	
+	fn spawn(&self) -> bool {
+		false
+	}
 }

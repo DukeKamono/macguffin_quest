@@ -18,6 +18,8 @@ pub enum AITypes {
     RangeDirect,
     // When you see the player then go towards and fire at them.
     RangeLineOfSight,
+	// Boss?
+	Boss,
     // an error occurred and needs reported.
     Error,
 }
@@ -37,6 +39,7 @@ impl AI {
 			AITypes::MeleeLineOfSight => enemy.chase_player_sight(delta, player, level),
 			AITypes::RangeDirect => enemy.chase_player(delta, player, level),
 			AITypes::RangeLineOfSight => enemy.chase_player_sight(delta, player, level),
+			AITypes::Boss => { enemy.chase_player(delta, player, level); enemy.chase_player_sight(delta, player, level); },
 			AITypes::Error => println!("Error"),
 		}
 	}
