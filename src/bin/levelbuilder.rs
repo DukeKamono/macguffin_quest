@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use ggez::event::{EventHandler, KeyCode};
 use ggez::input::{keyboard, mouse};
 use ggez::graphics::{DrawParam, Image, Mesh, Rect};
@@ -19,7 +21,7 @@ struct State {
     builder: LevelBuilder, // used to build levels
     level: Level, // level being designed
 
-    vector_tiles: Vec<(f32, f32, usize)>, // generate level from
+    map_tiles: HashMap<(i64, i64), usize>, // generate level from
     vector_types: Vec<Sprite>, // various tile images (after sheet is split up)
 }
 
@@ -44,7 +46,7 @@ impl State {
         let level = builder.sample0();
 
         // new level tile information
-        let vector_tiles = Vec::new();
+        let map_tiles = HashMap::new();
         let vector_types = State::tileize(&mut builder, & sheet);
 
         State {
@@ -54,7 +56,7 @@ impl State {
             tile_value,
             builder,
             level,
-            vector_tiles,
+            map_tiles,
             vector_types,
         }
     }
@@ -111,6 +113,21 @@ impl EventHandler for State {
             _ => println!("other mouse released"),
         }
         if button == mouse::MouseButton::Left {
+            // add new tiles
+            /*let mut point = self.click_start.unwrap();
+            point.x = f32::floor((point.x + self.screen.x) / 64f32) * 64f32;
+            point.y = f32::floor((point.y + self.screen.y) / 64f32) * 64f32;
+            self.map_tiles.insert((point.x as i64, point.y as i64), self.tile_value);
+            */
+            
+            // build level with new tiles
+            self.level = self.builder.generate_level(
+                self.map_tiles.iter()
+                    .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
+                    .collect()
+            );
+            
+            // no longer tracking line (hope!)
             self.click_start = None;
         }
     }

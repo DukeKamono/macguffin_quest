@@ -64,12 +64,12 @@ impl LevelBuilder {
 
     pub fn sample1(&self) -> Level {
         let w = vec![
-            (350.0, 150.0, 1usize),
-            (414.0, 150.0, 0usize),
-            (350.0, 250.0, 1usize),
-            (414.0, 250.0, 0usize),
-            (350.0, 350.0, 1usize),
-            (414.0, 350.0, 0usize),
+            ((350.0, 150.0), 1usize),
+            ((414.0, 150.0), 0usize),
+            ((350.0, 250.0), 1usize),
+            ((414.0, 250.0), 0usize),
+            ((350.0, 350.0), 1usize),
+            ((414.0, 350.0), 0usize),
         ];
         self.generate_level(w)
     }
@@ -80,14 +80,14 @@ impl LevelBuilder {
         // top bottom
         for x in (0..800).step_by(self.tile_width) {
             for y in &[0, (600 - self.tile_height)] {
-                w.push((x as f32, *y as f32, 1usize));
+                w.push(((x as f32, *y as f32), 1usize));
                 //println!("{},{}", x, y);
             }
         }
         // left right
         for x in &[0, (800 - self.tile_width)] {
             for y in (self.tile_height..(600 - self.tile_height)).step_by(self.tile_height) {
-                w.push((*x as f32, y as f32, 1usize));
+                w.push(((*x as f32, y as f32), 1usize));
                 //println!("{},{}", x, y);
             }
         }
@@ -100,36 +100,36 @@ impl LevelBuilder {
         let br = self.tile_height * 8usize;
         let m = self.tile_width * 6usize;
         // corners
-        w.push((0f32, 0f32, 5usize));
-        w.push((tr as f32, 0f32, 5usize));
-        w.push((0f32, br as f32, 5usize));
-        w.push((tr as f32, br as f32, 5usize));
+        w.push(((0f32, 0f32), 5usize));
+        w.push(((tr as f32, 0f32), 5usize));
+        w.push(((0f32, br as f32), 5usize));
+        w.push(((tr as f32, br as f32), 5usize));
         // top and bottom
         for x in (self.tile_width..tr).step_by(self.tile_width) {
-            w.push((x as f32, 0f32, 0usize));
-            w.push((x as f32, br as f32, 1usize));
+            w.push(((x as f32, 0f32), 0usize));
+            w.push(((x as f32, br as f32), 1usize));
         }
         // left right
         for y in (self.tile_height..br).step_by(self.tile_height) {
-            w.push((0f32, y as f32, 2usize));
-            w.push((tr as f32, y as f32, 3usize));
+            w.push(((0f32, y as f32), 2usize));
+            w.push(((tr as f32, y as f32), 3usize));
         }
         // middle
         for y in (self.tile_height * 3usize..m).step_by(self.tile_height) {
-            w.push((m as f32, y as f32, 4usize));
+            w.push(((m as f32, y as f32), 4usize));
         }
         self.generate_level(w)
     }
 
-    fn generate_level(&self, points: Vec<(f32, f32, usize)>) -> Level {
+    pub fn generate_level(&self, points: Vec<((f32, f32), usize)>) -> Level {
         let tiles = points
             .iter()
             .map(|p| {
-                let image = match self.tile_image.get(&p.2) {
+                let image = match self.tile_image.get(&p.1) {
                     Some(image) => image,
                     None => &self.default,
                 };
-                Tile::new(&image, p.0, p.1)
+                Tile::new(&image, (p.0).0, (p.0).1)
             })
             .collect();
         Level::new(tiles)
