@@ -32,7 +32,6 @@ impl State {
     fn readfile(ctx: &mut Context, path: &String) -> HashMap<(i64, i64), usize> {
         let mut retvalue = HashMap::new();
 
-        let mut path = path.clone();
         if !ggez::filesystem::exists(ctx, &path) {
             println!("unable to find {} loading empty level", path);
             return retvalue;
@@ -160,13 +159,13 @@ impl EventHandler for State {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         // move screen
         if keyboard::is_key_pressed(ctx, KeyCode::D) {
-            self.screen.x += 4f32;
+            self.screen.x += 16f32;
         } else if keyboard::is_key_pressed(ctx, KeyCode::A) {
-            self.screen.x -= 4f32;
+            self.screen.x -= 16f32;
         } else if keyboard::is_key_pressed(ctx, KeyCode::W) {
-            self.screen.y -= 4f32;
+            self.screen.y -= 16f32;
         } else if keyboard::is_key_pressed(ctx, KeyCode::S) {
-            self.screen.y += 4f32;
+            self.screen.y += 16f32;
         }
 
         if mouse::button_pressed(ctx, mouse::MouseButton::Left) {
