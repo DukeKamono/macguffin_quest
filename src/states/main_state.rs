@@ -25,7 +25,7 @@ use super::ui::UI;
 //mod sprites;
 //use sprites::sprite::Sprite;
 //use sprites::animated_sprite::*;
-use super::sprites::*;
+//use super::sprites::*;
 
 use crate::entities::enemies::ai::AITypes;
 
@@ -186,27 +186,7 @@ impl MainState {
         // build level
         let img = graphics::Image::new(ctx, "/testwalls.png").unwrap();
         let mut lb = LevelBuilder::new(ctx, None);
-        lb.set_tile_image(
-            0usize,
-            &Sprite::new(&img, graphics::Rect::new(0f32, 0f32, 64f32, 64f32)).unwrap(),
-        )
-        .unwrap();
-        lb.set_tile_image(
-            1usize,
-            &Sprite::new(&img, graphics::Rect::new(64f32, 0f32, 64f32, 64f32)).unwrap(),
-        )
-        .unwrap();
-        lb.set_tile_image(
-            2usize,
-            &Sprite::new(&img, graphics::Rect::new(128f32, 0f32, 64f32, 64f32)).unwrap(),
-        )
-        .unwrap();
-        lb.set_tile_image(
-            3usize,
-            &Sprite::new(&img, graphics::Rect::new(192f32, 0f32, 64f32, 64f32)).unwrap(),
-        )
-        .unwrap();
-        let level = lb.sample3();
+        let level = lb.fromfile(ctx, &img, &"/BasicLevel.lvl".to_string());
 
 		let mac = Macguffin::new(ctx, 50.0, 350.0);
 		
