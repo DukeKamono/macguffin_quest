@@ -23,10 +23,41 @@ struct State {
 
     map_tiles: HashMap<(i64, i64), usize>, // generate level from
     vector_types: Vec<Sprite>, // various tile images (after sheet is split up)
+
+    path: String, // where to save to
 }
 
 impl State {
-    fn new(ctx: &mut Context, sheet: &Image) -> State {
+    fn readfile(ctx: &mut Context, path: &String) -> HashMap<(i64, i64), usize> {
+        let mut retvalue = HashMap::new();
+
+        let file = ggez::filesystem::open(ctx, path).unwrap();
+        let reader = BufReader::new(file);
+        for (i, line) in reader.lines().enumerate() {
+            let line = line.unwrap();
+            let mut parse = line.split_whitespace();
+            let message = format!("Error on line {}, unable to parse valid value", i + 1);
+            let x = parse.next().unwrap().parse::<i64>().expect(&message);
+            let y = parse.next().unwrap().parse::<i64>().expect(&message);
+            let t = parse.next().unwrap().parse::<usize>().expect(&message);
+            //println!("{}, ({},{}), {}", i, x, y, t);
+            retvalue.insert((x, y), t);
+        }
+
+        retvalue
+    }
+
+    //fn writefile(ctx: &mut Context) {}
+
+    fn buildlevel(builder: &mut LevelBuilder, map_tiles: & HashMap<(i64, i64), usize>) -> Level {
+        builder.generate_level(
+            map_tiles.iter()
+                .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
+                .collect()
+        )
+    }
+
+    fn new(ctx: &mut Context, sheet: &Image, path: &String) -> State {
         // what is the drawable region of the screen
         let (width, height) = graphics::drawable_size(ctx);
         let screen = Rect::new(0f32, 0f32, width, height);
@@ -39,11 +70,14 @@ impl State {
 
         // create basic level to build
         let mut builder = LevelBuilder::new(ctx, None);
-        let level = builder.sample0();
 
-        // new level tile information
-        let map_tiles = HashMap::new();
+        // new level + tile information
+        let map_tiles = State::readfile(ctx, path);
         let vector_types = State::tileize(&mut builder, sheet);
+        let level = State::buildlevel(&mut builder, &map_tiles);
+
+        // where to save
+        let path = path.clone();
 
         State {
             screen,
@@ -53,6 +87,7 @@ impl State {
             level,
             map_tiles,
             vector_types,
+            path,
         }
     }
 
@@ -112,12 +147,12 @@ impl EventHandler for State {
             // update tile
             self.map_tiles.insert((self.mouse_position.x as i64, self.mouse_position.y as i64), self.tile_value);
             // build level with new tile
-            self.level = buildlevel(&mut self.builder, &mut self.map_tiles);
+            self.level = State::buildlevel(&mut self.builder, &mut self.map_tiles);
         } else if mouse::button_pressed(ctx, mouse::MouseButton::Right) {
             // update tile
             self.map_tiles.remove(&(self.mouse_position.x as i64, self.mouse_position.y as i64));
             // build level with new tile
-            self.level = buildlevel(&mut self.builder, &mut self.map_tiles);
+            self.level = State::buildlevel(&mut self.builder, &mut self.map_tiles);
         }
 
         Ok(())
@@ -146,55 +181,30 @@ impl EventHandler for State {
     }
 }
 
-fn readfile(ctx: &mut Context, path: String) -> HashMap<(i64, i64), usize> {
-    let retvalue = HashMap::new();
+fn main() {
+    // get arguments
+    let args: Vec<String> = std::env::args().collect();
 
-    let file = ggez::filesystem::open(ctx, path).unwrap();
-    let reader = BufReader::new(file);
-    for (i, line) in reader.lines().enumerate() {
-        let line = line.unwrap();
-        let mut parse = line.split_whitespace();
-        let message = format!("Error on line {}, unable to parse valid value", i + 1);
-        let x = parse.next().unwrap().parse::<f32>().expect(&message);
-        let y = parse.next().unwrap().parse::<f32>().expect(&message);
-        let t = parse.next().unwrap().parse::<usize>().expect(&message);
-        println!("{}, ({},{}), {}", i, x, y, t);
+    let mut path = "/level/testing.lvl".to_string();
+    if args.len() > 1usize {
+        path = args[1].clone();
     }
 
-    retvalue
-}
-
-//fn writefile() {}
-
-fn buildlevel(builder: &mut LevelBuilder, map_tiles: &mut HashMap<(i64, i64), usize>) -> Level {
-    builder.generate_level(
-        map_tiles.iter()
-            .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
-            .collect()
-    )
-}
-
-fn main() {
-    // view arguments
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() > 1usize {
-        println!("{}", args[1]);
+    let mut sheet = "/texture/testwalls.png".to_string();
+    if args.len() > 2usize {
+        sheet = args[2].clone();
     }
 
     // create a context to access hardware (also creates event loop)
     let (ref mut ctx, ref mut event_loop) =
         ggez::ContextBuilder::new("macguffin_quest", "James M. & William O.")
-            .add_resource_path(std::path::PathBuf::from("./resources/texture"))
-            .add_resource_path(std::path::PathBuf::from("./resources/font"))
-            .add_resource_path(std::path::PathBuf::from("./resources/level"))
+            .add_resource_path(std::path::PathBuf::from("./resources"))
             .build()
             .unwrap();
 
     // initial state to level builder
-    let sheet = Image::new(ctx, "/testwalls.png").unwrap();
-    let tiles = readfile(ctx, "/testing.lvl".to_string());
-    println!("{:?}", tiles);
-    let state = &mut State::new(ctx, &sheet);
+    let sheet = Image::new(ctx, sheet).unwrap();
+    let state = &mut State::new(ctx, &sheet, &path);
 
     // start game loop
     match ggez::event::run(ctx, event_loop, state) {
