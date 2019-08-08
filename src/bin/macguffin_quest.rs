@@ -6,6 +6,7 @@ fn main() {
         ggez::ContextBuilder::new("macguffin_quest", "James M. & William O.")
             .add_resource_path(std::path::PathBuf::from("./resources/texture"))
             .add_resource_path(std::path::PathBuf::from("./resources/font"))
+            .add_resource_path(std::path::PathBuf::from("./resources/level"))
             .build()
             .unwrap();
 
