@@ -1,8 +1,9 @@
 use std::collections::HashMap;
+use std::io::{BufRead, BufReader};
 
 use ggez::event::{EventHandler, KeyCode};
-use ggez::input::{keyboard, mouse};
 use ggez::graphics::{DrawParam, Image, Rect};
+use ggez::input::{keyboard, mouse};
 use ggez::*;
 
 use macguffin_quest::entities::DrawableEntity;
@@ -25,7 +26,7 @@ struct State {
 }
 
 impl State {
-    fn new(ctx: &mut Context) -> State {
+    fn new(ctx: &mut Context, sheet: &Image) -> State {
         // what is the drawable region of the screen
         let (width, height) = graphics::drawable_size(ctx);
         let screen = Rect::new(0f32, 0f32, width, height);
@@ -36,16 +37,13 @@ impl State {
         // initially selected tile
         let tile_value = 0usize;
 
-        // tile sprite sheet
-        let sheet = Image::new(ctx, "/testwalls.png").unwrap();
-
         // create basic level to build
         let mut builder = LevelBuilder::new(ctx, None);
         let level = builder.sample0();
 
         // new level tile information
         let map_tiles = HashMap::new();
-        let vector_types = State::tileize(&mut builder, & sheet);
+        let vector_types = State::tileize(&mut builder, sheet);
 
         State {
             screen,
@@ -112,24 +110,14 @@ impl EventHandler for State {
 
         if mouse::button_pressed(ctx, mouse::MouseButton::Left) {
             // update tile
-            let point = self.mouse_position;
-            self.map_tiles.insert((point.x as i64, point.y as i64), self.tile_value);
+            self.map_tiles.insert((self.mouse_position.x as i64, self.mouse_position.y as i64), self.tile_value);
             // build level with new tile
-            self.level = self.builder.generate_level(
-                self.map_tiles.iter()
-                    .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
-                    .collect()
-            );
+            self.level = buildlevel(&mut self.builder, &mut self.map_tiles);
         } else if mouse::button_pressed(ctx, mouse::MouseButton::Right) {
             // update tile
-            let point = self.mouse_position;
-            self.map_tiles.remove(&(point.x as i64, point.y as i64));
+            self.map_tiles.remove(&(self.mouse_position.x as i64, self.mouse_position.y as i64));
             // build level with new tile
-            self.level = self.builder.generate_level(
-                self.map_tiles.iter()
-                    .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
-                    .collect()
-            );
+            self.level = buildlevel(&mut self.builder, &mut self.map_tiles);
         }
 
         Ok(())
@@ -158,18 +146,55 @@ impl EventHandler for State {
     }
 }
 
+fn readfile(ctx: &mut Context, path: String) -> HashMap<(i64, i64), usize> {
+    let retvalue = HashMap::new();
+
+    let file = ggez::filesystem::open(ctx, path).unwrap();
+    let reader = BufReader::new(file);
+    for (i, line) in reader.lines().enumerate() {
+        let line = line.unwrap();
+        let mut parse = line.split_whitespace();
+        let message = format!("Error on line {}, unable to parse valid value", i + 1);
+        let x = parse.next().unwrap().parse::<f32>().expect(&message);
+        let y = parse.next().unwrap().parse::<f32>().expect(&message);
+        let t = parse.next().unwrap().parse::<usize>().expect(&message);
+        println!("{}, ({},{}), {}", i, x, y, t);
+    }
+
+    retvalue
+}
+
+//fn writefile() {}
+
+fn buildlevel(builder: &mut LevelBuilder, map_tiles: &mut HashMap<(i64, i64), usize>) -> Level {
+    builder.generate_level(
+        map_tiles.iter()
+            .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
+            .collect()
+    )
+}
 
 fn main() {
+    // view arguments
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1usize {
+        println!("{}", args[1]);
+    }
+
     // create a context to access hardware (also creates event loop)
     let (ref mut ctx, ref mut event_loop) =
         ggez::ContextBuilder::new("macguffin_quest", "James M. & William O.")
             .add_resource_path(std::path::PathBuf::from("./resources/texture"))
             .add_resource_path(std::path::PathBuf::from("./resources/font"))
+            .add_resource_path(std::path::PathBuf::from("./resources/level"))
             .build()
             .unwrap();
 
     // initial state to level builder
-    let state = &mut State::new(ctx);
+    let sheet = Image::new(ctx, "/testwalls.png").unwrap();
+    let tiles = readfile(ctx, "/testing.lvl".to_string());
+    println!("{:?}", tiles);
+    let state = &mut State::new(ctx, &sheet);
 
     // start game loop
     match ggez::event::run(ctx, event_loop, state) {
