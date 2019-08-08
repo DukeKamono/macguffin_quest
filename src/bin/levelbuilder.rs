@@ -1,9 +1,10 @@
 use std::collections::HashMap;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Write};
 
 use ggez::event::{EventHandler, KeyCode};
 use ggez::graphics::{DrawParam, Image, Rect};
 use ggez::input::{keyboard, mouse};
+use keyboard::KeyMods;
 use ggez::*;
 
 use macguffin_quest::entities::DrawableEntity;
@@ -31,7 +32,13 @@ impl State {
     fn readfile(ctx: &mut Context, path: &String) -> HashMap<(i64, i64), usize> {
         let mut retvalue = HashMap::new();
 
-        let file = ggez::filesystem::open(ctx, path).unwrap();
+        let mut path = path.clone();
+        if !ggez::filesystem::exists(ctx, &path) {
+            println!("unable to find {} loading empty level", path);
+            return retvalue;
+        }
+        let file = ggez::filesystem::open(ctx, &path).unwrap();
+
         let reader = BufReader::new(file);
         for (i, line) in reader.lines().enumerate() {
             let line = line.unwrap();
@@ -47,7 +54,20 @@ impl State {
         retvalue
     }
 
-    //fn writefile(ctx: &mut Context) {}
+    fn writefile(&self, ctx: &mut Context,) {
+        // creates a file in 
+        // C:\Users\username\AppData\Roaming\James M. & William O\levelbuilder\config
+        println!("saving: {:?}", self.path);
+        let mut file = ggez::filesystem::create(ctx, &self.path).unwrap();
+
+        for (key, value) in self.map_tiles.iter() {
+            let x = key.0;
+            let y = key.1;
+            let t = value;
+            let output = format!("{} {} {}", x, y, t);
+            file.write(output.as_bytes()).unwrap();
+        }
+    }
 
     fn buildlevel(builder: &mut LevelBuilder, map_tiles: & HashMap<(i64, i64), usize>) -> Level {
         builder.generate_level(
@@ -130,6 +150,12 @@ impl EventHandler for State {
         }
         //println!("{}", self.tile_value);
     }
+
+    fn key_up_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods) {
+        if keycode == KeyCode::O {
+            self.writefile(ctx);
+        }
+    }
     
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         // move screen
@@ -184,21 +210,25 @@ impl EventHandler for State {
 fn main() {
     // get arguments
     let args: Vec<String> = std::env::args().collect();
+    println!("{:?}", args);
 
-    let mut path = "/level/testing.lvl".to_string();
+    let mut path = "/default.lvl".to_string();
     if args.len() > 1usize {
         path = args[1].clone();
+        path.insert(0usize, '\\');
     }
+    println!("path: {}", path);
 
-    let mut sheet = "/texture/testwalls.png".to_string();
+    let mut sheet = "/testwalls.png".to_string();
     if args.len() > 2usize {
         sheet = args[2].clone();
     }
+    println!("sheet: {}", sheet);
 
     // create a context to access hardware (also creates event loop)
     let (ref mut ctx, ref mut event_loop) =
-        ggez::ContextBuilder::new("macguffin_quest", "James M. & William O.")
-            .add_resource_path(std::path::PathBuf::from("./resources"))
+        ggez::ContextBuilder::new("levelbuilder", "James M. & William O.")
+            .add_resource_path(std::path::PathBuf::from("./resources/texture"))
             .build()
             .unwrap();
 
