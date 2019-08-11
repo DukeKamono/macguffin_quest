@@ -6,13 +6,13 @@ pub struct CountDownTimer {
 }
 
 impl CountDownTimer {
-    fn new(time_left: Duration) -> CountDownTimer {
+    pub fn new(time_left: Duration) -> CountDownTimer {
         CountDownTimer {
             time_left,
         }
     }
 
-    fn update(&mut self, delta: Duration) -> Duration {
+    pub fn update(&mut self, delta: Duration) -> Duration {
         if self.time_left >= delta {
             self.time_left -= delta;
         } else {
@@ -21,15 +21,15 @@ impl CountDownTimer {
         self.time_left
     }
 
-    fn has_elapsed(&self) -> bool {
+    pub fn has_elapsed(&self) -> bool {
         self.time_left > Duration::new(0u64, 0u32)
     }
 
-    fn set(&mut self, new_time: Duration) {
+    pub fn set(&mut self, new_time: Duration) {
         self.time_left = new_time
     }
 
-    fn remaining(&self) -> Duration {
+    pub fn remaining(&self) -> Duration {
         self.time_left
     }
 }

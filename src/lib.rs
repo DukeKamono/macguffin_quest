@@ -7,3 +7,6 @@ pub mod ui;
 
 // revamped code starts here
 pub mod state_revamp;
+mod entity_revamp;
+mod sprite_revamp;
+mod countdowntimer_revamp;

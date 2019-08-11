@@ -258,6 +258,7 @@ impl CustomStateTrait for PauseMenuState {
 
 
 // includes
+use crate::entity_revamp::Entity;
 
 // Active GamePlay state
 // - "q" will transition to main menu state
@@ -265,35 +266,46 @@ impl CustomStateTrait for PauseMenuState {
 #[derive(Clone)]
 struct GamePlayState {
     text: Text,
+    entity: Entity,
 }
 
 impl GamePlayState {
-    fn new(_ctx: &mut Context)-> GameResult<Box<CustomStateTrait>> {
+    fn new(ctx: &mut Context)-> GameResult<Box<CustomStateTrait>> {
         let font = Font::default();
         let message = "Game Play Here!".to_string();
         let text = Text::new((message, font, 24f32));
+        let entity = Entity::new(ctx);
         Ok(Box::new(GamePlayState{
             text,
+            entity,
         }))
     }
 }
 
 impl CustomStateTrait for GamePlayState {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
+    fn update(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
+        let delta = timer::delta(ctx);
+
+        self.entity.update(delta);
+
         Ok(None)
     }
     fn draw(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
         graphics::clear(ctx, BLACK);
 
-        // queue menu text
-        graphics::queue_text(ctx, &self.text, [0f32, 0f32], Some(WHITE));
-
         // draw menu text
+        graphics::queue_text(ctx, &self.text, [0f32, 0f32], Some(WHITE));
         let (width, height) = self.text.dimensions(ctx);
         let width = width as f32 / 2f32;
         let height = height as f32 / 2f32;
         let dp = DrawParam::default().dest([400f32 - width, 300f32 - height]);
         graphics::draw_queued_text(ctx, dp, None, FilterMode::Linear)?;
+        graphics::draw_queued_text(ctx, DrawParam::default(), None, FilterMode::Linear)?;
+
+        // draw entity test
+        graphics::draw_queued_text(ctx, DrawParam::default(), None, FilterMode::Linear)?;
+        let dp = DrawParam::default().dest([0f32,0f32]);
+        graphics::draw(ctx, &self.entity, dp)?;
 
         graphics::present(ctx)?;
         timer::yield_now();
