@@ -77,11 +77,11 @@ impl Sprite {
         }
     }
 
-    pub fn frame_number(&self) -> usize {
+    pub fn _frame_number(&self) -> usize {
         self.current_frame
     }
 
-    pub fn set_frame_number(&mut self, frame_number: usize) -> Result<(), String> {
+    pub fn _set_frame_number(&mut self, frame_number: usize) -> Result<(), String> {
         if frame_number < self.frames.len() {
             self.current_frame = frame_number;
             Ok(())
@@ -90,12 +90,12 @@ impl Sprite {
         }
     }
 
-    pub fn restart(&mut self) {
+    pub fn _restart(&mut self) {
         // if this ever panics... something has gone wrong... like sprite having no frames
-        self.set_frame_number(0usize).unwrap();
+        self._set_frame_number(0usize).unwrap();
     }
 
-    pub fn is_looping(&self) -> bool {
+    pub fn _is_looping(&self) -> bool {
         self.looping
     }
 
@@ -103,11 +103,11 @@ impl Sprite {
         self.looping = looping;
     }
 
-    pub fn play(&mut self) {
+    pub fn _play(&mut self) {
         self.paused = false;
     }
 
-    pub fn pause(&mut self) {
+    pub fn _pause(&mut self) {
         self.paused = true;
     }
 }

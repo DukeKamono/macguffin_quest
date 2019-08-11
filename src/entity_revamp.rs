@@ -14,9 +14,14 @@ impl Entity {
     pub fn new(ctx: &mut Context) -> Entity {
         let img = Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
         let frames = vec![
-            Frame::new(Rect::new(64f32, 768f32, 64f32, 64f32), Duration::new(1u64, 0u32))
+            Frame::new(Rect::new(64f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
+            Frame::new(Rect::new(128f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
+            Frame::new(Rect::new(192f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
+            Frame::new(Rect::new(256f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
+            Frame::new(Rect::new(320f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
         ];
-        let sprite = Sprite::new(&img, &frames).unwrap();
+        let mut sprite = Sprite::new(&img, &frames).unwrap();
+        sprite.set_looping(true);
         Entity{
             sprite
         }

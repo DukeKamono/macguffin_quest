@@ -22,14 +22,14 @@ impl CountDownTimer {
     }
 
     pub fn has_elapsed(&self) -> bool {
-        self.time_left > Duration::new(0u64, 0u32)
+        self.time_left == Duration::new(0u64, 0u32)
     }
 
     pub fn set(&mut self, new_time: Duration) {
         self.time_left = new_time
     }
 
-    pub fn remaining(&self) -> Duration {
+    pub fn _remaining(&self) -> Duration {
         self.time_left
     }
 }
