@@ -173,14 +173,20 @@ impl CustomStateTrait for MainMenuState {
     }
     fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods, _repeat: bool) -> GameResult<Option<Box<CustomStateTrait>>> {
         match keycode {
-            KeyCode::Q => event::quit(ctx),
+            KeyCode::Q => {
+                event::quit(ctx);
+                Ok(None)
+            },
             KeyCode::P => {
                 let pause = PauseMenuState::new(ctx, self.box_clone())?;
-                return Ok(Some(pause));
+                Ok(Some(pause))
             },
-            _ => (),
+            KeyCode::Return => {
+                let game = GamePlayState::new(ctx)?;
+                Ok(Some(game))
+            },
+            _ => Ok(None),
         }
-        Ok(None)
     }
 }
 
@@ -189,7 +195,7 @@ impl CustomStateTrait for MainMenuState {
 
 // Paused state for the video game
 // - "q" will transition to main menu state
-// - "p" will transition previous state (ie the one that did transitioned to pause)
+// - "p" will transition to pause state
 #[derive(Clone)]
 struct PauseMenuState {
     text: Text,
@@ -236,15 +242,77 @@ impl CustomStateTrait for PauseMenuState {
         match keycode {
             KeyCode::Q => {
                 let main = MainMenuState::new(ctx)?;
-                return Ok(Some(main));
+                Ok(Some(main))
             },
             KeyCode::P => {
                 let mut newstate = EmptyState::new()?;
                 mem::swap(&mut self.previous_state, &mut newstate);
-                return Ok(Some(newstate))
+                Ok(Some(newstate))
             },
-            _ => (),
+            _ => Ok(None),
         }
+    }
+}
+
+
+
+
+// includes
+
+// Active GamePlay state
+// - "q" will transition to main menu state
+// - "p" will transition previous state (ie the one that did transitioned to pause)
+#[derive(Clone)]
+struct GamePlayState {
+    text: Text,
+}
+
+impl GamePlayState {
+    fn new(_ctx: &mut Context)-> GameResult<Box<CustomStateTrait>> {
+        let font = Font::default();
+        let message = "Game Play Here!".to_string();
+        let text = Text::new((message, font, 24f32));
+        Ok(Box::new(GamePlayState{
+            text,
+        }))
+    }
+}
+
+impl CustomStateTrait for GamePlayState {
+    fn update(&mut self, _ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
         Ok(None)
+    }
+    fn draw(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
+        graphics::clear(ctx, BLACK);
+
+        // queue menu text
+        graphics::queue_text(ctx, &self.text, [0f32, 0f32], Some(WHITE));
+
+        // draw menu text
+        let (width, height) = self.text.dimensions(ctx);
+        let width = width as f32 / 2f32;
+        let height = height as f32 / 2f32;
+        let dp = DrawParam::default().dest([400f32 - width, 300f32 - height]);
+        graphics::draw_queued_text(ctx, dp, None, FilterMode::Linear)?;
+
+        graphics::present(ctx)?;
+        timer::yield_now();
+        Ok(None)
+    }
+    fn box_clone(&self) -> Box<CustomStateTrait>{
+        Box::new(self.clone())
+    }
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods, _repeat: bool) -> GameResult<Option<Box<CustomStateTrait>>> {
+        match keycode {
+            KeyCode::Q => {
+                let main = MainMenuState::new(ctx)?;
+                 Ok(Some(main))
+            },
+            KeyCode::P => {
+                let pause = PauseMenuState::new(ctx, self.box_clone())?;
+                Ok(Some(pause))
+            },
+            _ => Ok(None),
+        }
     }
 }
