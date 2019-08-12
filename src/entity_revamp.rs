@@ -3,7 +3,7 @@ use std::time::Duration;
 use ggez::{Context, GameResult};
 use ggez::graphics::{BlendMode, Drawable, DrawParam, Image, Rect};
 
-use crate::sprite_revamp::{Frame, Sprite};
+use crate::sprite_revamp::{Sprite, SpriteBuilder};
 
 #[derive(Clone)]
 pub struct Entity {
@@ -13,15 +13,16 @@ pub struct Entity {
 impl Entity {
     pub fn new(ctx: &mut Context) -> Entity {
         let img = Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
-        let frames = vec![
-            Frame::new(Rect::new(64f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
-            Frame::new(Rect::new(128f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
-            Frame::new(Rect::new(192f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
-            Frame::new(Rect::new(256f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
-            Frame::new(Rect::new(320f32, 768f32, 64f32, 64f32), Duration::new(1u64, 500_000_000u32)),
-        ];
-        let mut sprite = Sprite::new(&img, &frames).unwrap();
-        sprite.set_looping(true);
+        // Duration::new(1u64, 500_000_000u32)
+        let sprite = SpriteBuilder::new(&img)
+            //.add_frames_going_up(4usize, Rect::new(0f32, 256f32, 64f32, 64f32), None, None, None)
+            .add_frames_going_down(4usize, Rect::new(0f32, 576f32, 64f32, 64f32), None, None, None)
+            //.add_frames_going_left(9usize, Rect::new(576f32, 0f32, 64f32, 64f32), None, None, None)
+            //.add_frames_going_right(6usize, Rect::new(0f32, 768f32, 64f32, 64f32), None, None, None)
+            //.add_frame(Rect::new(64f32, 768f32, 64f32, 64f32), None, None, None)
+            //.build_sprite()
+            .build_looping_sprite()
+            .unwrap();
         Entity{
             sprite
         }
