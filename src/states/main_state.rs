@@ -47,17 +47,12 @@ impl CustomEventHandler for MainState {
         let playerx = self.player.x;
         let playery = self.player.y;
 		
-		self.player.update(ctx, delta);
-		
-        if self.player.collision(&self.level) {
-            self.player.move_location(playerx, playery);
-        }
-		
 		// Collision with potions
 		for p in &mut self.potions {
 			if self.player.collision(p) {
-				self.player.stats.hp = self.player.stats.max_hp;
 				self.player.pick_up(ctx, (self.player.stats.max_hp - self.player.stats.hp).to_string());
+				self.player.stats.hp = self.player.stats.max_hp;
+				p.used = true;
 			}
 		}
 		
@@ -66,19 +61,13 @@ impl CustomEventHandler for MainState {
 			if mac.collision(&self.player) {
 				self.player.macguffin = true; // Make a inventory system later
 				self.enemies.push(Box::new(Boss::new(ctx, 1000.0, 1000.0, AITypes::Boss)));
-				
-				// Text to say you got it.... Might have it float over the player instead.
-				//mac.pick_up(ctx, 1.0);
-				//mac.update(delta);
+				self.player.pick_up(ctx, "You picked up the MacGuffin!".to_string());
 			}
 		}
 		
+		// Remove the macguffin.
 		if self.player.macguffin {
 			self.macguffin = None;
-		}
-		
-		for p in &mut self.potions {
-			p.update(delta);
 		}
 
 		// another check because of text being setup before ui.update()
@@ -92,6 +81,16 @@ impl CustomEventHandler for MainState {
 		}
 		self.macguffin_man.update(delta);
         self.enemies.update(ctx, delta, &mut self.player, &self.level);
+		self.player.update(ctx, delta);
+		
+		// This could move into the player struct.
+		// Needs to be after the player.update()
+        if self.player.collision(&self.level) {
+            self.player.move_location(playerx, playery);
+        }
+		
+		// Update potions
+		self.potions.retain(|t| !t.used);
 		
         // Should prob make UI update last all the time.
         self.ui.update(ctx, self.player.stats.hp, self.player.stats.max_hp, self.player.stats.mp, self.player.stats.max_mp, self.player.stats.lv);

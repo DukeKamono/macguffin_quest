@@ -264,7 +264,11 @@ impl DrawableEntity for Player {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         self.draw_weapon(ctx);
         let dp = graphics::DrawParam::default().offset(nalgebra::Point2::new(0.5, 0.5)).dest(na::Point2::new(self.x, self.y));
-        graphics::draw(ctx, self.sprite.get(&self.animation).unwrap(), dp)
+        graphics::draw(ctx, self.sprite.get(&self.animation).unwrap(), dp)?;
+
+        self.floating_text.iter().for_each(|t| t.draw(ctx));
+
+        Ok(())
     }
 }
 
