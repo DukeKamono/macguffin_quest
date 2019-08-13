@@ -47,12 +47,18 @@ impl Blob {
     }
 
     pub fn take_dmg(&mut self, ctx: &mut Context, player: &mut Player) {
-        if !self.invulnerable() {
-            self.hp -= player.stats.atk;
-            self.invulnerable = Duration::new(0u64, 0u32);
-            self.floating_text.push(FloatingText::new(ctx, self.x, self.y, player.stats.atk.to_string()));
-            // Check for death and maybe call a death function.
-        }
+        let true_dmg = player.stats.atk - self.def;
+		if !self.invulnerable() {
+			if true_dmg > 0.0 {
+				self.hp -= true_dmg;
+				self.invulnerable = Duration::new(0u64, 0u32);
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string()));
+				// Check for death and maybe call a death function.
+			}
+			else {
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string()));
+			}
+		}
         
         if self.hp <= 0.0 {
             player.stats.check_for_level_up(5);
@@ -111,7 +117,7 @@ impl Enemy for Blob {
         &self.ai_type
     }
     
-    fn chase_player(&mut self, _delta: Duration, player: &mut Player, level: &Level) {
+    fn chase_player(&mut self, ctx: &mut Context, _delta: Duration, player: &mut Player, level: &Level) {
         // holding onto previous location
         let xpos = self.x;
         let ypos = self.y;
@@ -140,17 +146,17 @@ impl Enemy for Blob {
         // I touched the player.
         if self.collision(player) {
             // need attack animation
-            player.take_dmg(self.atk);
+            player.take_dmg(ctx, self.atk);
             self.x = xpos;
             self.y = ypos;
         }
     }
     
-    fn chase_player_sight(&mut self, delta: Duration, player: &mut Player, level: &Level) {
+    fn chase_player_sight(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
         self.line_of_sight.update(self.x - 100.0, self.y - 100.0, 200.0, 200.0);
         
         if self.line_of_sight.collision(player) {// && !self.line_of_sight.collision(level) {
-            self.chase_player(delta, player, level);
+            self.chase_player(ctx, delta, player, level);
         }
     }
 	

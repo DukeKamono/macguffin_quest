@@ -2,6 +2,7 @@ use crate::entities::player::player::Player;
 use crate::entities::environment::level::Level;
 use crate::entities::enemies::enemies::Enemy;
 use std::time::Duration;
+use ggez::*;
 
 #[derive(Default)]
 pub struct AI {
@@ -33,13 +34,13 @@ impl AI {
 	
 	// Tried to pass in Enemy and do the movement and attack checks here, but now it will call different variations
 	// that each enemy can do differntly. Like a skeleton chase_player can be differnt then a blob chase_player. 
-	pub fn update(&mut self, delta: Duration, enemy: &mut Box<dyn Enemy>, player: &mut Player, level: &Level) {
+	pub fn update(&mut self, ctx: &mut Context, delta: Duration, enemy: &mut Box<dyn Enemy>, player: &mut Player, level: &Level) {
 		match enemy.get_aitype() {
-			AITypes::MeleeDirect => enemy.chase_player(delta, player, level),
-			AITypes::MeleeLineOfSight => enemy.chase_player_sight(delta, player, level),
-			AITypes::RangeDirect => enemy.chase_player(delta, player, level),
-			AITypes::RangeLineOfSight => enemy.chase_player_sight(delta, player, level),
-			AITypes::Boss => { enemy.chase_player(delta, player, level); enemy.chase_player_sight(delta, player, level); },
+			AITypes::MeleeDirect => enemy.chase_player(ctx, delta, player, level),
+			AITypes::MeleeLineOfSight => enemy.chase_player_sight(ctx, delta, player, level),
+			AITypes::RangeDirect => enemy.chase_player(ctx, delta, player, level),
+			AITypes::RangeLineOfSight => enemy.chase_player_sight(ctx, delta, player, level),
+			AITypes::Boss => { enemy.chase_player(ctx, delta, player, level); enemy.chase_player_sight(ctx, delta, player, level); },
 			AITypes::Error => println!("Error"),
 		}
 	}

@@ -49,7 +49,7 @@ impl CustomEventHandler for MainState {
 		
 		// Collision with potions
 		for p in &mut self.potions {
-			if self.player.collision(p) {
+			if self.player.collision(p) && self.player.stats.hp < self.player.stats.max_hp {
 				self.player.pick_up(ctx, (self.player.stats.max_hp - self.player.stats.hp).to_string());
 				self.player.stats.hp = self.player.stats.max_hp;
 				p.used = true;
@@ -61,7 +61,7 @@ impl CustomEventHandler for MainState {
 			if mac.collision(&self.player) {
 				self.player.macguffin = true; // Make a inventory system later
 				self.enemies.push(Box::new(Boss::new(ctx, 1000.0, 1000.0, AITypes::Boss)));
-				self.player.pick_up(ctx, "You picked up the MacGuffin!".to_string());
+				self.player.pick_up(ctx, "You Picked Up The MacGuffin!\nA Boss Has Appeared!".to_string());
 			}
 		}
 		
@@ -76,7 +76,7 @@ impl CustomEventHandler for MainState {
 				self.macguffin_man.talk(ctx, "You Found The MacGuffin!".to_string());
 			}
 			else {
-				self.macguffin_man.talk(ctx, "Please Look For the MacGuffin!".to_string());
+				self.macguffin_man.talk(ctx, "Please Bring Me The MacGuffin!".to_string());
 			}
 		}
 		self.macguffin_man.update(delta);
@@ -176,23 +176,29 @@ impl MainState {
 
         // create enemies
         let mut e = Enemies::new();
-        e.push(Box::new(Blob::new(ctx, 250.0, 250.0, AITypes::MeleeDirect)));
-        e.push(Box::new(Blob::new(ctx, 250.0, 350.0, AITypes::MeleeDirect)));
-        e.push(Box::new(Blob::new(ctx, 250.0, 150.0, AITypes::MeleeDirect)));
-        e.push(Box::new(Skeleton::new(ctx, 550.0, 350.0, AITypes::MeleeLineOfSight)));
+        e.push(Box::new(Blob::new(ctx, 700.0, 250.0, AITypes::MeleeDirect)));
+        e.push(Box::new(Blob::new(ctx, 700.0, 350.0, AITypes::MeleeDirect)));
+        e.push(Box::new(Blob::new(ctx, 700.0, 150.0, AITypes::MeleeDirect)));
+        e.push(Box::new(Skeleton::new(ctx, 950.0, 350.0, AITypes::MeleeLineOfSight)));
+        e.push(Box::new(Skeleton::new(ctx, 950.0, -350.0, AITypes::MeleeLineOfSight)));
+        e.push(Box::new(Skeleton::new(ctx, 1300.0, -350.0, AITypes::MeleeLineOfSight)));
         e.push(Box::new(Ghost::new(ctx, 600.0, 550.0, AITypes::MeleeLineOfSight)));
+        e.push(Box::new(Ghost::new(ctx, 1600.0, 150.0, AITypes::MeleeLineOfSight)));
+        e.push(Box::new(Ghost::new(ctx, 1600.0, 350.0, AITypes::MeleeLineOfSight)));
+        e.push(Box::new(Ghost::new(ctx, 1600.0, 550.0, AITypes::MeleeLineOfSight)));
 
         // build level
         let img = graphics::Image::new(ctx, "/testwalls.png").unwrap();
         let mut lb = LevelBuilder::new(ctx, None);
         let level = lb.fromfile(ctx, &img, &"/BasicLevel.lvl".to_string());
 
-		let mac = Macguffin::new(ctx, 50.0, 350.0);
+		let mac = Macguffin::new(ctx, 1050.0, -650.0);
 		
 		let mut pot = Vec::new();
+		pot.push(Potions::new(ctx, 1800.0, 350.0));
 		pot.push(Potions::new(ctx, 250.0, 250.0));
 		
-		let npc = MacguffinMan::new(ctx, 100.0, 100.0);
+		let npc = MacguffinMan::new(ctx, 250.0, 350.0);
 		
         // create state
         MainState {

@@ -127,7 +127,7 @@ impl Player {
         Player {
             x: 10.0,
             y: 10.0,
-            stats: Stats::new(1, 0, 30.0, 150, 3.0, 2.0, 1.0, 15.0),
+            stats: Stats::new(1, 0, 30.0, 150, 3.0, 0.5, 1.0),
             sprite,
             animation: (Animations::Walking, Direction::Right),
             atk_box: None,
@@ -169,13 +169,13 @@ impl Player {
         }
         // casting
         else if keyboard::is_key_pressed(ctx, KeyCode::Q) && self.stats.hp > 0f32 && self.stats.mp > 0 {
-            self.atk_box = Some(AtkBox::new(ctx, 5.0, self.x, self.y, 64.0, 80.0, &self.direction, 40.0));
+            self.atk_box = Some(AtkBox::new(ctx, self.x, self.y, 64.0, 80.0, &self.direction, 40.0));
             self.animation.0 = Animations::Cast;
             self.stats.mp -= 1;
         }
         // slashing
         else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.stats.hp > 0f32 { //&& self.atk_cooldown() {
-            self.atk_box = Some(AtkBox::new(ctx, 2.0, self.x, self.y, 32.0, 64.0, &self.direction, 40.0));
+            self.atk_box = Some(AtkBox::new(ctx, self.x, self.y, 32.0, 64.0, &self.direction, 40.0));
             self.animation.0 = Animations::Slash;
             self.atk_cooldown = Duration::new(0u64, 0u32);
         }
@@ -241,15 +241,22 @@ impl Player {
         self.y = yinc;
     }
 
-    pub fn take_dmg(&mut self, dmg_to_take: f32) {
-        if !self.invulnerable() {
-            self.stats.hp -= dmg_to_take;
-            if self.stats.hp < 0f32 {
-                self.stats.hp = 0f32;
-            }
-            self.invulnerable = Duration::new(0u64, 0u32);
-            // Check for death and maybe call a death function.
-        }
+    pub fn take_dmg(&mut self, ctx: &mut Context, dmg_to_take: f32) {
+		let true_dmg = dmg_to_take - self.stats.def;
+		if !self.invulnerable() {
+			if true_dmg > 0.0 {
+				self.stats.hp -= true_dmg;
+				if self.stats.hp < 0f32 {
+					self.stats.hp = 0f32;
+				}
+				self.invulnerable = Duration::new(0u64, 0u32);
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string()));
+				// Check for death and maybe call a death function.
+			}
+			else {
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string()));
+			}
+		}
     }
 
     // With multiple weapons, we should make a new struct for each type and attach them to the player.

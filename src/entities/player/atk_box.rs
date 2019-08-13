@@ -4,7 +4,6 @@ use std::mem;
 use super::super::{CollideEntity, DrawableEntity, Direction};
 
 pub struct AtkBox {
-    pub duration: f32,
     pub x: f32,
     pub y: f32,
     pub hitbox: graphics::Rect,
@@ -12,7 +11,7 @@ pub struct AtkBox {
 }
 
 impl AtkBox {
-    pub fn new(ctx: &mut Context, duration: f32, xpos: f32, ypos: f32, width: f32, height: f32, direction: &Direction, offset: f32) -> AtkBox {
+    pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, width: f32, height: f32, direction: &Direction, offset: f32) -> AtkBox {
         
         let mut xpos = xpos;
         let mut ypos = ypos;
@@ -35,11 +34,10 @@ impl AtkBox {
             .build(ctx)
             .unwrap();
 			
-		xpos = xpos - hb.w / 2f32;
-		ypos = ypos - hb.h / 2f32;
+		xpos -= hb.w / 2f32;
+		ypos -= hb.h / 2f32;
 
         AtkBox {
-            duration,
             x: xpos,
             y: ypos,
             hitbox: hb,

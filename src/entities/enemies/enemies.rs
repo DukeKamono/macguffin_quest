@@ -11,8 +11,8 @@ pub trait Enemy: DrawableEntity {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level);
     fn islive(&self) -> bool;
     fn get_aitype(&mut self) -> &AITypes;
-    fn chase_player(&mut self, _delta: Duration, player: &mut Player, level: &Level);
-    fn chase_player_sight(&mut self, delta: Duration, player: &mut Player, level: &Level);
+    fn chase_player(&mut self, ctx: &mut Context, _delta: Duration, player: &mut Player, level: &Level);
+    fn chase_player_sight(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level);
 	fn spawn(&self) -> bool;
 }
 
@@ -54,7 +54,7 @@ impl Enemy for Enemies {
         // update enemies
         self.enemies.iter_mut().for_each(|e| {
             e.update(ctx, delta, player, level);
-            ai.update(delta, e, player, level);
+            ai.update(ctx, delta, e, player, level);
 			// I need to find a better spot for this spawning, keeps spawning ghosts if spawn comes back true. (boss only)
 			if e.spawn() {
 				spawning = true;
@@ -82,10 +82,10 @@ impl Enemy for Enemies {
         &AITypes::MeleeDirect
     }
     
-    fn chase_player(&mut self, _delta: Duration, _player: &mut Player, _level: &Level) {
+    fn chase_player(&mut self, _ctx: &mut Context, _delta: Duration, _player: &mut Player, _level: &Level) {
     }
     
-    fn chase_player_sight(&mut self, _delta: Duration, _player: &mut Player, _level: &Level) {
+    fn chase_player_sight(&mut self, _ctx: &mut Context, _delta: Duration, _player: &mut Player, _level: &Level) {
     }
 	
 	fn spawn(&self) -> bool {
