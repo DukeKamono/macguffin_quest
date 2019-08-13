@@ -118,7 +118,7 @@ impl Player {
         Player {
             x: 10.0,
             y: 10.0,
-            stats: Stats::new(1, 0, 30.0, 150, 3.0, 0.5, 1.0),
+            stats: Stats::new(1, 0, 50.0, 150, 3.0, 0.5, 1.0),
             sprite,
             animation: (Animations::Walking, Direction::Right),
             atk_box: None,
@@ -160,13 +160,13 @@ impl Player {
         }
         // casting
         else if keyboard::is_key_pressed(ctx, KeyCode::Q) && self.stats.hp > 0f32 && self.stats.mp > 0 {
-            self.atk_box = Some(AtkBox::new(ctx, self.x, self.y, 64.0, 80.0, &self.direction, 40.0));
+            self.atk_box = Some(AtkBox::new(ctx, self.x, self.y, 64.0, 100.0, &self.direction, 40.0));
             self.animation.0 = Animations::Cast;
             self.stats.mp -= 1;
         }
         // slashing
         else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.stats.hp > 0f32 { //&& self.atk_cooldown() {
-            self.atk_box = Some(AtkBox::new(ctx, self.x, self.y, 32.0, 64.0, &self.direction, 40.0));
+            self.atk_box = Some(AtkBox::new(ctx, self.x, self.y, 32.0, 80.0, &self.direction, 40.0));
             self.animation.0 = Animations::Slash;
             self.atk_cooldown = Duration::new(0u64, 0u32);
         }
@@ -219,7 +219,7 @@ impl Player {
 	pub fn pick_up(&mut self, ctx: &mut Context, text: String) {
 		if !self.pick_up_cooldown() {
             self.cooldown = Duration::new(0u64, 0u32);
-			self.floating_text.push(FloatingText::new(ctx, self.x, self.y, text));
+			self.floating_text.push(FloatingText::new(ctx, self.x, self.y, text, "Green"));
 		}
 	}
 	
@@ -241,11 +241,11 @@ impl Player {
 					self.stats.hp = 0f32;
 				}
 				self.invulnerable = Duration::new(0u64, 0u32);
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string()));
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string(), "Red"));
 				// Check for death and maybe call a death function.
 			}
 			else {
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string()));
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string(), "Blue"));
 			}
 		}
     }

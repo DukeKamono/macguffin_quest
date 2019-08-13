@@ -93,11 +93,11 @@ impl Skeleton {
 			if true_dmg > 0.0 {
 				self.hp -= true_dmg;
 				self.invulnerable = Duration::new(0u64, 0u32);
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string()));
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string(), "Red"));
 				// Check for death and maybe call a death function.
 			}
 			else {
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string()));
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string(), "Blue"));
 			}
 		}
 		

@@ -42,15 +42,15 @@ impl Boss {
         );
         sprite.insert(
             (Animations::Walking, Direction::Left),
-            builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 1usize).unwrap()
+            builder.create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 1usize).unwrap()
         );
         sprite.insert(
             (Animations::Walking, Direction::Down),
-            builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 1usize).unwrap()
+            builder.create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize).unwrap()
         );
         sprite.insert(
             (Animations::Walking, Direction::Right),
-            builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 1usize).unwrap()
+            builder.create_animated(Rect::new(0f32, 192f32, 64f32, 64f32), 1usize).unwrap()
         );
 		
         let floating_text = Vec::new();
@@ -77,11 +77,11 @@ impl Boss {
 			if true_dmg > 0.0 {
 				self.hp -= true_dmg;
 				self.invulnerable = Duration::new(0u64, 0u32);
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string()));
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string(), "Red"));
 				// Check for death and maybe call a death function.
 			}
 			else {
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string()));
+				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string(), "Blue"));
 			}
 		}
 		

@@ -61,7 +61,7 @@ impl MacguffinMan {
 	pub fn talk(&mut self, ctx: &mut Context, text: String) {
 		if !self.talk_cooldown() {
             self.cooldown = Duration::new(0u64, 0u32);
-			self.floating_text.push(FloatingText::new(ctx, self.x, self.y, text));
+			self.floating_text.push(FloatingText::new(ctx, self.x, self.y, text, "White"));
 		}
 	}
 	
