@@ -29,7 +29,7 @@ struct State {
 }
 
 impl State {
-    fn readfile(ctx: &mut Context, path: &String) -> HashMap<(i64, i64), usize> {
+    fn readfile(ctx: &mut Context, path: &str) -> HashMap<(i64, i64), usize> {
         let mut retvalue = HashMap::new();
 
         if !ggez::filesystem::exists(ctx, &path) {
@@ -64,7 +64,7 @@ impl State {
             let y = key.1;
             let t = value;
             let output = format!("{} {} {}\n", x, y, t);
-            file.write(output.as_bytes()).unwrap();
+            file.write_all(output.as_bytes()).unwrap();
         }
     }
 
@@ -77,7 +77,7 @@ impl State {
         )
     }
 
-    fn new(ctx: &mut Context, sheet: &Image, path: &String) -> State {
+    fn new(ctx: &mut Context, sheet: &Image, path: &str) -> State {
         // what is the drawable region of the screen
         let (width, height) = graphics::drawable_size(ctx);
         let screen = Rect::new(0f32, 0f32, width, height);
@@ -97,7 +97,7 @@ impl State {
         let level = State::buildlevel(&mut builder, &map_tiles);
 
         // where to save
-        let path = path.clone();
+        let path = path.to_string();
 
         State {
             screen,
@@ -153,13 +153,13 @@ impl EventHandler for State {
                 self.tile_value,
             );
             // build level with new tile
-            self.level = State::buildlevel(&mut self.builder, &mut self.map_tiles);
+            self.level = State::buildlevel(&mut self.builder, &self.map_tiles);
         } else if mouse::button_pressed(ctx, mouse::MouseButton::Right) {
             // update tile
             self.map_tiles
                 .remove(&(self.mouse_position.x as i64, self.mouse_position.y as i64));
             // build level with new tile
-            self.level = State::buildlevel(&mut self.builder, &mut self.map_tiles);
+            self.level = State::buildlevel(&mut self.builder, &self.map_tiles);
         }
 
         Ok(())
@@ -191,17 +191,20 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     println!("{:?}", args);
 
-    let mut path = "/default.lvl".to_string();
-    if args.len() > 1usize {
-        path = args[1].clone();
+    let mut path = if args.len() > 1usize {
+        args[1].clone()
+    } else {
+        "default.lvl".to_string()
+    };
         path.insert(0usize, '\\');
-    }
     println!("path: {}", path);
 
-    let mut sheet = "/testwalls.png".to_string();
-    if args.len() > 2usize {
-        sheet = args[2].clone();
+    let sheet = if args.len() > 2usize {
+        args[2].clone()
     }
+    else {
+        "/testwalls.png".to_string()
+    };
     println!("sheet: {}", sheet);
 
     // create a context to access hardware (also creates event loop)

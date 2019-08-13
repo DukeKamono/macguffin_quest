@@ -38,7 +38,7 @@ impl AI {
         &mut self,
         ctx: &mut Context,
         delta: Duration,
-        enemy: &mut Box<dyn Enemy>,
+        enemy: &mut dyn Enemy,
         player: &mut Player,
         level: &Level,
     ) {

@@ -52,8 +52,8 @@ impl LevelBuilder {
     pub fn tileize(&mut self, img: &Image) -> Vec<Sprite> {
         let mut ret_value = Vec::new();
 
-        let width = f32::floor(img.width() as f32 / 64f32); // max
-        let height = f32::floor(img.height() as f32 / 64f32); // max
+        let width = f32::floor(f32::from(img.width()) / 64f32); // max
+        let height = f32::floor(f32::from(img.height()) / 64f32); // max
 
         // do the tiling
         let mut h = 0f32; // counting
@@ -142,7 +142,7 @@ impl LevelBuilder {
         self.generate_level(w)
     }
 
-    pub fn fromfile(&mut self, ctx: &mut Context, sheet: &Image, path: &String) -> Level {
+    pub fn fromfile(&mut self, ctx: &mut Context, sheet: &Image, path: &str) -> Level {
         let mut w = Vec::new();
         self.tileize(sheet);
 

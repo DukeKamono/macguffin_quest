@@ -44,7 +44,7 @@ impl MacguffinMan {
             def: 1.0,
             floating_text,
             cooldown: Duration::new(1u64, 0u32),
-            sprite: sprite,
+            sprite,
             animation: (Animations::Stand, Direction::Down),
             direction: Direction::Down,
         }

@@ -66,7 +66,7 @@ impl Enemy for Enemies {
         // update enemies
         self.enemies.iter_mut().for_each(|e| {
             e.update(ctx, delta, player, level);
-            ai.update(ctx, delta, e, player, level);
+            ai.update(ctx, delta, e.as_mut(), player, level);
             // I need to find a better spot for this spawning, keeps spawning ghosts if spawn comes back true. (boss only)
             if e.spawn() {
                 spawning = true;
