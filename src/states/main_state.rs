@@ -3,13 +3,13 @@
 // get collison trait from entities
 use super::entities::{CollideEntity, DrawableEntity};
 // get player struct to use
-use super::entities::player::player::Player;
+use super::entities::player::playerstruct::Player;
 // get enemies to use
 use super::entities::enemies::blob::Blob;
 use super::entities::enemies::skeleton::Skeleton;
 use super::entities::enemies::ghost::Ghost;
 use super::entities::enemies::boss::Boss;
-use super::entities::enemies::enemies::*;
+use super::entities::enemies::enemiesstruct::*;
 // get wall struct to use
 use super::entities::environment::{level::Level, level_builder::LevelBuilder};
 // get macguffin struct to use

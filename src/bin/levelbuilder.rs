@@ -1,15 +1,15 @@
 use std::collections::HashMap;
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader};
 
 use ggez::event::{EventHandler, KeyCode};
 use ggez::graphics::{DrawParam, Image, Rect};
 use ggez::input::{keyboard, mouse};
-use keyboard::KeyMods;
 use ggez::*;
+use keyboard::KeyMods;
 
-use macguffin_quest::entities::DrawableEntity;
-use macguffin_quest::entities::environment::level_builder::LevelBuilder;
 use macguffin_quest::entities::environment::level::Level;
+use macguffin_quest::entities::environment::level_builder::LevelBuilder;
+use macguffin_quest::entities::DrawableEntity;
 use macguffin_quest::sprites::Sprite;
 
 struct State {
@@ -20,16 +20,16 @@ struct State {
     tile_value: usize, // value of currently selected tile type
 
     builder: LevelBuilder, // used to build levels
-    level: Level, // level being designed
+    level: Level,          // level being designed
 
     map_tiles: HashMap<(i64, i64), usize>, // generate level from
-    vector_types: Vec<Sprite>, // various tile images (after sheet is split up)
+    vector_types: Vec<Sprite>,             // various tile images (after sheet is split up)
 
     path: String, // where to save to
 }
 
 impl State {
-    fn readfile(ctx: &mut Context, path: &String) -> HashMap<(i64, i64), usize> {
+    fn readfile(ctx: &mut Context, path: &str) -> HashMap<(i64, i64), usize> {
         let mut retvalue = HashMap::new();
 
         if !ggez::filesystem::exists(ctx, &path) {
@@ -53,8 +53,8 @@ impl State {
         retvalue
     }
 
-    fn writefile(&self, ctx: &mut Context,) {
-        // creates a file in 
+    fn writefile(&self, ctx: &mut Context) {
+        // creates a file in
         // C:\Users\username\AppData\Roaming\James M. & William O\levelbuilder\config
         println!("saving: {:?}", self.path);
         let mut file = ggez::filesystem::create(ctx, &self.path).unwrap();
@@ -64,19 +64,21 @@ impl State {
             let y = key.1;
             let t = value;
             let output = format!("{} {} {}\n", x, y, t);
-            file.write(output.as_bytes()).unwrap();
+            use std::io::Write;
+            file.write_all(output.as_bytes()).unwrap();
         }
     }
 
-    fn buildlevel(builder: &mut LevelBuilder, map_tiles: & HashMap<(i64, i64), usize>) -> Level {
+    fn buildlevel(builder: &mut LevelBuilder, map_tiles: &HashMap<(i64, i64), usize>) -> Level {
         builder.generate_level(
-            map_tiles.iter()
+            map_tiles
+                .iter()
                 .map(|(k, v)| ((k.0 as f32, k.1 as f32), *v))
-                .collect()
+                .collect(),
         )
     }
 
-    fn new(ctx: &mut Context, sheet: &Image, path: &String) -> State {
+    fn new(ctx: &mut Context, sheet: &Image, path: &str) -> State {
         // what is the drawable region of the screen
         let (width, height) = graphics::drawable_size(ctx);
         let screen = Rect::new(0f32, 0f32, width, height);
@@ -96,7 +98,7 @@ impl State {
         let level = State::buildlevel(&mut builder, &map_tiles);
 
         // where to save
-        let path = path.clone();
+        let path = path.to_string();
 
         State {
             screen,
@@ -132,7 +134,7 @@ impl EventHandler for State {
             self.writefile(ctx);
         }
     }
-    
+
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         // move screen
         if keyboard::is_key_pressed(ctx, KeyCode::D) {
@@ -147,19 +149,23 @@ impl EventHandler for State {
 
         if mouse::button_pressed(ctx, mouse::MouseButton::Left) {
             // update tile
-            self.map_tiles.insert((self.mouse_position.x as i64, self.mouse_position.y as i64), self.tile_value);
+            self.map_tiles.insert(
+                (self.mouse_position.x as i64, self.mouse_position.y as i64),
+                self.tile_value,
+            );
             // build level with new tile
-            self.level = State::buildlevel(&mut self.builder, &mut self.map_tiles);
+            self.level = State::buildlevel(&mut self.builder, &self.map_tiles);
         } else if mouse::button_pressed(ctx, mouse::MouseButton::Right) {
             // update tile
-            self.map_tiles.remove(&(self.mouse_position.x as i64, self.mouse_position.y as i64));
+            self.map_tiles
+                .remove(&(self.mouse_position.x as i64, self.mouse_position.y as i64));
             // build level with new tile
-            self.level = State::buildlevel(&mut self.builder, &mut self.map_tiles);
+            self.level = State::buildlevel(&mut self.builder, &self.map_tiles);
         }
 
         Ok(())
     }
-    
+
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         // set background color
         graphics::clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
@@ -171,11 +177,9 @@ impl EventHandler for State {
         self.level.draw(ctx)?;
 
         // draw mouse placement
-        let dp = DrawParam::default()
-            .dest(self.mouse_position)
-            ;
+        let dp = DrawParam::default().dest(self.mouse_position);
         graphics::draw(ctx, &self.vector_types[self.tile_value], dp)?;
-        
+
         // display frame
         graphics::present(ctx)?;
         timer::yield_now();
@@ -188,17 +192,19 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     println!("{:?}", args);
 
-    let mut path = "/default.lvl".to_string();
-    if args.len() > 1usize {
-        path = args[1].clone();
-        path.insert(0usize, '\\');
-    }
+    let mut path = if args.len() > 1usize {
+        args[1].clone()
+    } else {
+        "default.lvl".to_string()
+    };
+    path.insert(0usize, '\\');
     println!("path: {}", path);
 
-    let mut sheet = "/testwalls.png".to_string();
-    if args.len() > 2usize {
-        sheet = args[2].clone();
-    }
+    let sheet = if args.len() > 2usize {
+        args[2].clone()
+    } else {
+        "/testwalls.png".to_string()
+    };
     println!("sheet: {}", sheet);
 
     // create a context to access hardware (also creates event loop)

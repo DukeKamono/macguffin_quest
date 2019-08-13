@@ -8,7 +8,7 @@ pub struct Potions {
     pub y: f32,
     pub sprite: graphics::Image,
     pub hitbox: graphics::Rect,
-	pub used: bool,
+    pub used: bool,
 }
 
 impl Potions {
@@ -21,8 +21,8 @@ impl Potions {
             y: ypos,
             sprite: img,
             hitbox: hb,
-			used: false,
-		}
+            used: false,
+        }
     }
 }
 

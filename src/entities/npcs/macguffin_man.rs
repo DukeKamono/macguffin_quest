@@ -1,11 +1,11 @@
+use crate::sprites::*;
+use ggez::graphics::{Image, Rect};
 use ggez::nalgebra as na;
 use ggez::*;
-use ggez::graphics::{Image, Rect};
-use std::time::Duration;
-use crate::sprites::*;
 use std::collections::HashMap;
+use std::time::Duration;
 
-use super::super::{CollideEntity, DrawableEntity, Direction, Animations};
+use super::super::{Animations, CollideEntity, Direction, DrawableEntity};
 use crate::ui::FloatingText;
 
 pub struct MacguffinMan {
@@ -16,22 +16,24 @@ pub struct MacguffinMan {
     pub def: f32,
     floating_text: Vec<FloatingText>,
     pub cooldown: Duration,
-	pub sprite: HashMap<(Animations, Direction), AnimatedSprite>,
-	pub animation: (Animations, Direction),
-	pub direction: Direction,
+    pub sprite: HashMap<(Animations, Direction), AnimatedSprite>,
+    pub animation: (Animations, Direction),
+    pub direction: Direction,
 }
 
 impl MacguffinMan {
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> MacguffinMan {
         let floating_text = Vec::new();
-		
-		let mut sprite = HashMap::new();
+
+        let mut sprite = HashMap::new();
         let sheet = Image::new(ctx, "/macguffin-man.png").unwrap();
         let builder = AnimatedBuilder::new(&sheet);
-		
-		 sprite.insert(
+
+        sprite.insert(
             (Animations::Stand, Direction::Down),
-            builder.create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize).unwrap()
+            builder
+                .create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize)
+                .unwrap(),
         );
 
         MacguffinMan {
@@ -41,14 +43,14 @@ impl MacguffinMan {
             atk: 3.0,
             def: 1.0,
             floating_text,
-			cooldown: Duration::new(1u64, 0u32),
-			sprite: sprite,
-			animation: (Animations::Stand, Direction::Down),
-			direction: Direction::Down,
-		}
+            cooldown: Duration::new(1u64, 0u32),
+            sprite,
+            animation: (Animations::Stand, Direction::Down),
+            direction: Direction::Down,
+        }
     }
 
-	pub fn update(&mut self, delta: Duration) {
+    pub fn update(&mut self, delta: Duration) {
         self.floating_text.retain(|t| t.live());
         self.floating_text.iter_mut().for_each(|t| t.update(delta));
 
@@ -57,14 +59,15 @@ impl MacguffinMan {
             self.cooldown += delta;
         }
     }
-	
-	pub fn talk(&mut self, ctx: &mut Context, text: String) {
-		if !self.talk_cooldown() {
+
+    pub fn talk(&mut self, ctx: &mut Context, text: String) {
+        if !self.talk_cooldown() {
             self.cooldown = Duration::new(0u64, 0u32);
-			self.floating_text.push(FloatingText::new(ctx, self.x, self.y, text));
-		}
-	}
-	
+            self.floating_text
+                .push(FloatingText::new(ctx, self.x, self.y, text));
+        }
+    }
+
     fn talk_cooldown(&self) -> bool {
         self.cooldown < Duration::from_millis(1000u64)
     }
@@ -83,7 +86,12 @@ impl DrawableEntity for MacguffinMan {
 
 impl CollideEntity for MacguffinMan {
     fn get_hitbox(&self) -> graphics::Rect {
-        let mut r = self.sprite.get(&self.animation).unwrap().dimensions().unwrap();
+        let mut r = self
+            .sprite
+            .get(&self.animation)
+            .unwrap()
+            .dimensions()
+            .unwrap();
         r.x = self.x;
         r.y = self.y;
         r

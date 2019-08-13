@@ -1,15 +1,15 @@
-use crate::entities::player::player::Player;
-use crate::entities::environment::level::Level;
-use crate::entities::enemies::enemies::Enemy;
 use crate::entities::enemies::ai::*;
+use crate::entities::enemies::enemiesstruct::Enemy;
+use crate::entities::environment::level::Level;
+use crate::entities::player::playerstruct::Player;
 use ggez::nalgebra as na;
 use ggez::*;
-use std::time::Duration;
 use rand::prelude::*;
+use std::time::Duration;
 
 use super::super::{CollideEntity, DrawableEntity};
-use crate::ui::FloatingText;
 use crate::entities::enemies::sight::*;
+use crate::ui::FloatingText;
 
 pub struct Boss {
     pub x: f32,
@@ -21,8 +21,8 @@ pub struct Boss {
     pub hitbox: graphics::Rect,
     floating_text: Vec<FloatingText>,
     pub invulnerable: Duration,
-	pub line_of_sight: LineOfSight,
-	pub ai_type: AITypes,
+    pub line_of_sight: LineOfSight,
+    pub ai_type: AITypes,
 }
 
 impl Boss {
@@ -41,31 +41,40 @@ impl Boss {
             hitbox: hb,
             floating_text,
             invulnerable: Duration::new(1u64, 0u32),
-			line_of_sight: LineOfSight::new(xpos, ypos),
-			ai_type,
+            line_of_sight: LineOfSight::new(xpos, ypos),
+            ai_type,
         }
     }
 
     pub fn take_dmg(&mut self, ctx: &mut Context, player: &mut Player) {
         let true_dmg = player.stats.atk - self.def;
-		if !self.invulnerable() {
-			if true_dmg > 0.0 {
-				self.hp -= true_dmg;
-				self.invulnerable = Duration::new(0u64, 0u32);
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string()));
-				// Check for death and maybe call a death function.
-			}
-			else {
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string()));
-			}
-		}
-		
-		if self.hp <= 0.0 {
-			player.stats.check_for_level_up(5);
-		}
+        if !self.invulnerable() {
+            if true_dmg > 0.0 {
+                self.hp -= true_dmg;
+                self.invulnerable = Duration::new(0u64, 0u32);
+                self.floating_text.push(FloatingText::new(
+                    ctx,
+                    self.x,
+                    self.y,
+                    true_dmg.to_string(),
+                ));
+            // Check for death and maybe call a death function.
+            } else {
+                self.floating_text.push(FloatingText::new(
+                    ctx,
+                    self.x,
+                    self.y,
+                    "Blocked".to_string(),
+                ));
+            }
+        }
+
+        if self.hp <= 0.0 {
+            player.stats.check_for_level_up(5);
+        }
     }
-	
-	// returns if boss should be able to take damage (time is 1/4 sec)
+
+    // returns if boss should be able to take damage (time is 1/4 sec)
     fn invulnerable(&self) -> bool {
         self.invulnerable < Duration::from_millis(250u64)
     }
@@ -95,13 +104,13 @@ impl Enemy for Boss {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, _level: &Level) {
         self.floating_text.retain(|t| t.live());
         self.floating_text.iter_mut().for_each(|t| t.update(delta));
-        
+
         // cool down invulnerable of Boss
         if self.invulnerable() {
             self.invulnerable += delta;
         }
-        
-		// Player's atk_box hits me
+
+        // Player's atk_box hits me
         if let Some(atk) = &player.atk_box {
             if self.collision(atk) {
                 self.take_dmg(ctx, player);
@@ -112,45 +121,59 @@ impl Enemy for Boss {
     fn islive(&self) -> bool {
         self.hp > 0.0
     }
-	
-	fn get_aitype(&mut self) -> &AITypes {
-		&self.ai_type
-	}
-	
-	fn chase_player(&mut self, ctx: &mut Context, _delta: Duration, player: &mut Player, _level: &Level) {
-		// Charge towards player.
-		if self.x >= player.x {
-			self.x -= 1.0;
-		}
-		if self.x <= player.x {
-			self.x += 1.0;
-		}
 
-		if self.y >= player.y {
-			self.y -= 1.0;
-		}
-		if self.y <= player.y {
-			self.y += 1.0;
-		}
-		
-		// I touched the player.
-		if self.collision(player) {
-			// need attack animation
-			player.take_dmg(ctx, self.atk);
-		}
-	}
-	
-	fn chase_player_sight(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
-		self.line_of_sight.update(self.x - 100.0, self.y - 100.0, 200.0, 200.0);
-		
-		if self.line_of_sight.collision(player) {// && !self.line_of_sight.collision(level) {
-			self.chase_player(ctx, delta, player, level);
-		}
-	}
-	
-	fn spawn(&self) -> bool {
-		let mut rng = thread_rng();
-		let spawn = rng.gen_range(0, 100) as u64;
-		spawn == 5
-	}
+    fn get_aitype(&mut self) -> &AITypes {
+        &self.ai_type
+    }
+
+    fn chase_player(
+        &mut self,
+        ctx: &mut Context,
+        _delta: Duration,
+        player: &mut Player,
+        _level: &Level,
+    ) {
+        // Charge towards player.
+        if self.x >= player.x {
+            self.x -= 1.0;
+        }
+        if self.x <= player.x {
+            self.x += 1.0;
+        }
+
+        if self.y >= player.y {
+            self.y -= 1.0;
+        }
+        if self.y <= player.y {
+            self.y += 1.0;
+        }
+
+        // I touched the player.
+        if self.collision(player) {
+            // need attack animation
+            player.take_dmg(ctx, self.atk);
+        }
+    }
+
+    fn chase_player_sight(
+        &mut self,
+        ctx: &mut Context,
+        delta: Duration,
+        player: &mut Player,
+        level: &Level,
+    ) {
+        self.line_of_sight
+            .update(self.x - 100.0, self.y - 100.0, 200.0, 200.0);
+
+        if self.line_of_sight.collision(player) {
+            // && !self.line_of_sight.collision(level) {
+            self.chase_player(ctx, delta, player, level);
+        }
+    }
+
+    fn spawn(&self) -> bool {
+        let mut rng = thread_rng();
+        let spawn = rng.gen_range(0, 100) as u64;
+        spawn == 5
+    }
 }
