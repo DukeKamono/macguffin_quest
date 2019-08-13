@@ -20,7 +20,7 @@ impl Macguffin {
             y: ypos,
             sprite: img,
             hitbox: hb,
-		}
+        }
     }
 }
 
@@ -28,7 +28,7 @@ impl DrawableEntity for Macguffin {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, &self.sprite, dp)
-	}
+    }
 }
 
 impl CollideEntity for Macguffin {

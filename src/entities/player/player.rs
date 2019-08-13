@@ -1,14 +1,14 @@
+use super::super::{Animations, CollideEntity, Direction, DrawableEntity};
+use super::atk_box::AtkBox;
+use super::stats::Stats;
+use crate::sprites::*;
 use ggez::event::{KeyCode, KeyMods};
+use ggez::graphics::{Image, Rect};
 use ggez::input::keyboard;
 use ggez::nalgebra as na;
 use ggez::*;
-use ggez::graphics::{Image, Rect};
 use std::collections::HashMap;
 use std::time::Duration;
-use super::stats::Stats;
-use super::super::{CollideEntity, DrawableEntity, Direction, Animations};
-use super::atk_box::AtkBox;
-use crate::sprites::*;
 
 use crate::ui::FloatingText;
 
@@ -29,8 +29,8 @@ pub struct Player {
     pub atk_cooldown: Duration,
     pub invulnerable: Duration,
     pub direction: Direction,
-	pub macguffin: bool,
-	pub cooldown: Duration,
+    pub macguffin: bool,
+    pub cooldown: Duration,
     floating_text: Vec<FloatingText>,
 }
 
@@ -42,77 +42,111 @@ impl Player {
         // standing
         sprite.insert(
             (Animations::Stand, Direction::Up),
-            builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 1usize).unwrap()
+            builder
+                .create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 1usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Stand, Direction::Left),
-            builder.create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 1usize).unwrap()
+            builder
+                .create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 1usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Stand, Direction::Down),
-            builder.create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize).unwrap()
+            builder
+                .create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Stand, Direction::Right),
-            builder.create_animated(Rect::new(0f32, 192f32, 64f32, 64f32), 1usize).unwrap()
+            builder
+                .create_animated(Rect::new(0f32, 192f32, 64f32, 64f32), 1usize)
+                .unwrap(),
         );
         // walking
         sprite.insert(
             (Animations::Walking, Direction::Up),
-            builder.create_animated(Rect::new(64f32, 0f32, 64f32, 64f32), 8usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 0f32, 64f32, 64f32), 8usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Walking, Direction::Left),
-            builder.create_animated(Rect::new(64f32, 64f32, 64f32, 64f32), 8usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 64f32, 64f32, 64f32), 8usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Walking, Direction::Down),
-            builder.create_animated(Rect::new(64f32, 128f32, 64f32, 64f32), 8usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 128f32, 64f32, 64f32), 8usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Walking, Direction::Right),
-            builder.create_animated(Rect::new(64f32, 192f32, 64f32, 64f32), 8usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 192f32, 64f32, 64f32), 8usize)
+                .unwrap(),
         );
         // casting
         sprite.insert(
             (Animations::Cast, Direction::Up),
-            builder.create_animated(Rect::new(64f32, 512f32, 64f32, 64f32), 6usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 512f32, 64f32, 64f32), 6usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Cast, Direction::Left),
-            builder.create_animated(Rect::new(64f32, 576f32, 64f32, 64f32), 6usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 576f32, 64f32, 64f32), 6usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Cast, Direction::Down),
-            builder.create_animated(Rect::new(64f32, 640f32, 64f32, 64f32), 6usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 640f32, 64f32, 64f32), 6usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Cast, Direction::Right),
-            builder.create_animated(Rect::new(64f32, 704f32, 64f32, 64f32), 6usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 704f32, 64f32, 64f32), 6usize)
+                .unwrap(),
         );
         // slashing
         sprite.insert(
             (Animations::Slash, Direction::Up),
-            builder.create_animated(Rect::new(64f32, 256f32, 64f32, 64f32), 6usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 256f32, 64f32, 64f32), 6usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Slash, Direction::Left),
-            builder.create_animated(Rect::new(64f32, 320f32, 64f32, 64f32), 6usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 320f32, 64f32, 64f32), 6usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Slash, Direction::Down),
-            builder.create_animated(Rect::new(64f32, 384f32, 64f32, 64f32), 6usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 384f32, 64f32, 64f32), 6usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Slash, Direction::Right),
-            builder.create_animated(Rect::new(64f32, 448f32, 64f32, 64f32), 6usize).unwrap()
+            builder
+                .create_animated(Rect::new(64f32, 448f32, 64f32, 64f32), 6usize)
+                .unwrap(),
         );
         // die
         sprite.insert(
             (Animations::Die, Direction::Down),
-            builder.create_animated_once(Rect::new(64f32, 768f32, 64f32, 64f32), 5usize).unwrap()
+            builder
+                .create_animated_once(Rect::new(64f32, 768f32, 64f32, 64f32), 5usize)
+                .unwrap(),
         );
-		
+
         let floating_text = Vec::new();
 
         Player {
@@ -126,8 +160,8 @@ impl Player {
             atk_cooldown: Duration::new(0u64, 0u32),
             invulnerable: Duration::new(0u64, 0u32),
             direction: Direction::Right, // Starting direction?
-			macguffin: false,
-			cooldown: Duration::new(1u64, 0u32),
+            macguffin: false,
+            cooldown: Duration::new(1u64, 0u32),
             floating_text,
         }
     }
@@ -159,14 +193,34 @@ impl Player {
             self.animation = (Animations::Die, Direction::Down);
         }
         // casting
-        else if keyboard::is_key_pressed(ctx, KeyCode::Q) && self.stats.hp > 0f32 && self.stats.mp > 0 {
-            self.atk_box = Some(AtkBox::new(ctx, self.x, self.y, 64.0, 80.0, &self.direction, 40.0));
+        else if keyboard::is_key_pressed(ctx, KeyCode::Q)
+            && self.stats.hp > 0f32
+            && self.stats.mp > 0
+        {
+            self.atk_box = Some(AtkBox::new(
+                ctx,
+                self.x,
+                self.y,
+                64.0,
+                80.0,
+                &self.direction,
+                40.0,
+            ));
             self.animation.0 = Animations::Cast;
             self.stats.mp -= 1;
         }
         // slashing
-        else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.stats.hp > 0f32 { //&& self.atk_cooldown() {
-            self.atk_box = Some(AtkBox::new(ctx, self.x, self.y, 32.0, 64.0, &self.direction, 40.0));
+        else if keyboard::is_key_pressed(ctx, KeyCode::Space) && self.stats.hp > 0f32 {
+            //&& self.atk_cooldown() {
+            self.atk_box = Some(AtkBox::new(
+                ctx,
+                self.x,
+                self.y,
+                32.0,
+                64.0,
+                &self.direction,
+                40.0,
+            ));
             self.animation.0 = Animations::Slash;
             self.atk_cooldown = Duration::new(0u64, 0u32);
         }
@@ -194,8 +248,8 @@ impl Player {
         }
 
         self.sprite.get_mut(&self.animation).unwrap().animate(delta);
-		
-		self.floating_text.retain(|t| t.live());
+
+        self.floating_text.retain(|t| t.live());
         self.floating_text.iter_mut().for_each(|t| t.update(delta));
 
         // cooldown
@@ -210,19 +264,20 @@ impl Player {
         self.invulnerable < Duration::from_millis(250u64)
     }
 
-	// This is still in the works
+    // This is still in the works
     fn atk_cooldown(&self) -> bool {
         self.atk_cooldown > Duration::from_millis(350u64)
     }
-	
-	// player pick_up item text. should be combined with other text stuff...
-	pub fn pick_up(&mut self, ctx: &mut Context, text: String) {
-		if !self.pick_up_cooldown() {
+
+    // player pick_up item text. should be combined with other text stuff...
+    pub fn pick_up(&mut self, ctx: &mut Context, text: String) {
+        if !self.pick_up_cooldown() {
             self.cooldown = Duration::new(0u64, 0u32);
-			self.floating_text.push(FloatingText::new(ctx, self.x, self.y, text));
-		}
-	}
-	
+            self.floating_text
+                .push(FloatingText::new(ctx, self.x, self.y, text));
+        }
+    }
+
     fn pick_up_cooldown(&self) -> bool {
         self.cooldown < Duration::from_millis(250u64)
     }
@@ -233,21 +288,30 @@ impl Player {
     }
 
     pub fn take_dmg(&mut self, ctx: &mut Context, dmg_to_take: f32) {
-		let true_dmg = dmg_to_take - self.stats.def;
-		if !self.invulnerable() {
-			if true_dmg > 0.0 {
-				self.stats.hp -= true_dmg;
-				if self.stats.hp < 0f32 {
-					self.stats.hp = 0f32;
-				}
-				self.invulnerable = Duration::new(0u64, 0u32);
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string()));
-				// Check for death and maybe call a death function.
-			}
-			else {
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string()));
-			}
-		}
+        let true_dmg = dmg_to_take - self.stats.def;
+        if !self.invulnerable() {
+            if true_dmg > 0.0 {
+                self.stats.hp -= true_dmg;
+                if self.stats.hp < 0f32 {
+                    self.stats.hp = 0f32;
+                }
+                self.invulnerable = Duration::new(0u64, 0u32);
+                self.floating_text.push(FloatingText::new(
+                    ctx,
+                    self.x,
+                    self.y,
+                    true_dmg.to_string(),
+                ));
+            // Check for death and maybe call a death function.
+            } else {
+                self.floating_text.push(FloatingText::new(
+                    ctx,
+                    self.x,
+                    self.y,
+                    "Blocked".to_string(),
+                ));
+            }
+        }
     }
 
     // With multiple weapons, we should make a new struct for each type and attach them to the player.
@@ -261,7 +325,9 @@ impl Player {
 impl DrawableEntity for Player {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         self.draw_weapon(ctx);
-        let dp = graphics::DrawParam::default().offset(nalgebra::Point2::new(0.5, 0.5)).dest(na::Point2::new(self.x, self.y));
+        let dp = graphics::DrawParam::default()
+            .offset(nalgebra::Point2::new(0.5, 0.5))
+            .dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, self.sprite.get(&self.animation).unwrap(), dp)?;
 
         self.floating_text.iter().for_each(|t| t.draw(ctx));
@@ -272,9 +338,14 @@ impl DrawableEntity for Player {
 
 impl CollideEntity for Player {
     fn get_hitbox(&self) -> graphics::Rect {
-        let mut r = self.sprite.get(&self.animation).unwrap().dimensions().unwrap();
-        r.x = self.x - r.w/2.0;
-        r.y = self.y - r.h/2.0;
+        let mut r = self
+            .sprite
+            .get(&self.animation)
+            .unwrap()
+            .dimensions()
+            .unwrap();
+        r.x = self.x - r.w / 2.0;
+        r.y = self.y - r.h / 2.0;
         r
     }
 }

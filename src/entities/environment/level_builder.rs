@@ -60,11 +60,10 @@ impl LevelBuilder {
         while h < height {
             let mut w = 0f32; // counting
             while w < width {
-                ret_value.push(Sprite::new(img, Rect::new(w * 64f32, h * 64f32, 64f32, 64f32)).unwrap());
-                self.set_tile_image(
-                    ret_value.len() - 1usize,
-                    ret_value.last().unwrap(),
-                ).unwrap();
+                ret_value
+                    .push(Sprite::new(img, Rect::new(w * 64f32, h * 64f32, 64f32, 64f32)).unwrap());
+                self.set_tile_image(ret_value.len() - 1usize, ret_value.last().unwrap())
+                    .unwrap();
                 w += 1f32;
             }
             h += 1f32;
@@ -162,7 +161,7 @@ impl LevelBuilder {
             let y = parse.next().unwrap().parse::<i64>().expect(&message) as f32;
             let t = parse.next().unwrap().parse::<usize>().expect(&message);
             //println!("{}, ({},{}), {}", i, x, y, t);
-            w.push(((x,y),t));
+            w.push(((x, y), t));
         }
 
         self.generate_level(w)

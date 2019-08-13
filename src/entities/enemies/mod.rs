@@ -5,9 +5,9 @@
 
 // Namespace of current blob code
 pub mod blob;
-pub mod skeleton;
-pub mod ghost;
 pub mod boss;
+pub mod ghost;
+pub mod skeleton;
 
 pub mod ai;
 

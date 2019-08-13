@@ -1,15 +1,15 @@
-use crate::entities::player::player::Player;
-use crate::entities::environment::level::Level;
-use crate::entities::enemies::enemies::Enemy;
 use crate::entities::enemies::ai::*;
+use crate::entities::enemies::enemies::Enemy;
+use crate::entities::environment::level::Level;
+use crate::entities::player::player::Player;
 use ggez::nalgebra as na;
 use ggez::*;
 use std::time::Duration;
 //use rand::prelude::*;
 
 use super::super::{CollideEntity, DrawableEntity};
-use crate::ui::FloatingText;
 use crate::entities::enemies::sight::*;
+use crate::ui::FloatingText;
 
 pub struct Skeleton {
     pub x: f32,
@@ -48,18 +48,27 @@ impl Skeleton {
 
     pub fn take_dmg(&mut self, ctx: &mut Context, player: &mut Player) {
         let true_dmg = player.stats.atk - self.def;
-		if !self.invulnerable() {
-			if true_dmg > 0.0 {
-				self.hp -= true_dmg;
-				self.invulnerable = Duration::new(0u64, 0u32);
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, true_dmg.to_string()));
-				// Check for death and maybe call a death function.
-			}
-			else {
-				self.floating_text.push(FloatingText::new(ctx, self.x, self.y, "Blocked".to_string()));
-			}
-		}
-		
+        if !self.invulnerable() {
+            if true_dmg > 0.0 {
+                self.hp -= true_dmg;
+                self.invulnerable = Duration::new(0u64, 0u32);
+                self.floating_text.push(FloatingText::new(
+                    ctx,
+                    self.x,
+                    self.y,
+                    true_dmg.to_string(),
+                ));
+            // Check for death and maybe call a death function.
+            } else {
+                self.floating_text.push(FloatingText::new(
+                    ctx,
+                    self.x,
+                    self.y,
+                    "Blocked".to_string(),
+                ));
+            }
+        }
+
         if self.hp <= 0.0 {
             player.stats.check_for_level_up(5);
         }
@@ -95,12 +104,12 @@ impl Enemy for Skeleton {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, _level: &Level) {
         self.floating_text.retain(|t| t.live());
         self.floating_text.iter_mut().for_each(|t| t.update(delta));
-        
+
         // cool down invulnerable of skeleton
         if self.invulnerable() {
             self.invulnerable += delta;
         }
-        
+
         // Player's atk_box hits me
         if let Some(atk) = &player.atk_box {
             if self.collision(atk) {
@@ -112,16 +121,22 @@ impl Enemy for Skeleton {
     fn islive(&self) -> bool {
         self.hp > 0.0
     }
-    
+
     fn get_aitype(&mut self) -> &AITypes {
         &self.ai_type
     }
-    
-    fn chase_player(&mut self, ctx: &mut Context, _delta: Duration, player: &mut Player, level: &Level) {
+
+    fn chase_player(
+        &mut self,
+        ctx: &mut Context,
+        _delta: Duration,
+        player: &mut Player,
+        level: &Level,
+    ) {
         // holding onto previous location
         let xpos = self.x;
         let ypos = self.y;
-        
+
         // Charge towards player.
         if self.x >= player.x {
             self.x -= 1.0;
@@ -136,13 +151,13 @@ impl Enemy for Skeleton {
         if self.y <= player.y {
             self.y += 1.0;
         }
-        
+
         // Check wall collision
         if self.collision(level) {
             self.x = xpos;
             self.y = ypos;
         }
-        
+
         // I touched the player.
         if self.collision(player) {
             // need attack animation
@@ -151,16 +166,24 @@ impl Enemy for Skeleton {
             self.y = ypos;
         }
     }
-    
-    fn chase_player_sight(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
-        self.line_of_sight.update(self.x - 100.0, self.y - 100.0, 200.0, 200.0);
-        
-        if self.line_of_sight.collision(player) {// && !self.line_of_sight.collision(level) {
+
+    fn chase_player_sight(
+        &mut self,
+        ctx: &mut Context,
+        delta: Duration,
+        player: &mut Player,
+        level: &Level,
+    ) {
+        self.line_of_sight
+            .update(self.x - 100.0, self.y - 100.0, 200.0, 200.0);
+
+        if self.line_of_sight.collision(player) {
+            // && !self.line_of_sight.collision(level) {
             self.chase_player(ctx, delta, player, level);
         }
     }
-	
-	fn spawn(&self) -> bool {
-		false
-	}
+
+    fn spawn(&self) -> bool {
+        false
+    }
 }
