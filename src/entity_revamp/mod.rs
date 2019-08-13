@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 use std::mem;
 use std::time::Duration;
 
-use ggez::{Context, GameResult};
+use ggez::{Context, GameResult, mint};
 use ggez::graphics::{Drawable, DrawParam, Image, Rect};
 use ggez::timer;
 
@@ -141,26 +141,28 @@ pub struct EntityBuilder {
 }
 
 impl EntityBuilder {
-    pub fn build_player(ctx: &mut Context) -> GameResult<Entity> {
+    pub fn build_player<P>(ctx: &mut Context, location: P) -> GameResult<Entity>
+        where P: Into<mint::Point2<f32>> {
         let img = Image::new(ctx, "/dapper-skeleton-sheet.png")?;
         let sprite = SpriteBuilder::new(&img)
             .add_frame(Rect::new(0f32, 768f32, 64f32, 64f32), None, None, None)
             .build_sprite()
             ?;
         let stats = StatBlock::default();
-        let param = DrawParam::default();
+        let param = DrawParam::default().dest(location);
         let ai = AI::new(&vec![ai_revamp::player_input]);
         Ok(Entity::new(Player, stats, sprite, param, Down, ai, Idle))
     }
 
-    pub fn build_enemy(ctx: &mut Context) -> GameResult<Entity> {
+    pub fn build_enemy<P>(ctx: &mut Context, location: P) -> GameResult<Entity>
+        where P: Into<mint::Point2<f32>> {
         let img = Image::new(ctx, "/dapper-skeleton-sheet.png")?;
         let sprite = SpriteBuilder::new(&img)
             .add_frame(Rect::new(128f32, 768f32, 64f32, 64f32), None, None, None)
             .build_sprite()
             ?;
         let stats = StatBlock::default();
-        let param = DrawParam::default();
+        let param = DrawParam::default().dest(location);
         let ai = AI::new(&vec![ai_revamp::chase_player]);
         Ok(Entity::new(Player, stats, sprite, param, Down, ai, Idle))
     }

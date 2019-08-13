@@ -274,9 +274,11 @@ impl GamePlayState {
         let font = Font::default();
         let message = "Game Play Here!".to_string();
         let text = Text::new((message, font, 24f32));
-        let player = EntityBuilder::build_player(ctx)?;
+        let player = EntityBuilder::build_player(ctx, [0f32, 0f32])?;
         let mut enemies = VecDeque::new();
-        enemies.push_back(EntityBuilder::build_enemy(ctx)?);
+        enemies.push_back(EntityBuilder::build_enemy(ctx, [400f32,300f32])?);
+        enemies.push_back(EntityBuilder::build_enemy(ctx, [200f32,300f32])?);
+        enemies.push_back(EntityBuilder::build_enemy(ctx, [600f32,300f32])?);
         Ok(Box::new(GamePlayState{
             text,
             player,
@@ -301,6 +303,8 @@ impl CustomStateTrait for GamePlayState {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
         graphics::clear(ctx, BLACK);
 
+        // draw level
+
         // draw player
         self.player.draw(ctx)?;
 
@@ -308,6 +312,8 @@ impl CustomStateTrait for GamePlayState {
         for e in &self.enemies {
             e.draw(ctx)?;
         }
+
+        // draw items
 
         // draw menu text
         let (width, height) = self.text.dimensions(ctx);
