@@ -10,3 +10,4 @@ pub mod state_revamp;
 mod entity_revamp;
 mod sprite_revamp;
 mod countdowntimer_revamp;
+mod level_revamp;

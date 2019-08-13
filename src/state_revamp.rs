@@ -12,6 +12,7 @@ use ggez::graphics::{BLACK, DrawParam, FilterMode, Font, self, Text, WHITE};
 use ggez::timer::{self};
 
 use crate::entity_revamp::{Entity, EntityBuilder};
+use crate::level_revamp::{Level, LevelBuilder};
 
 
 
@@ -266,7 +267,7 @@ impl CustomStateTrait for PauseMenuState {
 struct GamePlayState {
     text: Text,
     player: Entity,
-    enemies: VecDeque<Entity>,
+    level: Level,
 }
 
 impl GamePlayState {
@@ -275,14 +276,11 @@ impl GamePlayState {
         let message = "Game Play Here!".to_string();
         let text = Text::new((message, font, 24f32));
         let player = EntityBuilder::build_player(ctx, [0f32, 0f32])?;
-        let mut enemies = VecDeque::new();
-        enemies.push_back(EntityBuilder::build_enemy(ctx, [400f32,300f32])?);
-        enemies.push_back(EntityBuilder::build_enemy(ctx, [200f32,300f32])?);
-        enemies.push_back(EntityBuilder::build_enemy(ctx, [600f32,300f32])?);
+        let level = LevelBuilder::new(ctx).sample(ctx).build_level(ctx)?;
         Ok(Box::new(GamePlayState{
             text,
             player,
-            enemies,
+            level,
         }))
     }
 }
@@ -290,30 +288,20 @@ impl GamePlayState {
 impl CustomStateTrait for GamePlayState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
         let mut pclone = self.player.clone();
-        self.player.update(ctx, &mut pclone, &mut self.enemies);
+        self.player.update(ctx, &mut pclone, self.level.get_enemies());
 
-        for _ in 0usize..self.enemies.len() {
-            let mut enemy = self.enemies.pop_front().unwrap();
-            enemy.update(ctx, &mut self.player, &mut self.enemies);
-            self.enemies.push_back(enemy);
-        }
+        self.level.update(ctx, &mut self.player);
 
         Ok(None)
     }
     fn draw(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
         graphics::clear(ctx, BLACK);
 
-        // draw level
+        // draw level (also draws enemies)
+        self.level.draw(ctx, true)?;
 
         // draw player
         self.player.draw(ctx, true)?;
-
-        // draw enemies
-        for e in &self.enemies {
-            e.draw(ctx, true)?;
-        }
-
-        // draw items
 
         // draw menu text
         let (width, height) = self.text.dimensions(ctx);

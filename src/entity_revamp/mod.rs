@@ -49,7 +49,7 @@ pub enum EntityType {
 }
 use EntityType::*;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum EntityState {
     Idle,
     Attacking, // attack box, duration
@@ -59,7 +59,7 @@ pub enum EntityState {
 }
 use EntityState::*;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 enum EntityDirection {
     Up,
     Down,
@@ -96,14 +96,14 @@ pub struct Entity {
 }
 
 impl Entity {
-    fn new(entitytype: EntityType, stats: StatBlock, sprite: Sprite, param: DrawParam, direction: EntityDirection, aibehavior: AI, state: EntityState) -> Entity {
+    fn new(entitytype: EntityType, stats: &StatBlock, sprite: &Sprite, param: DrawParam, direction: EntityDirection, aibehavior: &AI, state: EntityState) -> Entity {
         Entity{
             entitytype,
-            stats,
-            sprite,
+            stats: stats.clone(),
+            sprite: sprite.clone(),
             param,
             direction,
-            aibehavior,
+            aibehavior: aibehavior.clone(),
             state
         }
     }
@@ -168,7 +168,8 @@ pub struct EntityBuilder {
 
 impl EntityBuilder {
     pub fn build_player<P>(ctx: &mut Context, location: P) -> GameResult<Entity>
-        where P: Into<mint::Point2<f32>> {
+        where P: Into<mint::Point2<f32>>
+    {
         let img = Image::new(ctx, "/dapper-skeleton-sheet.png")?;
         let sprite = SpriteBuilder::new(&img)
             .add_frame(Rect::new(0f32, 768f32, 64f32, 64f32), None, None, None)
@@ -177,11 +178,12 @@ impl EntityBuilder {
         let stats = StatBlock::default();
         let param = DrawParam::default().dest(location);
         let ai = AI::new(&vec![ai_revamp::player_input]);
-        Ok(Entity::new(Player, stats, sprite, param, Down, ai, Idle))
+        Ok(Entity::new(Player, &stats, &sprite, param, Down, &ai, Idle))
     }
 
     pub fn build_enemy<P>(ctx: &mut Context, location: P) -> GameResult<Entity>
-        where P: Into<mint::Point2<f32>> {
+        where P: Into<mint::Point2<f32>>
+    {
         let img = Image::new(ctx, "/dapper-skeleton-sheet.png")?;
         let sprite = SpriteBuilder::new(&img)
             .add_frame(Rect::new(128f32, 768f32, 64f32, 64f32), None, None, None)
@@ -190,6 +192,15 @@ impl EntityBuilder {
         let stats = StatBlock::default();
         let param = DrawParam::default().dest(location);
         let ai = AI::new(&vec![ai_revamp::chase_player]);
-        Ok(Entity::new(Enemy, stats, sprite, param, Down, ai, Idle))
+        Ok(Entity::new(Enemy, &stats, &sprite, param, Down, &ai, Idle))
+    }
+
+    pub fn build_wall<P>(sprite: &Sprite, location: P) -> GameResult<Entity>
+        where P: Into<mint::Point2<f32>>
+    {
+        let stats = StatBlock::default();
+        let param = DrawParam::default().dest(location);
+        let ai = AI::default();
+        Ok(Entity::new(Wall, &stats, sprite, param, Down, &ai, Idle))
     }
 }
