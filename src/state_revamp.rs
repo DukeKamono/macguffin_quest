@@ -301,16 +301,6 @@ impl CustomStateTrait for GamePlayState {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
         graphics::clear(ctx, BLACK);
 
-        // draw menu text
-        graphics::queue_text(ctx, &self.text, [0f32, 0f32], Some(WHITE));
-        let (width, height) = self.text.dimensions(ctx);
-        let width = width as f32 / 2f32;
-        let height = height as f32 / 2f32;
-        let dp = DrawParam::default().dest([400f32 - width, 300f32 - height]);
-        graphics::draw_queued_text(ctx, dp, None, FilterMode::Linear)?;
-        graphics::draw_queued_text(ctx, DrawParam::default(), None, FilterMode::Linear)?;
-        graphics::draw_queued_text(ctx, DrawParam::default(), None, FilterMode::Linear)?;
-
         // draw player
         self.player.draw(ctx)?;
 
@@ -319,6 +309,13 @@ impl CustomStateTrait for GamePlayState {
             e.draw(ctx)?;
         }
 
+        // draw menu text
+        let (width, height) = self.text.dimensions(ctx);
+        let width = width as f32 / 2f32;
+        let height = height as f32 / 2f32;
+        graphics::queue_text(ctx, &self.text, [400f32 - width, 300f32 - height], Some(WHITE));
+        graphics::draw_queued_text(ctx, DrawParam::default(), None, FilterMode::Linear)?;
+        
         graphics::present(ctx)?;
         timer::yield_now();
         Ok(None)
