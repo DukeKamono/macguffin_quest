@@ -108,12 +108,12 @@ impl Entity {
         }
     }
 
-    pub fn update(&mut self, ctx: &mut Context, player: &mut Entity, enemies: &mut VecDeque<Entity>) {
+    pub fn update(&mut self, ctx: &mut Context, player: &mut Entity, enemies: &mut VecDeque<Entity>, walls: &mut Vec<Entity>) {
         let delta = timer::delta(ctx);
 
         let mut ai = AI::default();
         mem::swap(&mut self.aibehavior, &mut ai);
-        ai.execute(ctx, self, player, enemies);
+        ai.execute(ctx, self, player, enemies, walls);
         mem::swap(&mut self.aibehavior, &mut ai);
 
         self.sprite.update(delta);

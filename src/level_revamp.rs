@@ -54,12 +54,12 @@ impl Level {
         self.floor.iter_mut().for_each(|f| f.update(delta));
 
         for w in &mut self.walls {
-            w.update(ctx, player, &mut self.enemies);
+            w.update(ctx, player, &mut self.enemies, &mut Vec::new());
         }
 
         for _ in 0usize..self.enemies.len() {
             let mut enemy = self.enemies.pop_front().unwrap();
-            enemy.update(ctx, player, &mut self.enemies);
+            enemy.update(ctx, player, &mut self.enemies, &mut self.walls);
             self.enemies.push_back(enemy);
         }
     }
@@ -82,6 +82,10 @@ impl Level {
 
     pub fn get_enemies(&mut self) -> &mut VecDeque<Entity> {
         &mut self.enemies
+    }
+
+    pub fn get_walls(&mut self) -> &mut Vec<Entity> {
+        &mut self.walls
     }
 }
 

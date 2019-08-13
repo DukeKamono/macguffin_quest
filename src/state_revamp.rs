@@ -288,7 +288,9 @@ impl GamePlayState {
 impl CustomStateTrait for GamePlayState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
         let mut pclone = self.player.clone();
-        self.player.update(ctx, &mut pclone, self.level.get_enemies());
+        // bad should not do this...
+        let enemies = &mut self.level.get_enemies().clone();
+        self.player.update(ctx, &mut pclone, enemies, self.level.get_walls());
 
         self.level.update(ctx, &mut self.player);
 
