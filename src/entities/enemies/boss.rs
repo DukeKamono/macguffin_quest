@@ -6,7 +6,6 @@ use ggez::nalgebra as na;
 use ggez::*;
 use rand::prelude::*;
 use std::time::Duration;
-use rand::prelude::*;
 use ggez::graphics::{Image, Rect};
 use crate::sprites::*;
 use std::collections::HashMap;
@@ -153,19 +152,6 @@ impl Enemy for Boss {
 	fn get_aitype(&mut self) -> &AITypes {
 		&self.ai_type
 	}
-	
-	fn chase_player(&mut self, ctx: &mut Context, _delta: Duration, player: &mut Player, _level: &Level) {
-		// Charge towards player.
-		if self.x >= player.x {
-			self.x -= 1.0;
-		}
-		if self.x <= player.x {
-			self.x += 1.0;
-		}
-
-    fn get_aitype(&mut self) -> &AITypes {
-        &self.ai_type
-    }
 
     fn chase_player(
         &mut self,
