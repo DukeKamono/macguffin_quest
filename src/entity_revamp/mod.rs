@@ -1,33 +1,74 @@
+use std::collections::VecDeque;
+use std::mem;
 use std::time::Duration;
 
 use ggez::{Context, GameResult};
 use ggez::graphics::{BlendMode, Drawable, DrawParam, Image, Rect};
+use ggez::timer;
 
 use crate::sprite_revamp::{Sprite, SpriteBuilder};
 
 mod ai_revamp;
+use ai_revamp::{AI};
 
 #[derive(Clone)]
-pub struct Entity {
-    sprite: Sprite,
+pub struct StatBlock {
+    pub name: String,
+    pub lvl: u64,
+    pub exp: u64,
+    pub health: (u64, u64),
+    pub magic: (u64, u64),
+    pub attack: u64,
+    pub defense: u64,
+    pub speed: f32
+}
+
+impl Default for StatBlock {
+    fn default() -> StatBlock {
+        StatBlock {
+            name: "Default Entity Name".to_string(),
+            lvl: 1u64,
+            exp: 0u64,
+            health: (10u64, 10u64),
+            magic: (10u64, 10u64),
+            attack: 1u64,
+            defense: 0u64,
+            speed: 1f32,
+        }
+    }
+}
+
+// useful for collisions
+#[derive(Clone)]
+pub enum EntityType {
+    Player,
+    Enemy,
+    Item,
+    Wall,
+    Misc, // anything else (will probably use for ignored things) [or remove]
+}
+use EntityType::*;
+
+#[derive(Clone)]
+pub enum EntityState {
+    Idle,
+    Attacking, // attack box, duration
+    Casting, // attack box, duration
+    Walking,
+    Dead, // duration
+}
+use EntityState::*;
+
+#[derive(Clone)]
+enum EntityDirection {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+use EntityDirection::*;
+
     /*
-        name
-        type (enum for quick oversimplifications)
-            - player
-            - item
-            - enemy
-            - etc
-        Stats
-            - lvl
-            - exp
-            - health and health maximum
-            - magic and magic maximum
-            - attack damage
-            - magic damage
-            - defense
-            - speed
-        location (give drawparam and methods to alter)
-        hitbox
         animations (with animated sprite to use)
         state (attacking, moving, damaged, dead, etc)
             - could make enum containing needed information
@@ -38,30 +79,48 @@ pub struct Entity {
         AI function (how act/update)
         sight radius
     */
+
+#[derive(Clone)]
+pub struct Entity {
+    entitytype: EntityType,
+    stats: StatBlock,
+    sprite: Sprite, // change to have multiple animations [hitbox baked into frame information]
+    param: DrawParam, // location as DrawParam.dest
+    direction: EntityDirection,
+    aibehavior: AI,
+    state: EntityState,
+    // not implemented
+    // items
+    // floating text
+    // visible
 }
 
 impl Entity {
-    pub fn new(ctx: &mut Context) -> Entity {
-        let img = Image::new(ctx, "/dapper-skeleton-sheet.png").unwrap();
-        // Duration::new(1u64, 500_000_000u32)
-        let sprite = SpriteBuilder::new(&img)
-            //.add_frames_going_up(4usize, Rect::new(0f32, 256f32, 64f32, 64f32), None, None, None)
-            .add_frames_going_down(4usize, Rect::new(0f32, 576f32, 64f32, 64f32), None, None, None)
-            //.add_frames_going_left(9usize, Rect::new(576f32, 0f32, 64f32, 64f32), None, None, None)
-            //.add_frames_going_right(6usize, Rect::new(0f32, 768f32, 64f32, 64f32), None, None, None)
-            //.add_frame(Rect::new(64f32, 768f32, 64f32, 64f32), None, None, None)
-            //.build_sprite()
-            .build_looping_sprite()
-            .unwrap();
+    fn new(entitytype: EntityType, stats: StatBlock, sprite: Sprite, param: DrawParam, direction: EntityDirection, aibehavior: AI, state: EntityState) -> Entity {
         Entity{
-            sprite
+            entitytype,
+            stats,
+            sprite,
+            param,
+            direction,
+            aibehavior,
+            state
         }
     }
 
-    pub fn update(&mut self, delta: Duration) {
-        // call ai
-        // ai should deal damage... or at least spawn attack
+    pub fn update(&mut self, ctx: &mut Context, player: &mut Entity, enemies: &mut VecDeque<Entity>) {
+        let delta = timer::delta(ctx);
+
+        let mut ai = AI::default();
+        mem::swap(&mut self.aibehavior, &mut ai);
+        ai.execute(ctx, self, player, enemies);
+        mem::swap(&mut self.aibehavior, &mut ai);
+
         self.sprite.update(delta);
+    }
+
+    pub fn draw(&self, ctx: &mut Context) -> GameResult {
+        self.sprite.draw(ctx, self.param)
     }
 
     // translate
@@ -74,29 +133,23 @@ impl Entity {
 }
 
 /*
-Should it be directly drawable
-or should it really be drawn with own methods...
-*/
-impl Drawable for Entity {
-    fn draw(&self, ctx: &mut Context, param: DrawParam) -> GameResult{
-        self.sprite.draw(ctx, param)
-    }
-    fn dimensions(&self, ctx: &mut Context) -> Option<Rect> {
-        self.sprite.dimensions(ctx)
-    }
-    fn set_blend_mode(&mut self, mode: Option<BlendMode>) {
-        self.sprite.set_blend_mode(mode)
-    }
-    fn blend_mode(&self) -> Option<BlendMode> {
-        self.sprite.blend_mode()
-    }
-}
-
-
-/*
 Entity Builder
 builds an entity like player or skeleton
 */
 pub struct EntityBuilder {
     // fields
+}
+
+impl EntityBuilder {
+    pub fn build_player(ctx: &mut Context) -> GameResult<Entity> {
+        let img = Image::new(ctx, "/dapper-skeleton-sheet.png")?;
+        let sprite = SpriteBuilder::new(&img)
+            .add_frame(Rect::new(0f32, 768f32, 64f32, 64f32), None, None, None)
+            .build_sprite()
+            ?;
+        let stats = StatBlock::default();
+        let param = DrawParam::default();
+        let ai = AI::new(&vec![ai_revamp::player_input]);
+        Ok(Entity::new(Player, stats, sprite, param, Down, ai, Idle))
+    }
 }

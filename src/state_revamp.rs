@@ -2,6 +2,7 @@
 // https://users.rust-lang.org/t/solved-is-it-possible-to-clone-a-boxed-trait-object/1714/5
 // to figure out how to clone box traits
 
+use std::collections::VecDeque;
 use std::mem;
 
 use ggez::{Context, GameResult};
@@ -10,6 +11,7 @@ use ggez::input::keyboard::{KeyCode, KeyMods};
 use ggez::graphics::{BLACK, DrawParam, FilterMode, Font, self, Text, WHITE};
 use ggez::timer::{self};
 
+use crate::entity_revamp::{Entity, EntityBuilder};
 
 
 
@@ -257,16 +259,14 @@ impl CustomStateTrait for PauseMenuState {
 
 
 
-// includes
-use crate::entity_revamp::Entity;
-
 // Active GamePlay state
 // - "q" will transition to main menu state
 // - "p" will transition previous state (ie the one that did transitioned to pause)
 #[derive(Clone)]
 struct GamePlayState {
     text: Text,
-    entity: Entity,
+    player: Entity,
+    enemies: VecDeque<Entity>,
 }
 
 impl GamePlayState {
@@ -274,19 +274,21 @@ impl GamePlayState {
         let font = Font::default();
         let message = "Game Play Here!".to_string();
         let text = Text::new((message, font, 24f32));
-        let entity = Entity::new(ctx);
+        let player = EntityBuilder::build_player(ctx)?;
+        let mut enemies = VecDeque::new();
+        enemies.push_back(EntityBuilder::build_player(ctx)?);
         Ok(Box::new(GamePlayState{
             text,
-            entity,
+            player,
+            enemies,
         }))
     }
 }
 
 impl CustomStateTrait for GamePlayState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
-        let delta = timer::delta(ctx);
-
-        self.entity.update(delta);
+        let mut pclone = self.player.clone();
+        self.player.update(ctx, &mut pclone, &mut self.enemies);
 
         Ok(None)
     }
@@ -305,7 +307,7 @@ impl CustomStateTrait for GamePlayState {
         // draw entity test
         graphics::draw_queued_text(ctx, DrawParam::default(), None, FilterMode::Linear)?;
         let dp = DrawParam::default().dest([0f32,0f32]);
-        graphics::draw(ctx, &self.entity, dp)?;
+        self.player.draw(ctx)?;
 
         graphics::present(ctx)?;
         timer::yield_now();

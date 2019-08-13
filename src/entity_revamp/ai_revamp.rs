@@ -1,7 +1,13 @@
+use std::collections::VecDeque;
+
+use ggez::{Context, GameResult};
+use ggez::event::{EventHandler, self};
+use ggez::input::keyboard::{KeyCode, KeyMods};
+
 use crate::entity_revamp::Entity;
 
-// various ai functions for controlling entities
-pub type AIfn = fn(&mut Entity, &mut Entity /*, level: Level, enemies: Iterator Entity, items: Iterator*/);
+// various ai functions for controlling entities with this type
+pub type AIfn = fn(ctx: &mut Context, entity: &mut Entity, player: &mut Entity, enemies: &mut VecDeque<Entity> /*, level: Level, items: Iterator*/);
 
 #[derive(Clone)]
 pub struct AI {
@@ -15,9 +21,9 @@ impl AI {
         ai
     }
 
-    pub fn execute(&self, entity: &mut Entity, player: &mut Entity) {
+    pub fn execute(&self, ctx: &mut Context, entity: &mut Entity, player: &mut Entity, enemies: &mut VecDeque<Entity>) {
         for ai in &self.calls {
-            ai(entity, player);
+            ai(ctx, entity, player, enemies);
         }
     }
 }
@@ -28,6 +34,12 @@ impl Default for AI {
     }
 }
 
-pub fn chase_player(entity: &mut Entity, player: &mut Entity /*, level: Level, enemies: Iterator Entity, items: Iterator*/) {
+// note `entity` is current enemy and should not be present in the enemies VecDeque
+pub fn chase_player(ctx: &mut Context, entity: &mut Entity, player: &mut Entity, enemies: &mut VecDeque<Entity>) {
     println!("Enemy should chase player...");
+}
+
+// note `ignore` is probably a clone of the player or a dummy entity... so yeah.
+pub fn player_input(ctx: &mut Context, player: &mut Entity, _ignore: &mut Entity, enemies: &mut VecDeque<Entity>) {
+    println!("Input from player");
 }
