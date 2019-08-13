@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader};
 
 use ggez::graphics::{Image, Rect, WHITE};
 use ggez::{error::GameError, Context, GameResult};

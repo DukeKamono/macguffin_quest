@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader};
 
 use ggez::event::{EventHandler, KeyCode};
 use ggez::graphics::{DrawParam, Image, Rect};
@@ -64,6 +64,7 @@ impl State {
             let y = key.1;
             let t = value;
             let output = format!("{} {} {}\n", x, y, t);
+            use std::io::Write;
             file.write_all(output.as_bytes()).unwrap();
         }
     }

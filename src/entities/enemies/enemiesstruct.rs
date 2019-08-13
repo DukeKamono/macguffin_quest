@@ -1,7 +1,7 @@
 use crate::entities::enemies::ai::*;
 use crate::entities::enemies::ghost::Ghost;
 use crate::entities::environment::level::Level;
-use crate::entities::player::player::Player;
+use crate::entities::player::playerstruct::Player;
 use crate::entities::DrawableEntity;
 use ggez::*;
 use rand::prelude::*;

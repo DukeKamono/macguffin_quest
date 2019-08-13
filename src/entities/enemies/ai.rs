@@ -1,6 +1,6 @@
-use crate::entities::enemies::enemies::Enemy;
+use crate::entities::enemies::enemiesstruct::Enemy;
 use crate::entities::environment::level::Level;
-use crate::entities::player::player::Player;
+use crate::entities::player::playerstruct::Player;
 use ggez::*;
 use std::time::Duration;
 
