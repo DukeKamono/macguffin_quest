@@ -197,13 +197,12 @@ fn main() {
     } else {
         "default.lvl".to_string()
     };
-        path.insert(0usize, '\\');
+    path.insert(0usize, '\\');
     println!("path: {}", path);
 
     let sheet = if args.len() > 2usize {
         args[2].clone()
-    }
-    else {
+    } else {
         "/testwalls.png".to_string()
     };
     println!("sheet: {}", sheet);
