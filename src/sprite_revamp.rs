@@ -119,7 +119,7 @@ impl Sprite {
         self.paused = true;
     }
 
-    pub fn _hitbox(&self) -> Rect {
+    pub fn hitbox(&self) -> Rect {
         self.frames[self.current_frame].bounds
     }
 

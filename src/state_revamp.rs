@@ -306,11 +306,11 @@ impl CustomStateTrait for GamePlayState {
         // draw level
 
         // draw player
-        self.player.draw(ctx)?;
+        self.player.draw(ctx, true)?;
 
         // draw enemies
         for e in &self.enemies {
-            e.draw(ctx)?;
+            e.draw(ctx, true)?;
         }
 
         // draw items

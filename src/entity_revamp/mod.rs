@@ -3,7 +3,7 @@ use std::mem;
 use std::time::Duration;
 
 use ggez::{Context, GameResult, mint};
-use ggez::graphics::{Drawable, DrawParam, Image, Rect};
+use ggez::graphics::{Drawable, DrawMode, DrawParam, Image, Mesh, Rect, WHITE};
 use ggez::timer;
 
 use crate::sprite_revamp::{Sprite, SpriteBuilder};
@@ -39,7 +39,7 @@ impl Default for StatBlock {
 }
 
 // useful for collisions
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum EntityType {
     Player,
     Enemy,
@@ -119,8 +119,19 @@ impl Entity {
         self.sprite.update(delta);
     }
 
-    pub fn draw(&self, ctx: &mut Context) -> GameResult {
-        self.sprite.draw(ctx, self.param)
+    pub fn draw(&self, ctx: &mut Context, showhitbox: bool) -> GameResult {
+        self.sprite.draw(ctx, self.param)?;
+        if showhitbox {
+            let hb = self.sprite.hitbox();
+            let m = Mesh::new_rectangle(
+                ctx,
+                DrawMode::stroke(2f32),
+                Rect::new(0f32, 0f32, hb.w, hb.h),
+                WHITE
+            )?;
+            m.draw(ctx, self.param)?;
+        }
+        Ok(())
     }
 
     // translate
@@ -128,6 +139,21 @@ impl Entity {
     // take damage
 
     // collision detection
+    fn collision(&self, other: &Entity) -> Option<EntityType> {
+        let mut myhitbox = self.sprite.hitbox();
+        myhitbox.x = self.param.dest.x;
+        myhitbox.y = self.param.dest.y;
+        
+        let mut otherhitbox = other.sprite.hitbox();
+        otherhitbox.x = other.param.dest.x;
+        otherhitbox.y = other.param.dest.y;
+
+        if myhitbox.overlaps(&otherhitbox) {
+            Some(other.entitytype)
+        } else {
+            None
+        }
+    }
 
     // is alive
 }
@@ -164,6 +190,6 @@ impl EntityBuilder {
         let stats = StatBlock::default();
         let param = DrawParam::default().dest(location);
         let ai = AI::new(&vec![ai_revamp::chase_player]);
-        Ok(Entity::new(Player, stats, sprite, param, Down, ai, Idle))
+        Ok(Entity::new(Enemy, stats, sprite, param, Down, ai, Idle))
     }
 }
