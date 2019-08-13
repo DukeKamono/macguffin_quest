@@ -4,10 +4,12 @@ use crate::entities::enemies::enemies::Enemy;
 use crate::entities::enemies::ai::*;
 use ggez::nalgebra as na;
 use ggez::*;
+use ggez::graphics::{Image, Rect};
 use std::time::Duration;
-//use rand::prelude::*;
+use crate::sprites::*;
+use std::collections::HashMap;
 
-use super::super::{CollideEntity, DrawableEntity};
+use super::super::{CollideEntity, DrawableEntity, Direction, Animations};
 use crate::ui::FloatingText;
 use crate::entities::enemies::sight::*;
 
@@ -17,18 +19,56 @@ pub struct Blob {
     pub hp: f32,
     pub atk: f32,
     pub def: f32,
-    pub sprite: graphics::Image,
-    pub hitbox: graphics::Rect,
     floating_text: Vec<FloatingText>,
     pub invulnerable: Duration,
     pub line_of_sight: LineOfSight,
     pub ai_type: AITypes,
+	pub sprite: HashMap<(Animations, Direction), AnimatedSprite>,
+	pub animation: (Animations, Direction),
+	pub direction: Direction,
 }
 
 impl Blob {
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, ai_type: AITypes) -> Blob {
-        let img = graphics::Image::new(ctx, "/blob.png").unwrap();
-        let hb = img.dimensions();
+		let mut sprite = HashMap::new();
+        let sheet = Image::new(ctx, "/gel.png").unwrap();
+        let builder = AnimatedBuilder::new(&sheet);
+		
+		// standing
+        sprite.insert(
+            (Animations::Stand, Direction::Up),
+            builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 1usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Stand, Direction::Left),
+            builder.create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 1usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Stand, Direction::Down),
+            builder.create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Stand, Direction::Right),
+            builder.create_animated(Rect::new(0f32, 192f32, 64f32, 64f32), 1usize).unwrap()
+        );
+		// walking
+		sprite.insert(
+            (Animations::Walking, Direction::Up),
+            builder.create_animated(Rect::new(64f32, 0f32, 64f32, 64f32), 8usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Walking, Direction::Left),
+            builder.create_animated(Rect::new(64f32, 64f32, 64f32, 64f32), 8usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Walking, Direction::Down),
+            builder.create_animated(Rect::new(64f32, 128f32, 64f32, 64f32), 8usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Walking, Direction::Right),
+            builder.create_animated(Rect::new(64f32, 192f32, 64f32, 64f32), 8usize).unwrap()
+        );
+		
         let floating_text = Vec::new();
 
         Blob {
@@ -37,12 +77,13 @@ impl Blob {
             hp: 10.0,
             atk: 3.0,
             def: 1.0,
-            sprite: img,
-            hitbox: hb,
             floating_text,
             invulnerable: Duration::new(1u64, 0u32),
             line_of_sight: LineOfSight::new(xpos, ypos),
             ai_type,
+			sprite: sprite,
+			animation: (Animations::Walking, Direction::Down),
+			direction: Direction::Down,
         }
     }
 
@@ -74,7 +115,7 @@ impl Blob {
 impl DrawableEntity for Blob {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
-        graphics::draw(ctx, &self.sprite, dp)?;
+        graphics::draw(ctx, self.sprite.get(&self.animation).unwrap(), dp)?;
 
         self.floating_text.iter().for_each(|t| t.draw(ctx));
 
@@ -84,7 +125,7 @@ impl DrawableEntity for Blob {
 
 impl CollideEntity for Blob {
     fn get_hitbox(&self) -> graphics::Rect {
-        let mut r = self.hitbox;
+        let mut r = self.sprite.get(&self.animation).unwrap().dimensions().unwrap();
         r.x = self.x;
         r.y = self.y;
         r
@@ -117,8 +158,8 @@ impl Enemy for Blob {
         &self.ai_type
     }
     
-    fn chase_player(&mut self, ctx: &mut Context, _delta: Duration, player: &mut Player, level: &Level) {
-        // holding onto previous location
+    fn chase_player(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
+		// holding onto previous location
         let xpos = self.x;
         let ypos = self.y;
         
@@ -136,6 +177,26 @@ impl Enemy for Blob {
         if self.y <= player.y {
             self.y += 1.0;
         }
+		
+		// Which way am I facing?
+		if self.x > player.x && self.y > player.y {
+			self.animation = (Animations::Walking, Direction::Left);
+            self.direction = Direction::Left;
+		}
+		else if self.x < player.x && self.y < player.y {
+			self.animation = (Animations::Walking, Direction::Right);
+            self.direction = Direction::Right;
+		}
+		else if self.y > player.y && self.x < player.x {
+			self.animation = (Animations::Walking, Direction::Up);
+            self.direction = Direction::Up;
+		}
+		else {
+			self.animation = (Animations::Walking, Direction::Down);
+            self.direction = Direction::Down;
+		}
+		
+		self.sprite.get_mut(&self.animation).unwrap().animate(delta);
         
         // Check wall collision
         if self.collision(level) {
@@ -155,8 +216,11 @@ impl Enemy for Blob {
     fn chase_player_sight(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
         self.line_of_sight.update(self.x - 100.0, self.y - 100.0, 200.0, 200.0);
         
-        if self.line_of_sight.collision(player) {// && !self.line_of_sight.collision(level) {
+        if self.line_of_sight.collision(player) {
             self.chase_player(ctx, delta, player, level);
+        }
+		else {
+            self.animation.0 = Animations::Stand;
         }
     }
 	

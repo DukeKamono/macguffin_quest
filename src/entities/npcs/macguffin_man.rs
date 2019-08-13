@@ -29,7 +29,7 @@ impl MacguffinMan {
         let sheet = Image::new(ctx, "/macguffin-man.png").unwrap();
         let builder = AnimatedBuilder::new(&sheet);
 		
-		 sprite.insert(
+		sprite.insert(
             (Animations::Stand, Direction::Down),
             builder.create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize).unwrap()
         );
