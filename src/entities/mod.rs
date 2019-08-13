@@ -32,6 +32,15 @@ pub enum Direction {
     Right,
 }
 
+#[derive(PartialEq, Eq, Hash)]
+pub enum Animations {
+    Stand,
+    Walking,
+    Cast,
+    Slash,
+    Die,
+}
+
 // trait used to mark drawable entities
 // must implement ggez::graphics::Drawable (but not right now)
 pub trait DrawableEntity /*: Drawable */ {

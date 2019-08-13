@@ -6,7 +6,7 @@ use ggez::graphics::{Image, Rect};
 use std::collections::HashMap;
 use std::time::Duration;
 use super::stats::Stats;
-use super::super::{CollideEntity, DrawableEntity, Direction};
+use super::super::{CollideEntity, DrawableEntity, Direction, Animations};
 use super::atk_box::AtkBox;
 use crate::sprites::*;
 
@@ -17,15 +17,6 @@ const KEY_UP: KeyCode = KeyCode::W;
 const KEY_DOWN: KeyCode = KeyCode::S;
 const KEY_RIGHT: KeyCode = KeyCode::D;
 const KEY_LEFT: KeyCode = KeyCode::A;
-
-#[derive(PartialEq, Eq, Hash)]
-pub enum Animations {
-    Stand,
-    Walking,
-    Cast,
-    Slash,
-    Die,
-}
 
 pub struct Player {
     pub x: f32,

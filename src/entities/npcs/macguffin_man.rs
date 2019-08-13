@@ -1,8 +1,11 @@
 use ggez::nalgebra as na;
 use ggez::*;
+use ggez::graphics::{Image, Rect};
 use std::time::Duration;
+use crate::sprites::*;
+use std::collections::HashMap;
 
-use super::super::{CollideEntity, DrawableEntity};
+use super::super::{CollideEntity, DrawableEntity, Direction, Animations};
 use crate::ui::FloatingText;
 
 pub struct MacguffinMan {
@@ -11,17 +14,25 @@ pub struct MacguffinMan {
     pub hp: f32,
     pub atk: f32,
     pub def: f32,
-    pub sprite: graphics::Image,
-    pub hitbox: graphics::Rect,
     floating_text: Vec<FloatingText>,
     pub cooldown: Duration,
+	pub sprite: HashMap<(Animations, Direction), AnimatedSprite>,
+	pub animation: (Animations, Direction),
+	pub direction: Direction,
 }
 
 impl MacguffinMan {
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> MacguffinMan {
-        let img = graphics::Image::new(ctx, "/blob.png").unwrap();
-        let hb = img.dimensions();
         let floating_text = Vec::new();
+		
+		let mut sprite = HashMap::new();
+        let sheet = Image::new(ctx, "/macguffin-man.png").unwrap();
+        let builder = AnimatedBuilder::new(&sheet);
+		
+		 sprite.insert(
+            (Animations::Stand, Direction::Down),
+            builder.create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize).unwrap()
+        );
 
         MacguffinMan {
             x: xpos,
@@ -29,10 +40,11 @@ impl MacguffinMan {
             hp: 10.0,
             atk: 3.0,
             def: 1.0,
-            sprite: img,
-            hitbox: hb,
             floating_text,
 			cooldown: Duration::new(1u64, 0u32),
+			sprite: sprite,
+			animation: (Animations::Stand, Direction::Down),
+			direction: Direction::Down,
 		}
     }
 
@@ -61,7 +73,7 @@ impl MacguffinMan {
 impl DrawableEntity for MacguffinMan {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
-        graphics::draw(ctx, &self.sprite, dp)?;
+        graphics::draw(ctx, self.sprite.get(&self.animation).unwrap(), dp)?;
 
         self.floating_text.iter().for_each(|t| t.draw(ctx));
 
@@ -71,7 +83,7 @@ impl DrawableEntity for MacguffinMan {
 
 impl CollideEntity for MacguffinMan {
     fn get_hitbox(&self) -> graphics::Rect {
-        let mut r = self.hitbox;
+        let mut r = self.sprite.get(&self.animation).unwrap().dimensions().unwrap();
         r.x = self.x;
         r.y = self.y;
         r
