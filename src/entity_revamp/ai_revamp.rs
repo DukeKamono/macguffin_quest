@@ -1,8 +1,7 @@
 use std::collections::VecDeque;
 
 use ggez::{Context, GameResult};
-use ggez::event::{EventHandler, self};
-use ggez::input::keyboard::{KeyCode, KeyMods};
+use ggez::input::keyboard::{KeyCode, KeyMods, self};
 
 use crate::entity_revamp::Entity;
 
@@ -36,10 +35,29 @@ impl Default for AI {
 
 // note `entity` is current enemy and should not be present in the enemies VecDeque
 pub fn chase_player(ctx: &mut Context, entity: &mut Entity, player: &mut Entity, enemies: &mut VecDeque<Entity>) {
-    println!("Enemy should chase player...");
+    if entity.param.dest.x < player.param.dest.x {
+        entity.param.dest.x += 1f32
+    } else if entity.param.dest.x > player.param.dest.x {
+        entity.param.dest.x -= 1f32
+    }
+    
+    if entity.param.dest.y < player.param.dest.y {
+        entity.param.dest.y += 1f32
+    } else if entity.param.dest.y > player.param.dest.y {
+        entity.param.dest.y -= 1f32
+    }
 }
 
 // note `ignore` is probably a clone of the player or a dummy entity... so yeah.
 pub fn player_input(ctx: &mut Context, player: &mut Entity, _ignore: &mut Entity, enemies: &mut VecDeque<Entity>) {
-    println!("Input from player");
+    // only doing simple input from player
+    if keyboard::is_key_pressed(ctx, KeyCode::Right) {
+        player.param.dest.x += 4f32;
+    } else if keyboard::is_key_pressed(ctx, KeyCode::Left) {
+        player.param.dest.x -= 4f32;
+    } else if keyboard::is_key_pressed(ctx, KeyCode::Down) {
+        player.param.dest.y += 4f32;
+    } else if keyboard::is_key_pressed(ctx, KeyCode::Up) {
+        player.param.dest.y -= 4f32;
+    }
 }

@@ -276,7 +276,7 @@ impl GamePlayState {
         let text = Text::new((message, font, 24f32));
         let player = EntityBuilder::build_player(ctx)?;
         let mut enemies = VecDeque::new();
-        enemies.push_back(EntityBuilder::build_player(ctx)?);
+        enemies.push_back(EntityBuilder::build_enemy(ctx)?);
         Ok(Box::new(GamePlayState{
             text,
             player,
@@ -289,6 +289,12 @@ impl CustomStateTrait for GamePlayState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<Option<Box<CustomStateTrait>>> {
         let mut pclone = self.player.clone();
         self.player.update(ctx, &mut pclone, &mut self.enemies);
+
+        for _ in 0usize..self.enemies.len() {
+            let mut enemy = self.enemies.pop_front().unwrap();
+            enemy.update(ctx, &mut self.player, &mut self.enemies);
+            self.enemies.push_back(enemy);
+        }
 
         Ok(None)
     }
@@ -303,11 +309,15 @@ impl CustomStateTrait for GamePlayState {
         let dp = DrawParam::default().dest([400f32 - width, 300f32 - height]);
         graphics::draw_queued_text(ctx, dp, None, FilterMode::Linear)?;
         graphics::draw_queued_text(ctx, DrawParam::default(), None, FilterMode::Linear)?;
-
-        // draw entity test
         graphics::draw_queued_text(ctx, DrawParam::default(), None, FilterMode::Linear)?;
-        let dp = DrawParam::default().dest([0f32,0f32]);
+
+        // draw player
         self.player.draw(ctx)?;
+
+        // draw enemies
+        for e in &self.enemies {
+            e.draw(ctx)?;
+        }
 
         graphics::present(ctx)?;
         timer::yield_now();

@@ -3,7 +3,7 @@ use std::mem;
 use std::time::Duration;
 
 use ggez::{Context, GameResult};
-use ggez::graphics::{BlendMode, Drawable, DrawParam, Image, Rect};
+use ggez::graphics::{Drawable, DrawParam, Image, Rect};
 use ggez::timer;
 
 use crate::sprite_revamp::{Sprite, SpriteBuilder};
@@ -150,6 +150,18 @@ impl EntityBuilder {
         let stats = StatBlock::default();
         let param = DrawParam::default();
         let ai = AI::new(&vec![ai_revamp::player_input]);
+        Ok(Entity::new(Player, stats, sprite, param, Down, ai, Idle))
+    }
+
+    pub fn build_enemy(ctx: &mut Context) -> GameResult<Entity> {
+        let img = Image::new(ctx, "/dapper-skeleton-sheet.png")?;
+        let sprite = SpriteBuilder::new(&img)
+            .add_frame(Rect::new(128f32, 768f32, 64f32, 64f32), None, None, None)
+            .build_sprite()
+            ?;
+        let stats = StatBlock::default();
+        let param = DrawParam::default();
+        let ai = AI::new(&vec![ai_revamp::chase_player]);
         Ok(Entity::new(Player, stats, sprite, param, Down, ai, Idle))
     }
 }
