@@ -44,6 +44,15 @@ pub fn chase_player(ctx: &mut Context, entity: &mut Entity, player: &mut Entity,
         entity.param.dest.x -= 1f32
     }
 
+    // undo move if collision occurred
+    for e in iter::once(&mut player.clone()).chain(enemies.iter_mut()) {
+        if let Some(_) = entity.collision(e) {
+            entity.param.dest = p;
+        }
+    }
+
+    let p = entity.param.dest;
+
     if entity.param.dest.y < player.param.dest.y {
         entity.param.dest.y += 1f32
     } else if entity.param.dest.y > player.param.dest.y {
@@ -51,7 +60,7 @@ pub fn chase_player(ctx: &mut Context, entity: &mut Entity, player: &mut Entity,
     }
 
     // undo move if collision occurred
-    for e in iter::once(player).chain(enemies.iter_mut()) {
+    for e in iter::once(&mut player.clone()).chain(enemies.iter_mut()) {
         if let Some(_) = entity.collision(e) {
             entity.param.dest = p;
         }
