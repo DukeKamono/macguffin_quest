@@ -15,9 +15,6 @@ Upon hearing this proclamation many adventures set out in search of the MacGuffi
 MacGuffin Quest is an adventure game where you are tasked with finding the famed MacGuffin. To do this you will need to explore dangerous dungeons filled with monsters, traps, and puzzles. If you survive the MacGuffin may be yours for the taking.
 
 ## Operation
-The game is not near a completed state so all the controls/operations/features are not finished/listed.
-
-(ie this will be updated... eventually)
 
 ### Setup
 1. Install [Rust](https://www.rust-lang.org/)  
@@ -30,19 +27,29 @@ The game is not near a completed state so all the controls/operations/features a
 1. Be located in macguffin_quest folder.
 2. Run `cargo run --bin macguffin_quest`
 
+### Running Level Builder
+
+1. Be located in macguffin_quest folder.
+2. Run `cargo run --bin levelbuilder`
+
 ### Playing the Game
 Use WASD keys to move character sprite around the screen.
+Press space to do a slashing attack.
+Press Q to cast a spell.
+Hold Shift to run.
+Pressing P will pause the game.
 
-Collide with enemy sprite to cause it move to a new location.
+Hit the esc-key to quit.
 
-Hit the q-key to quit.
+Find the MacGuffin in the level and return it back to the MacGuffin Man to Win!
+Colliding with an enemy sprite will cause you damage and eventual death.
 
 ### Running examples
 Probably not of great interest due to fact that the examples are primarily demo programs to learn features of ggez.
 
 Run with command `cargo run --example [example_name]`
 
-See [example readme](https://github.com/DukeKamono/macguffin_quest/blob/master/examples/README.md) for more information.
+See [example readme] https://github.com/DukeKamono/macguffin_quest/blob/master/examples/README.md for more information.
 
 ## License 
 This program is licensed under the MIT License located in the [LICENSE](https://github.com/DukeKamono/macguffin_quest/blob/master/LICENSE) file.
@@ -62,5 +69,11 @@ Using version 0.5.0-rc.0
 Used to generate random numbers.  
 Using version 0.7
 
-* [ggez - goodies](https://github.com/ggez/ggez-goodies)  
-Debating using this for the state system.
+## Credit
+Credit to Outside Sources:
+
+dapper-skeleton, elf fighter, skeleton, macguffin-man created with http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/
+Ghost created by Luis Zuno (@ansimuz)
+Gel created by https://opengameart.org/content/adorable-blue-slimegelliving-water-droplet
+Grue created by https://opengameart.org/content/grue
+Items creaetd by Franco Giachetti http://ludicarts.com/contact/
