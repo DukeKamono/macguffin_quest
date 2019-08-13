@@ -2,14 +2,14 @@ use crate::entities::enemies::ai::*;
 use crate::entities::enemies::enemiesstruct::Enemy;
 use crate::entities::environment::level::Level;
 use crate::entities::player::playerstruct::Player;
+use crate::sprites::*;
+use ggez::graphics::{Image, Rect};
 use ggez::nalgebra as na;
 use ggez::*;
-use std::time::Duration;
-use ggez::graphics::{Image, Rect};
-use crate::sprites::*;
 use std::collections::HashMap;
+use std::time::Duration;
 
-use super::super::{CollideEntity, DrawableEntity, Direction, Animations};
+use super::super::{Animations, CollideEntity, Direction, DrawableEntity};
 use crate::entities::enemies::sight::*;
 use crate::ui::FloatingText;
 
@@ -23,9 +23,9 @@ pub struct Ghost {
     pub invulnerable: Duration,
     pub line_of_sight: LineOfSight,
     pub ai_type: AITypes,
-	pub sprite: HashMap<(Animations, Direction), AnimatedSprite>,
-	pub animation: (Animations, Direction),
-	pub direction: Direction,
+    pub sprite: HashMap<(Animations, Direction), AnimatedSprite>,
+    pub animation: (Animations, Direction),
+    pub direction: Direction,
 }
 
 impl Ghost {
@@ -33,25 +33,33 @@ impl Ghost {
         let mut sprite = HashMap::new();
         let sheet = Image::new(ctx, "/ghost.png").unwrap();
         let builder = AnimatedBuilder::new(&sheet);
-		
-		// walking
-		sprite.insert(
+
+        // walking
+        sprite.insert(
             (Animations::Walking, Direction::Up),
-            builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 8usize).unwrap()
+            builder
+                .create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 8usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Walking, Direction::Left),
-            builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 8usize).unwrap()
+            builder
+                .create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 8usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Walking, Direction::Down),
-            builder.create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 8usize).unwrap()
+            builder
+                .create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 8usize)
+                .unwrap(),
         );
         sprite.insert(
             (Animations::Walking, Direction::Right),
-            builder.create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 8usize).unwrap()
+            builder
+                .create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 8usize)
+                .unwrap(),
         );
-		
+
         let floating_text = Vec::new();
 
         Ghost {
@@ -64,9 +72,9 @@ impl Ghost {
             invulnerable: Duration::new(1u64, 0u32),
             line_of_sight: LineOfSight::new(xpos, ypos),
             ai_type,
-			sprite,
-			animation: (Animations::Walking, Direction::Down),
-			direction: Direction::Down,
+            sprite,
+            animation: (Animations::Walking, Direction::Down),
+            direction: Direction::Down,
         }
     }
 
@@ -119,7 +127,12 @@ impl DrawableEntity for Ghost {
 
 impl CollideEntity for Ghost {
     fn get_hitbox(&self) -> graphics::Rect {
-        let mut r = self.sprite.get(&self.animation).unwrap().dimensions().unwrap();
+        let mut r = self
+            .sprite
+            .get(&self.animation)
+            .unwrap()
+            .dimensions()
+            .unwrap();
         r.x = self.x;
         r.y = self.y;
         r
@@ -173,27 +186,24 @@ impl Enemy for Ghost {
         if self.y <= player.y {
             self.y += 1.0;
         }
-		
-		// Which way am I facing?
-		if self.x > player.x && self.y > player.y {
-			self.animation = (Animations::Walking, Direction::Left);
+
+        // Which way am I facing?
+        if self.x > player.x && self.y > player.y {
+            self.animation = (Animations::Walking, Direction::Left);
             self.direction = Direction::Left;
-		}
-		else if self.x < player.x && self.y < player.y {
-			self.animation = (Animations::Walking, Direction::Right);
+        } else if self.x < player.x && self.y < player.y {
+            self.animation = (Animations::Walking, Direction::Right);
             self.direction = Direction::Right;
-		}
-		else if self.y > player.y && self.x < player.x {
-			self.animation = (Animations::Walking, Direction::Up);
+        } else if self.y > player.y && self.x < player.x {
+            self.animation = (Animations::Walking, Direction::Up);
             self.direction = Direction::Up;
-		}
-		else {
-			self.animation = (Animations::Walking, Direction::Down);
+        } else {
+            self.animation = (Animations::Walking, Direction::Down);
             self.direction = Direction::Down;
-		}
-		
-		self.sprite.get_mut(&self.animation).unwrap().animate(delta);
-        
+        }
+
+        self.sprite.get_mut(&self.animation).unwrap().animate(delta);
+
         // I touched the player.
         if self.collision(player) {
             // need attack animation

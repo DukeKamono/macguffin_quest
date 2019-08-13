@@ -126,28 +126,28 @@ pub struct FloatingText {
     point: nalgebra::Point2<f32>,
     text: graphics::Text,
     duration: Duration,
-	color: graphics::Color,
+    color: graphics::Color,
 }
 
 impl FloatingText {
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, text: String, color: &str) -> FloatingText {
         let font = graphics::Font::new(ctx, "/square.ttf").unwrap();
         let t = graphics::Text::new((text, font, 22.0));
-		
-		let c = match color {
-			"White" => graphics::WHITE,
-			"Black" => graphics::BLACK,
-			"Red" => graphics::Color::from_rgb(255u8, 0u8, 0u8),
-			"Green" => graphics::Color::from_rgb(0u8, 128u8, 0u8),
-			"Blue" => graphics::Color::from_rgb(0u8, 0u8, 255u8),
-			_ => graphics::WHITE,
-		};
+
+        let c = match color {
+            "White" => graphics::WHITE,
+            "Black" => graphics::BLACK,
+            "Red" => graphics::Color::from_rgb(255u8, 0u8, 0u8),
+            "Green" => graphics::Color::from_rgb(0u8, 128u8, 0u8),
+            "Blue" => graphics::Color::from_rgb(0u8, 0u8, 255u8),
+            _ => graphics::WHITE,
+        };
 
         FloatingText {
             point: nalgebra::Point2::new(xpos + 5.0, ypos + 2.0), // The magic numbers help float over the object.
             text: t,
             duration: Duration::new(0, 0),
-			color: c,
+            color: c,
         }
     }
 

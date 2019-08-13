@@ -301,7 +301,7 @@ impl Player {
                     self.x,
                     self.y,
                     true_dmg.to_string(),
-					"Red",
+                    "Red",
                 ));
             // Check for death and maybe call a death function.
             } else {
@@ -310,7 +310,7 @@ impl Player {
                     self.x,
                     self.y,
                     "Blocked".to_string(),
-					"Blue",
+                    "Blue",
                 ));
             }
         }
