@@ -28,8 +28,8 @@ impl MacguffinMan {
         let mut sprite = HashMap::new();
         let sheet = Image::new(ctx, "/macguffin-man.png").unwrap();
         let builder = AnimatedBuilder::new(&sheet);
-
-        sprite.insert(
+		
+		sprite.insert(
             (Animations::Stand, Direction::Down),
             builder
                 .create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize)
@@ -64,7 +64,7 @@ impl MacguffinMan {
         if !self.talk_cooldown() {
             self.cooldown = Duration::new(0u64, 0u32);
             self.floating_text
-                .push(FloatingText::new(ctx, self.x, self.y, text));
+                .push(FloatingText::new(ctx, self.x, self.y, text, "White"));
         }
     }
 

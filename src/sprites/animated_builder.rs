@@ -16,7 +16,7 @@ impl AnimatedBuilder {
         let mut clips = Vec::new();
         let mut xpos = clip.x;
         let mut max_frames = max_frames;
-        while xpos + clip.w < f32::from(self.sheet.width()) && max_frames > 0usize {
+        while xpos + clip.w <= f32::from(self.sheet.width()) && max_frames > 0usize {
             clips.push(Rect::new(xpos, clip.y, clip.w, clip.h));
             xpos += clip.w;
             max_frames -= 1usize;

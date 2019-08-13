@@ -179,9 +179,9 @@ impl MainState {
         e.push(Box::new(Blob::new(ctx, 700.0, 250.0, AITypes::MeleeDirect)));
         e.push(Box::new(Blob::new(ctx, 700.0, 350.0, AITypes::MeleeDirect)));
         e.push(Box::new(Blob::new(ctx, 700.0, 150.0, AITypes::MeleeDirect)));
-        e.push(Box::new(Skeleton::new(ctx, 950.0, 350.0, AITypes::MeleeLineOfSight)));
+        e.push(Box::new(Skeleton::new(ctx, 950.0, 300.0, AITypes::MeleeLineOfSight)));
         e.push(Box::new(Skeleton::new(ctx, 950.0, -350.0, AITypes::MeleeLineOfSight)));
-        e.push(Box::new(Skeleton::new(ctx, 1300.0, -350.0, AITypes::MeleeLineOfSight)));
+        e.push(Box::new(Skeleton::new(ctx, 1200.0, -350.0, AITypes::MeleeLineOfSight)));
         e.push(Box::new(Ghost::new(ctx, 600.0, 550.0, AITypes::MeleeLineOfSight)));
         e.push(Box::new(Ghost::new(ctx, 1600.0, 150.0, AITypes::MeleeLineOfSight)));
         e.push(Box::new(Ghost::new(ctx, 1600.0, 350.0, AITypes::MeleeLineOfSight)));

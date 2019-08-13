@@ -6,8 +6,12 @@ use ggez::nalgebra as na;
 use ggez::*;
 use rand::prelude::*;
 use std::time::Duration;
+use rand::prelude::*;
+use ggez::graphics::{Image, Rect};
+use crate::sprites::*;
+use std::collections::HashMap;
 
-use super::super::{CollideEntity, DrawableEntity};
+use super::super::{CollideEntity, DrawableEntity, Direction, Animations};
 use crate::entities::enemies::sight::*;
 use crate::ui::FloatingText;
 
@@ -17,18 +21,39 @@ pub struct Boss {
     pub hp: f32,
     pub atk: f32,
     pub def: f32,
-    pub sprite: graphics::Image,
-    pub hitbox: graphics::Rect,
     floating_text: Vec<FloatingText>,
     pub invulnerable: Duration,
-    pub line_of_sight: LineOfSight,
-    pub ai_type: AITypes,
+	pub line_of_sight: LineOfSight,
+	pub ai_type: AITypes,
+	pub sprite: HashMap<(Animations, Direction), AnimatedSprite>,
+	pub animation: (Animations, Direction),
+	pub direction: Direction,
 }
 
 impl Boss {
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, ai_type: AITypes) -> Boss {
-        let img = graphics::Image::new(ctx, "/pong_spritesheet.png").unwrap();
-        let hb = img.dimensions();
+        let mut sprite = HashMap::new();
+        let sheet = Image::new(ctx, "/grue.png").unwrap();
+        let builder = AnimatedBuilder::new(&sheet);
+		
+		// walking
+		sprite.insert(
+            (Animations::Walking, Direction::Up),
+            builder.create_animated(Rect::new(0f32, 0f32, 64f32, 64f32), 1usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Walking, Direction::Left),
+            builder.create_animated(Rect::new(0f32, 64f32, 64f32, 64f32), 1usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Walking, Direction::Down),
+            builder.create_animated(Rect::new(0f32, 128f32, 64f32, 64f32), 1usize).unwrap()
+        );
+        sprite.insert(
+            (Animations::Walking, Direction::Right),
+            builder.create_animated(Rect::new(0f32, 192f32, 64f32, 64f32), 1usize).unwrap()
+        );
+		
         let floating_text = Vec::new();
 
         Boss {
@@ -37,12 +62,13 @@ impl Boss {
             hp: 100.0,
             atk: 5.0,
             def: 2.0,
-            sprite: img,
-            hitbox: hb,
             floating_text,
             invulnerable: Duration::new(1u64, 0u32),
-            line_of_sight: LineOfSight::new(xpos, ypos),
-            ai_type,
+			line_of_sight: LineOfSight::new(xpos, ypos),
+			ai_type,
+			sprite: sprite,
+			animation: (Animations::Walking, Direction::Down),
+			direction: Direction::Down,
         }
     }
 
@@ -57,6 +83,7 @@ impl Boss {
                     self.x,
                     self.y,
                     true_dmg.to_string(),
+                    "Red",
                 ));
             // Check for death and maybe call a death function.
             } else {
@@ -65,6 +92,7 @@ impl Boss {
                     self.x,
                     self.y,
                     "Blocked".to_string(),
+                    "Blue",
                 ));
             }
         }
@@ -83,7 +111,7 @@ impl Boss {
 impl DrawableEntity for Boss {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
-        graphics::draw(ctx, &self.sprite, dp)?;
+        graphics::draw(ctx, self.sprite.get(&self.animation).unwrap(), dp)?;
 
         self.floating_text.iter().for_each(|t| t.draw(ctx));
 
@@ -93,7 +121,7 @@ impl DrawableEntity for Boss {
 
 impl CollideEntity for Boss {
     fn get_hitbox(&self) -> graphics::Rect {
-        let mut r = self.hitbox;
+        let mut r = self.sprite.get(&self.animation).unwrap().dimensions().unwrap();
         r.x = self.x;
         r.y = self.y;
         r
@@ -121,6 +149,19 @@ impl Enemy for Boss {
     fn islive(&self) -> bool {
         self.hp > 0.0
     }
+	
+	fn get_aitype(&mut self) -> &AITypes {
+		&self.ai_type
+	}
+	
+	fn chase_player(&mut self, ctx: &mut Context, _delta: Duration, player: &mut Player, _level: &Level) {
+		// Charge towards player.
+		if self.x >= player.x {
+			self.x -= 1.0;
+		}
+		if self.x <= player.x {
+			self.x += 1.0;
+		}
 
     fn get_aitype(&mut self) -> &AITypes {
         &self.ai_type
@@ -129,7 +170,7 @@ impl Enemy for Boss {
     fn chase_player(
         &mut self,
         ctx: &mut Context,
-        _delta: Duration,
+        delta: Duration,
         player: &mut Player,
         _level: &Level,
     ) {
@@ -148,6 +189,26 @@ impl Enemy for Boss {
             self.y += 1.0;
         }
 
+		// Which way am I facing?
+		if self.x > player.x && self.y > player.y {
+			self.animation = (Animations::Walking, Direction::Left);
+            self.direction = Direction::Left;
+		}
+		else if self.x < player.x && self.y < player.y {
+			self.animation = (Animations::Walking, Direction::Right);
+            self.direction = Direction::Right;
+		}
+		else if self.y > player.y && self.x < player.x {
+			self.animation = (Animations::Walking, Direction::Up);
+            self.direction = Direction::Up;
+		}
+		else {
+			self.animation = (Animations::Walking, Direction::Down);
+            self.direction = Direction::Down;
+		}
+		
+		self.sprite.get_mut(&self.animation).unwrap().animate(delta);
+		
         // I touched the player.
         if self.collision(player) {
             // need attack animation

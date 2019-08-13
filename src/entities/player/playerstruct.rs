@@ -152,7 +152,7 @@ impl Player {
         Player {
             x: 10.0,
             y: 10.0,
-            stats: Stats::new(1, 0, 30.0, 150, 3.0, 0.5, 1.0),
+            stats: Stats::new(1, 0, 50.0, 150, 3.0, 0.5, 1.0),
             sprite,
             animation: (Animations::Walking, Direction::Right),
             atk_box: None,
@@ -202,7 +202,7 @@ impl Player {
                 self.x,
                 self.y,
                 64.0,
-                80.0,
+                100.0,
                 &self.direction,
                 40.0,
             ));
@@ -217,7 +217,7 @@ impl Player {
                 self.x,
                 self.y,
                 32.0,
-                64.0,
+                80.0,
                 &self.direction,
                 40.0,
             ));
@@ -274,7 +274,7 @@ impl Player {
         if !self.pick_up_cooldown() {
             self.cooldown = Duration::new(0u64, 0u32);
             self.floating_text
-                .push(FloatingText::new(ctx, self.x, self.y, text));
+                .push(FloatingText::new(ctx, self.x, self.y, text, "Green"));
         }
     }
 
@@ -301,6 +301,7 @@ impl Player {
                     self.x,
                     self.y,
                     true_dmg.to_string(),
+					"Red",
                 ));
             // Check for death and maybe call a death function.
             } else {
@@ -309,6 +310,7 @@ impl Player {
                     self.x,
                     self.y,
                     "Blocked".to_string(),
+					"Blue",
                 ));
             }
         }
