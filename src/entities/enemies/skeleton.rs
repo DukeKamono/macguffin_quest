@@ -81,7 +81,7 @@ impl Skeleton {
             invulnerable: Duration::new(1u64, 0u32),
             line_of_sight: LineOfSight::new(xpos, ypos),
             ai_type,
-			sprite: sprite,
+			sprite,
 			animation: (Animations::Walking, Direction::Down),
 			direction: Direction::Down,
         }

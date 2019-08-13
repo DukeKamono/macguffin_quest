@@ -33,7 +33,7 @@ impl Macguffin {
         Macguffin {
             x: xpos,
             y: ypos,
-			sprite: sprite,
+			sprite,
 			animation: (Animations::Stand, Direction::Down),
 			direction: Direction::Down,
 		}

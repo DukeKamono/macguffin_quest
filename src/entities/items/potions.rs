@@ -30,7 +30,7 @@ impl Potions {
             x: xpos,
             y: ypos,
 			used: false,
-			sprite: sprite,
+			sprite,
 			animation: (Animations::Stand, Direction::Down),
 			direction: Direction::Down,
 		}
