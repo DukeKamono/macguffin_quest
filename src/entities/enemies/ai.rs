@@ -4,12 +4,11 @@ use crate::entities::player::playerstruct::Player;
 use ggez::*;
 use std::time::Duration;
 
+/// AI struct. As we work on more with this there will be more to it.
 #[derive(Default)]
-pub struct AI {
-    //ai_type: AITypes,
-}
+pub struct AI {}
 
-// These could be better named too.
+/// A rough setup of differnt Types of AI the enemies can have.
 pub enum AITypes {
     // Move directly to the player and don't stop
     MeleeDirect,
@@ -19,21 +18,21 @@ pub enum AITypes {
     RangeDirect,
     // When you see the player then go towards and fire at them.
     RangeLineOfSight,
-    // Boss?
+    // Boss
     Boss,
     // an error occurred and needs reported.
     Error,
 }
 
+/// Impliments the functions for the AI struct.
 impl AI {
+	/// Creates a new AI struct and returns it.
     pub fn new() -> AI {
-        AI {
-			//ai_type: ai_type,
-		}
+        AI {}
     }
 
-    // Tried to pass in Enemy and do the movement and attack checks here, but now it will call different variations
-    // that each enemy can do differntly. Like a skeleton chase_player can be differnt then a blob chase_player.
+    /// This function takes pretty much everything in the level and depending on the
+	/// AI Type set for the enemy points to what it is supposed to do.
     pub fn update(
         &mut self,
         ctx: &mut Context,

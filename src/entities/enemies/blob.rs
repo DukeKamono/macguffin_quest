@@ -13,6 +13,7 @@ use super::super::{Animations, CollideEntity, Direction, DrawableEntity};
 use crate::entities::enemies::sight::*;
 use crate::ui::FloatingText;
 
+/// Everything associated with the blob enemy
 pub struct Blob {
     pub x: f32,
     pub y: f32,
@@ -28,7 +29,9 @@ pub struct Blob {
     pub direction: Direction,
 }
 
+/// The functions used by the blob struct
 impl Blob {
+	/// Sets up a new Blob struct and returns it.
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32, ai_type: AITypes) -> Blob {
         let mut sprite = HashMap::new();
         let sheet = Image::new(ctx, "/gel.png").unwrap();
@@ -103,6 +106,9 @@ impl Blob {
         }
     }
 
+	/// Whenever an enemy needs to take damage, we check to see if it is invulnerable
+	/// or not, then checks to see if the defence is high enough to reduce hp or not.
+	/// If the enemy has 0 or less hp give the player experience.
     pub fn take_dmg(&mut self, ctx: &mut Context, player: &mut Player) {
         let true_dmg = player.stats.atk - self.def;
         if !self.invulnerable() {
@@ -116,7 +122,6 @@ impl Blob {
                     true_dmg.to_string(),
                     "Red",
                 ));
-            // Check for death and maybe call a death function.
             } else {
                 self.floating_text.push(FloatingText::new(
                     ctx,
@@ -133,12 +138,13 @@ impl Blob {
         }
     }
 
-    // returns if blob should be able to take damage (time is 1/4 sec)
+    /// Returns if the enemy should be able to take damage (time is 1/4 sec)
     fn invulnerable(&self) -> bool {
         self.invulnerable < Duration::from_millis(250u64)
     }
 }
 
+/// Attempts to draw the enemy
 impl DrawableEntity for Blob {
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
@@ -150,6 +156,7 @@ impl DrawableEntity for Blob {
     }
 }
 
+/// Determines where the bounds of the enemy is for collision
 impl CollideEntity for Blob {
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self
@@ -164,7 +171,9 @@ impl CollideEntity for Blob {
     }
 }
 
+/// Functions associated with the Enemy trait implemented for the Blob struct
 impl Enemy for Blob {
+	/// Every update check for floating text, if we can be hit again, and if I have touched the player's attack box.
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, _level: &Level) {
         self.floating_text.retain(|t| t.live());
         self.floating_text.iter_mut().for_each(|t| t.update(delta));
@@ -182,14 +191,17 @@ impl Enemy for Blob {
         }
     }
 
+	/// Checks to see if the enemy is still alive or not.
     fn islive(&self) -> bool {
         self.hp > 0.0
     }
 
+	/// Returns what type of AI the enemy is set at.
     fn get_aitype(&mut self) -> &AITypes {
         &self.ai_type
     }
 
+	/// Describes how this enemy will chase the player.
     fn chase_player(
         &mut self,
         ctx: &mut Context,
@@ -248,6 +260,7 @@ impl Enemy for Blob {
         }
     }
 
+	/// If the player comes within sight of the enemy then chase the player.
     fn chase_player_sight(
         &mut self,
         ctx: &mut Context,
@@ -266,6 +279,7 @@ impl Enemy for Blob {
         }
     }
 
+	/// Determines with this enemy spawns enemies.
     fn spawn(&self) -> bool {
         false
     }
