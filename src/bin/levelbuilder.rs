@@ -12,6 +12,7 @@ use macguffin_quest::entities::environment::level_builder::LevelBuilder;
 use macguffin_quest::entities::DrawableEntity;
 use macguffin_quest::sprites::Sprite;
 
+/// State used by LevelBuilder
 struct State {
     screen: Rect, // used to move image around screen
 
@@ -29,6 +30,10 @@ struct State {
 }
 
 impl State {
+    /// load a level from file into LevelBuilder
+    /// needs a context and path to level to load
+    /// Note: that it makes use of ggez filesystem so path needs to exits in game's stored data (In windows this is AppData/author_name/levelbuilder/config).
+    /// Note: if no file was found returns a level builder.
     fn readfile(ctx: &mut Context, path: &str) -> HashMap<(i64, i64), usize> {
         let mut retvalue = HashMap::new();
 
@@ -53,6 +58,9 @@ impl State {
         retvalue
     }
 
+    /// load a level from file into LevelBuilder
+    /// needs a context
+    /// Note: that it makes use of ggez filesystem so it save to game's stored data (In windows this is AppData/author_name/levelbuilder/config).
     fn writefile(&self, ctx: &mut Context) {
         // creates a file in
         // C:\Users\username\AppData\Roaming\James M. & William O\levelbuilder\config
@@ -69,6 +77,8 @@ impl State {
         }
     }
 
+    /// Turns state data into a Level
+    /// needs a LevelBuilder and all the tiles to turn into a Level
     fn buildlevel(builder: &mut LevelBuilder, map_tiles: &HashMap<(i64, i64), usize>) -> Level {
         builder.generate_level(
             map_tiles
@@ -78,6 +88,8 @@ impl State {
         )
     }
 
+    /// Creates a new LevelBuilder state
+    /// needs a context, image to use as sprite sheet, and a path to file to load
     fn new(ctx: &mut Context, sheet: &Image, path: &str) -> State {
         // what is the drawable region of the screen
         let (width, height) = graphics::drawable_size(ctx);
@@ -113,12 +125,16 @@ impl State {
     }
 }
 
+/// Implements EventHandler for State (ie state used by LevelBuilder)
+/// https://docs.rs/ggez/0.5.1/ggez/event/trait.EventHandler.html
 impl EventHandler for State {
+    /// Track moving mouse
     fn mouse_motion_event(&mut self, _ctx: &mut Context, x: f32, y: f32, _dx: f32, _dy: f32) {
         self.mouse_position.x = f32::floor((x + self.screen.x) / 64f32) * 64f32;
         self.mouse_position.y = f32::floor((y + self.screen.y) / 64f32) * 64f32;
     }
 
+    /// Detect scroll wheel and change tile to add to level
     fn mouse_wheel_event(&mut self, _ctx: &mut Context, _x: f32, y: f32) {
         //println!("mouse wheel x{} y{}", x, y);
         if y > 0f32 && self.tile_value < self.vector_types.len() - 1usize {
@@ -129,12 +145,14 @@ impl EventHandler for State {
         //println!("{}", self.tile_value);
     }
 
+    /// Detect 'O' being pressed and saving level
     fn key_up_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods) {
         if keycode == KeyCode::O {
             self.writefile(ctx);
         }
     }
 
+    /// Updates State (ie the level being edited)
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         // move screen
         if keyboard::is_key_pressed(ctx, KeyCode::D) {
@@ -187,6 +205,7 @@ impl EventHandler for State {
     }
 }
 
+/// Builds LevelBuilder and gets it going
 fn main() {
     // get arguments
     let args: Vec<String> = std::env::args().collect();
