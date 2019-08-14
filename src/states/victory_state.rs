@@ -4,6 +4,8 @@ pub struct VictoryState {
     text: graphics::Text,
 }
 
+/// Implement CustomEventHandler from macguffin_quest::states::CustomEventHandler.
+/// Allows the state machine to pass on information.
 impl CustomEventHandler for VictoryState {
     /// Updates VictoryState.
     /// Does not really do anything... Real magic happens in key_down_event.
