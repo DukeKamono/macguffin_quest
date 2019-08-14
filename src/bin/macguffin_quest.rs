@@ -1,5 +1,7 @@
 use macguffin_quest::states::*;
 
+/// Entry point for MacGuffin Quest game
+/// creates game windows and starts the game
 fn main() {
     // create a context to access hardware (also creates event loop)
     let (ref mut ctx, ref mut event_loop) =
