@@ -1,3 +1,4 @@
+/// Struct for the stats
 pub struct Stats {
     pub lv: u32,
     pub exp: u32,
@@ -10,7 +11,9 @@ pub struct Stats {
     pub spd: f32,
 }
 
+/// Functions for the Stats struct
 impl Stats {
+    /// Returns a new Stats Struct
     pub fn new(lv: u32, exp: u32, hp: f32, mp: u32, atk: f32, def: f32, spd: f32) -> Stats {
         Stats {
             lv,
@@ -25,6 +28,7 @@ impl Stats {
         }
     }
 
+    /// Adds exp to the stats and check for a level up
     pub fn check_for_level_up(&mut self, exp: u32) {
         self.exp += exp;
         if self.exp >= 10 {
@@ -34,8 +38,7 @@ impl Stats {
         }
     }
 
-    // This is just a straight forward level_up, but
-    // there are so many things we can do here :)
+    /// This is just a straight forward level_up system added stats for each level.
     pub fn level_up(&mut self) {
         match self.lv {
             2 => {

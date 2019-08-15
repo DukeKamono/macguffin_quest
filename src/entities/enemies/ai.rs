@@ -26,13 +26,13 @@ pub enum AITypes {
 
 /// Impliments the functions for the AI struct.
 impl AI {
-	/// Creates a new AI struct and returns it.
+    /// Creates a new AI struct and returns it.
     pub fn new() -> AI {
         AI {}
     }
 
     /// This function takes pretty much everything in the level and depending on the
-	/// AI Type set for the enemy points to what it is supposed to do.
+    /// AI Type set for the enemy points to what it is supposed to do.
     pub fn update(
         &mut self,
         ctx: &mut Context,

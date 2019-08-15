@@ -6,6 +6,7 @@ use std::collections::HashMap;
 
 use super::super::{Animations, CollideEntity, Direction, DrawableEntity};
 
+/// The Potions struct
 pub struct Potions {
     pub x: f32,
     pub y: f32,
@@ -15,7 +16,9 @@ pub struct Potions {
     pub direction: Direction,
 }
 
+/// Functions for the Potions struct
 impl Potions {
+    /// News up a Potion
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> Potions {
         let mut sprite = HashMap::new();
         let sheet = Image::new(ctx, "/items.png").unwrap();
@@ -39,7 +42,9 @@ impl Potions {
     }
 }
 
+/// The draw trait for the Potions
 impl DrawableEntity for Potions {
+    /// Draws the Potion
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, self.sprite.get(&self.animation).unwrap(), dp)?;
@@ -48,7 +53,9 @@ impl DrawableEntity for Potions {
     }
 }
 
+/// Collide trait for the Potions
 impl CollideEntity for Potions {
+    /// Finds where the hitbox is for the Potion
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self
             .sprite

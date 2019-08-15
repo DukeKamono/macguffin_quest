@@ -8,6 +8,7 @@ use std::time::Duration;
 use super::super::{Animations, CollideEntity, Direction, DrawableEntity};
 use crate::ui::FloatingText;
 
+/// The MacguffinMan struct
 pub struct MacguffinMan {
     pub x: f32,
     pub y: f32,
@@ -21,7 +22,9 @@ pub struct MacguffinMan {
     pub direction: Direction,
 }
 
+/// Functions for the MacguffinMan
 impl MacguffinMan {
+    /// News up a MacguffinMan
     pub fn new(ctx: &mut Context, xpos: f32, ypos: f32) -> MacguffinMan {
         let floating_text = Vec::new();
 
@@ -50,6 +53,7 @@ impl MacguffinMan {
         }
     }
 
+    /// Keeps current floating text and resets the cooldown if needed for the text.
     pub fn update(&mut self, delta: Duration) {
         self.floating_text.retain(|t| t.live());
         self.floating_text.iter_mut().for_each(|t| t.update(delta));
@@ -60,6 +64,7 @@ impl MacguffinMan {
         }
     }
 
+    /// Shows the floating text if the cooldown is done.
     pub fn talk(&mut self, ctx: &mut Context, text: String) {
         if !self.talk_cooldown() {
             self.cooldown = Duration::new(0u64, 0u32);
@@ -68,12 +73,15 @@ impl MacguffinMan {
         }
     }
 
+    /// Check to see if the cooldown if less than 1000 milliseconds
     fn talk_cooldown(&self) -> bool {
         self.cooldown < Duration::from_millis(1000u64)
     }
 }
 
+/// The draw trait for the MacguffinMan
 impl DrawableEntity for MacguffinMan {
+    /// Draws the MacguffinMan and the floating text
     fn draw(&self, ctx: &mut Context) -> GameResult {
         let dp = graphics::DrawParam::default().dest(na::Point2::new(self.x, self.y));
         graphics::draw(ctx, self.sprite.get(&self.animation).unwrap(), dp)?;
@@ -84,7 +92,9 @@ impl DrawableEntity for MacguffinMan {
     }
 }
 
+/// Colldie trait for the MacguffinMan
 impl CollideEntity for MacguffinMan {
+    /// Find the hitbox for the MacguffinMan to check for collision.
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self
             .sprite
