@@ -7,6 +7,7 @@ use ggez::*;
 use rand::prelude::*;
 use std::time::Duration;
 
+/// Setting up the DrawableEntity triat for the Enemy struct
 pub trait Enemy: DrawableEntity {
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level);
     fn islive(&self) -> bool;
@@ -28,25 +29,31 @@ pub trait Enemy: DrawableEntity {
     fn spawn(&self) -> bool;
 }
 
+/// The enemies struct contains a Vec of Boxed Enemy.
+/// This will be the group of enemies in each level.
 #[derive(Default)]
 pub struct Enemies {
     enemies: Vec<Box<dyn Enemy>>,
 }
 
+/// The functions for the Enemies struct
 impl Enemies {
+    /// News up a new enemies struct
     pub fn new() -> Enemies {
         Enemies {
             enemies: Vec::new(),
         }
     }
 
-    // Add enemies.
+    /// Add a new enemy onto the enemies stack.
     pub fn push(&mut self, enemy: Box<dyn Enemy>) {
         self.enemies.push(enemy)
     }
 }
 
+/// Trait to call the draw function for each enemy in the enemies struct
 impl DrawableEntity for Enemies {
+    /// Draws the enemies
     fn draw(&self, ctx: &mut Context) -> GameResult {
         for me in &self.enemies {
             me.draw(ctx)?;
@@ -55,7 +62,9 @@ impl DrawableEntity for Enemies {
     }
 }
 
+/// Functions for the enemies struct from the Enemy trait
 impl Enemy for Enemies {
+    /// Removes "dead" enemies, updates all enemies and their ai, and checks to see if the ghost need to be spawned.
     fn update(&mut self, ctx: &mut Context, delta: Duration, player: &mut Player, level: &Level) {
         let mut spawning = false;
 
@@ -89,16 +98,17 @@ impl Enemy for Enemies {
         }
     }
 
-    // returns true if there are enemies
+    /// Returns true if there are enemies
     fn islive(&self) -> bool {
         !self.enemies.is_empty()
     }
 
-    // IDK what to do with these empty functions, which makes me second think this structure.
+    /// Returns the aitype for the enemy
     fn get_aitype(&mut self) -> &AITypes {
         &AITypes::MeleeDirect
     }
 
+    /// Does nothing right now
     fn chase_player(
         &mut self,
         _ctx: &mut Context,
@@ -108,6 +118,7 @@ impl Enemy for Enemies {
     ) {
     }
 
+    /// Does nothing right now
     fn chase_player_sight(
         &mut self,
         _ctx: &mut Context,
@@ -117,6 +128,7 @@ impl Enemy for Enemies {
     ) {
     }
 
+    /// Returns true
     fn spawn(&self) -> bool {
         true
     }

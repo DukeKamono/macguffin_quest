@@ -12,12 +12,13 @@ use std::time::Duration;
 
 use crate::ui::FloatingText;
 
-// constant values for keys used to determine movement
+/// Constant values for keys used to determine movement
 const KEY_UP: KeyCode = KeyCode::W;
 const KEY_DOWN: KeyCode = KeyCode::S;
 const KEY_RIGHT: KeyCode = KeyCode::D;
 const KEY_LEFT: KeyCode = KeyCode::A;
 
+/// The player struct
 pub struct Player {
     pub x: f32,
     pub y: f32,
@@ -34,7 +35,9 @@ pub struct Player {
     floating_text: Vec<FloatingText>,
 }
 
+/// Functions for the Player
 impl Player {
+    /// News up a new player struct.
     pub fn new(ctx: &mut Context, chosen_player: String) -> Player {
         let mut sprite = HashMap::new();
         let sheet = Image::new(ctx, chosen_player).unwrap();
@@ -166,7 +169,8 @@ impl Player {
         }
     }
 
-    // Increase or decrease `position_x` by 2.5, or by 5.0 if Shift is held.
+    /// Increase or decrease `position_x` by 2.5, or by 5.0 if Shift is held.
+    /// Checks for floating text, and animation and attacking.
     pub fn update(&mut self, ctx: &mut Context, delta: Duration) {
         // private function to return correct speed
         fn move_increment(ctx: &mut Context) -> f32 {
@@ -258,18 +262,17 @@ impl Player {
         }
     }
 
-    // returns if player should be able to take damage
-    // player is invulnerable for 1/4
+    /// Returns if player should be able to take damage
     fn invulnerable(&self) -> bool {
         self.invulnerable < Duration::from_millis(250u64)
     }
 
-    // This is still in the works
+    /// This is still in the works
     fn atk_cooldown(&self) -> bool {
         self.atk_cooldown > Duration::from_millis(350u64)
     }
 
-    // player pick_up item text. should be combined with other text stuff...
+    /// Player pick_up item text.
     pub fn pick_up(&mut self, ctx: &mut Context, text: String) {
         if !self.pick_up_cooldown() {
             self.cooldown = Duration::new(0u64, 0u32);
@@ -278,15 +281,18 @@ impl Player {
         }
     }
 
+    /// Checks if the pickup text cooldown is over
     fn pick_up_cooldown(&self) -> bool {
         self.cooldown < Duration::from_millis(250u64)
     }
 
+    /// Moves the player to a new location.
     pub fn move_location(&mut self, xinc: f32, yinc: f32) {
         self.x = xinc;
         self.y = yinc;
     }
 
+    /// When the player takes damage, check how much they can and if they can.
     pub fn take_dmg(&mut self, ctx: &mut Context, dmg_to_take: f32) {
         let true_dmg = dmg_to_take - self.stats.def;
         if !self.invulnerable() {
@@ -303,7 +309,6 @@ impl Player {
                     true_dmg.to_string(),
                     "Red",
                 ));
-            // Check for death and maybe call a death function.
             } else {
                 self.floating_text.push(FloatingText::new(
                     ctx,
@@ -316,7 +321,7 @@ impl Player {
         }
     }
 
-    // With multiple weapons, we should make a new struct for each type and attach them to the player.
+    /// Calls the atk_box struct draw function
     pub fn draw_weapon(&self, ctx: &mut Context) {
         if let Some(atk) = &self.atk_box {
             atk.draw(ctx).expect("Failed to draw attack.");
@@ -324,7 +329,9 @@ impl Player {
     }
 }
 
+/// Draw trait for the Player
 impl DrawableEntity for Player {
+    /// Draws the weapon, the player, and the floating text.
     fn draw(&self, ctx: &mut Context) -> GameResult {
         self.draw_weapon(ctx);
         let dp = graphics::DrawParam::default()
@@ -338,7 +345,9 @@ impl DrawableEntity for Player {
     }
 }
 
+/// Collide trait for the Player
 impl CollideEntity for Player {
+    /// Get the hitbox for the Player
     fn get_hitbox(&self) -> graphics::Rect {
         let mut r = self
             .sprite

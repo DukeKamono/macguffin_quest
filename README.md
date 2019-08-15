@@ -25,7 +25,9 @@ MacGuffin Quest is an adventure game where you are tasked with finding the famed
 ### Running Game
 
 1. Be located in macguffin_quest folder.
-2. Run `cargo run --bin macguffin_quest`
+2. Run `cargo run --release --bin macguffin_quest`
+
+We recommend running in release mode because debug ggez is slow drawing so man sprites.
 
 ### Playing the Game
 Find the MacGuffin in the level and return it back to the MacGuffin Man to Win!
@@ -37,6 +39,13 @@ Press `Q` to cast a spell.
 Hold `Shift` to run.  
 Pressing `P` will pause the game.  
 Hit `Esc` to quit.  
+
+### Testing the Game
+The primary method of testing was general QA of playing the game.
+There are limited tests, but the ggez Context is causing issues.
+
+For the current tests provided we recommend running single thread.
+`cargo test -- --test-threads=1`
 
 ### Running Level Builder
 

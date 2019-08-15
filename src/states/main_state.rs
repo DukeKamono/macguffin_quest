@@ -1,34 +1,15 @@
-// contains all the information on entities
-//mod entities;
-// get collison trait from entities
-use super::entities::{CollideEntity, DrawableEntity};
-// get player struct to use
-use super::entities::player::playerstruct::Player;
-// get enemies to use
-use super::entities::enemies::blob::Blob;
-use super::entities::enemies::skeleton::Skeleton;
-use super::entities::enemies::ghost::Ghost;
-use super::entities::enemies::boss::Boss;
-use super::entities::enemies::enemiesstruct::*;
-// get wall struct to use
-use super::entities::environment::{level::Level, level_builder::LevelBuilder};
-// get macguffin struct to use
-use super::entities::items::macguffin::Macguffin;
-// get potion struct to use
-use super::entities::items::potions::Potions;
-// get potion struct to use
-use super::entities::npcs::macguffin_man::MacguffinMan;
+use super::entities;
+use entities::{CollideEntity, DrawableEntity};
+use entities::player::playerstruct::Player;
+use entities::enemies::{ai::AITypes,blob::Blob, skeleton::Skeleton, ghost::Ghost, boss::Boss, enemiesstruct::*};
+use entities::environment::{level::Level, level_builder::LevelBuilder};
+use entities::items::{macguffin::Macguffin, potions::Potions};
+use entities::npcs::macguffin_man::MacguffinMan;
 
-//mod ui;
 use super::ui::UI;
 
-//mod sprites;
-//use sprites::sprite::Sprite;
-//use sprites::animated_sprite::*;
-//use super::sprites::*;
-
-use crate::entities::enemies::ai::AITypes;
-
+/// Game state for game (where actual gameplay happens!).
+/// Can transition to the pause menu.
 pub struct MainState {
     ui: UI,
     player: Player,
@@ -40,7 +21,11 @@ pub struct MainState {
 	macguffin_man: MacguffinMan
 }
 
+/// Implement CustomEventHandler from macguffin_quest::states::CustomEventHandler.
+/// Allows the state machine to pass on information.
 impl CustomEventHandler for MainState {
+    /// Updates MainState...
+    /// Which updates everything relevant to the game (like player, enemies, level, etc)
     fn update(&mut self, ctx: &mut Context) -> HandlerMessage {
         let delta = timer::delta(ctx);
 
@@ -114,6 +99,8 @@ impl CustomEventHandler for MainState {
         }
     }
 
+    /// Draws MainState...
+    /// Which draws everything relevant to the game (like player, enemies, level, etc)
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
         
@@ -152,6 +139,8 @@ impl CustomEventHandler for MainState {
         Ok(())
     }
 
+    /// Processes a key down event.
+    /// This is where transitioning to pause state occurs.
     fn key_down_event(&mut self, ctx: &mut Context, key: KeyCode, _mods: KeyMods, _repeat: bool) -> HandlerMessage {
         match key {
             KeyCode::P => {
@@ -164,6 +153,7 @@ impl CustomEventHandler for MainState {
 }
 
 impl MainState {
+    /// Creates a new MainState with player value
     pub fn new(ctx: &mut Context, chosen_player: String) -> MainState {
          // create player
         let mut player = Player::new(ctx, chosen_player);
@@ -212,6 +202,8 @@ impl MainState {
         }
     }
 
+    /// Useful helper function for centering the screen on a given point.
+    /// How the camera follows the player
     fn set_screen_coordinates(ctx: &mut Context, x: f32, y: f32) -> GameResult {
         let swh = graphics::drawable_size(ctx);
         let screen_shift = graphics::Rect::new(
@@ -222,3 +214,5 @@ impl MainState {
         graphics::set_screen_coordinates(ctx, screen_shift)
     }
 }
+
+// No good unit tests... very little (ie none) of this is non-trivial
